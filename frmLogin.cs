@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using MilkTeaPOS.Models;
 
@@ -98,8 +99,45 @@ namespace MilkTeaPOS
                         return;
                     }
 
-                    // Validate password (TODO: Use password hashing in production)
-                    if (user.Password != password)
+                    // Validate password with BCrypt
+                    bool passwordValid = false;
+                    
+                    // Check if password_hash exists and is a BCrypt hash
+                    if (!string.IsNullOrEmpty(user.PasswordHash) && 
+                        (user.PasswordHash.StartsWith("$2a$") || user.PasswordHash.StartsWith("$2b$")))
+                    {
+                        // BCrypt hash detected - use it
+                        try
+                        {
+                            passwordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+                        }
+                        catch (Exception ex)
+                        {
+                            passwordValid = false;
+                        }
+                    }
+                    // Fallback to plain text password (old data)
+                    else if (!string.IsNullOrEmpty(user.Password))
+                    {
+                        if (user.Password == password)
+                        {
+                            passwordValid = true;
+                            
+                            // Auto-migrate to BCrypt
+                            string newHash = BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
+                            user.PasswordHash = newHash;
+                            await context.SaveChangesAsync();
+                            
+                            MessageBox.Show(
+                                "🔐 Mật khẩu đã được nâng cấp lên chuẩn mã hóa BCrypt.\n\n" +
+                                "✅ Đăng nhập thành công!",
+                                "Nâng cấp bảo mật",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+                        }
+                    }
+                    
+                    if (!passwordValid)
                     {
                         MessageBox.Show(
                             "🔐 Mật khẩu không đúng!\n\n" +

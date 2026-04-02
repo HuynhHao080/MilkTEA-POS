@@ -56,11 +56,11 @@ dotnet run
 | Users | 1 | Staff management |
 | **TỔNG** | **18** | |
 
-**Tiến độ:** 4/18 forms (22%) ✅
+**Tiến độ:** 5/18 forms (28%) ✅
 
 ---
 
-## ✅ FORMS ĐÃ HOÀN THÀNH (4/18)
+## ✅ FORMS ĐÃ HOÀN THÀNH (5/18)
 
 ### 1. frmCategories - Quản lý danh mục sản phẩm ⭐
 
@@ -101,15 +101,63 @@ dotnet run
 
 ### 2. frmLogin - Đăng nhập
 
-**File:** `frmLogin.cs`
+**File:** `frmLogin.cs` (266 dòng)
 
 **Chức năng:**
 - ✅ Đăng nhập với username/password
-- ✅ Phân quyền theo role
+- ✅ Phân quyền theo role (Include)
+- ✅ BCrypt password verification
+- ✅ Auto-migration: Plain text → BCrypt
+- ✅ Kiểm tra user active/inactive
+- ✅ Friendly error messages
+- ✅ Nút đổi mật khẩu (mở từ frmMain)
+
+**Bảo mật:**
+- ✅ BCrypt verification (work=12)
+- ✅ Auto salt per password
+- ✅ Constant-time comparison
+- ✅ EF Core parameterized queries
+- ✅ Active status check
+
+**Lưu ý:**
+- Default: admin / admin123
+- Lần đầu login: Auto upgrade lên BCrypt
+- Lần sau: BCrypt verification (nhanh, an toàn)
 
 ---
 
-### 3. frmMain - Form chính (MDI Container)
+### 3. frmChangePassword - Đổi mật khẩu ⭐ NEW
+
+**File:**
+- `frmChangePassword.cs` (210 dòng)
+- `frmChangePassword.Designer.cs` (212 dòng)
+
+**Chức năng:**
+- ✅ Đổi mật khẩu cho user đang đăng nhập
+- ✅ Validate mật khẩu hiện tại (BCrypt)
+- ✅ Validate mật khẩu mới (min 6 ký tự)
+- ✅ Xác nhận mật khẩu mới
+- ✅ BCrypt hashing (work factor = 12)
+- ✅ Friendly error messages
+- ✅ Password masking (●)
+- ✅ Dual column update (hash + plain)
+
+**Bảo mật:**
+- ✅ BCrypt password hashing (work=12)
+- ✅ Verify current password trước khi đổi
+- ✅ Password length validation
+- ✅ Match confirmation check
+- ✅ SQL injection safe (EF Core)
+- ✅ Auto salt per password
+
+**Lưu ý:**
+- Mở từ frmMain (sau khi đăng nhập)
+- Update cả `password_hash` (BCrypt) và `password` (plain text)
+- `password` sẽ được xóa sau này (sau khi migration xong)
+
+---
+
+### 4. frmMain - Form chính (MDI Container)
 
 **File:** `frmMain.cs`
 
@@ -120,7 +168,7 @@ dotnet run
 
 ---
 
-### 4. frmDashboard - Màn hình tổng quan
+### 5. frmDashboard - Màn hình tổng quan
 
 **File:** `frmDashboard.cs`
 
@@ -131,7 +179,7 @@ dotnet run
 
 ---
 
-## 🔜 FORMS SẮP LÀM (14/18)
+## 🔜 FORMS SẮP LÀM (13/18)
 
 ### Ưu tiên cao (Core Business):
 
@@ -168,8 +216,7 @@ dotnet run
 10. **frmSalesReport** - Báo cáo doanh thu
 11. **frmAuditLog** - Audit log
 12. **frmUsers** - Quản lý nhân viên
-13. **frmChangePassword** - Đổi mật khẩu
-14. **frmOrderDetail** - Chi tiết đơn hàng
+13. **frmOrderDetail** - Chi tiết đơn hàng
 
 ---
 

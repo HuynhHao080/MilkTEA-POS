@@ -705,6 +705,9 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .HasColumnName("password_hash");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");

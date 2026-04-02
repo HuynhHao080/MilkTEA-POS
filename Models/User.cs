@@ -12,6 +12,14 @@ public partial class User
 
     public string Username { get; set; } = null!;
 
+    /// <summary>
+    /// BCrypt hashed password (NOT plain text)
+    /// </summary>
+    public string PasswordHash { get; set; } = null!;
+
+    /// <summary>
+    /// Legacy plain text password - will be removed after migration
+    /// </summary>
     public string Password { get; set; } = null!;
 
     public Guid? RoleId { get; set; }

@@ -158,7 +158,7 @@
             btnCancel.FlatStyle = FlatStyle.Flat;
             btnCancel.Font = new Font("Segoe UI", 12F);
             btnCancel.ForeColor = Color.FromArgb(107, 114, 128);
-            btnCancel.Location = new Point(520, 380);
+            btnCancel.Location = new Point(520, 379);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(320, 45);
             btnCancel.TabIndex = 4;

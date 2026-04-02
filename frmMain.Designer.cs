@@ -25,6 +25,7 @@
         private System.Windows.Forms.Button btnReports;
         private System.Windows.Forms.Button btnUsers;
         private System.Windows.Forms.Button btnAuditLog;
+        private System.Windows.Forms.Button btnChangePassword;
         private System.Windows.Forms.Button btnLogout;
 
         // Top Bar Controls
@@ -65,6 +66,7 @@
         {
             pnlSidebar = new Panel();
             btnLogout = new Button();
+            btnChangePassword = new Button();
             btnAuditLog = new Button();
             btnUsers = new Button();
             btnReports = new Button();
@@ -118,6 +120,7 @@
             // 
             pnlSidebar.BackColor = Color.FromArgb(20, 27, 36);
             pnlSidebar.Controls.Add(btnLogout);
+            pnlSidebar.Controls.Add(btnChangePassword);
             pnlSidebar.Controls.Add(btnAuditLog);
             pnlSidebar.Controls.Add(btnUsers);
             pnlSidebar.Controls.Add(btnReports);
@@ -137,9 +140,9 @@
             pnlSidebar.Name = "pnlSidebar";
             pnlSidebar.Size = new Size(280, 900);
             pnlSidebar.TabIndex = 2;
-            // 
+            //
             // btnLogout
-            // 
+            //
             btnLogout.BackColor = Color.FromArgb(220, 53, 69);
             btnLogout.Cursor = Cursors.Hand;
             btnLogout.Dock = DockStyle.Bottom;
@@ -149,7 +152,7 @@
             btnLogout.FlatStyle = FlatStyle.Flat;
             btnLogout.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
             btnLogout.ForeColor = Color.White;
-            btnLogout.Location = new Point(0, 852);
+            btnLogout.Location = new Point(0, 804);
             btnLogout.Name = "btnLogout";
             btnLogout.Size = new Size(280, 48);
             btnLogout.TabIndex = 0;
@@ -157,7 +160,26 @@
             btnLogout.Text = "🚪  Đăng xuất";
             btnLogout.UseVisualStyleBackColor = false;
             btnLogout.Click += btnMenu_Click;
-            // 
+            //
+            // btnChangePassword
+            //
+            btnChangePassword.BackColor = Color.FromArgb(108, 117, 125);
+            btnChangePassword.Cursor = Cursors.Hand;
+            btnChangePassword.Dock = DockStyle.Bottom;
+            btnChangePassword.FlatAppearance.BorderSize = 0;
+            btnChangePassword.FlatAppearance.MouseDownBackColor = Color.FromArgb(80, 90, 100);
+            btnChangePassword.FlatAppearance.MouseOverBackColor = Color.FromArgb(120, 130, 140);
+            btnChangePassword.FlatStyle = FlatStyle.Flat;
+            btnChangePassword.Font = new Font("Segoe UI", 11.5F);
+            btnChangePassword.ForeColor = Color.White;
+            btnChangePassword.Location = new Point(0, 756);
+            btnChangePassword.Name = "btnChangePassword";
+            btnChangePassword.Size = new Size(280, 48);
+            btnChangePassword.TabIndex = 13;
+            btnChangePassword.Text = "🔐  Đổi mật khẩu";
+            btnChangePassword.UseVisualStyleBackColor = false;
+            btnChangePassword.Click += btnChangePassword_Click;
+            //
             // btnAuditLog
             // 
             btnAuditLog.BackColor = Color.Transparent;
@@ -728,6 +750,12 @@
             pnlStats3.ResumeLayout(false);
             pnlStats4.ResumeLayout(false);
             ResumeLayout(false);
+        }
+
+        private void btnChangePassword_Click(object? sender, EventArgs e)
+        {
+            var frmChangePassword = new frmChangePassword(_currentUser);
+            frmChangePassword.ShowDialog(this);
         }
     }
 }
