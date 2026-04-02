@@ -37,34 +37,39 @@ dotnet run
 
 ---
 
-## 📁 Cấu trúc dự án
+## 📊 DANH SÁCH 18 FORMS
 
-```
-MilkTEA-POS/
-├── Models/                 # Entity models
-│   ├── Category.cs
-│   ├── Product.cs
-│   ├── Order.cs
-│   ├── Customer.cs
-│   └── ...
-├── Images/
-│   └── Categories/        # Ảnh danh mục sản phẩm
-├── frmDashboard.cs        # Màn hình chính
-├── frmLogin.cs            # Đăng nhập
-├── frmCategories.cs       # Quản lý danh mục ✅
-├── frmMain.cs             # Form chính
-├── database.sql           # Database schema
-├── db.config.txt          # Connection string
-└── README.md              # File này
-```
+### Tổng quan
+
+| Nhóm | Số Forms | Forms |
+|------|----------|-------|
+| Authentication | 2 | Login, ChangePassword |
+| Main | 1 | MDI Container |
+| Dashboard | 1 | Charts, KPIs |
+| Products | 3 | Categories, Products, Toppings |
+| Tables | 1 | Visual layout |
+| POS & Orders | 3 | Core business |
+| Customers | 2 | CRM + Membership |
+| Vouchers | 1 | Promotion |
+| Order History | 1 | Search, Filter |
+| Reports | 2 | Sales + Audit |
+| Users | 1 | Staff management |
+| **TỔNG** | **18** | |
+
+**Tiến độ:** 4/18 forms (22%) ✅
 
 ---
 
-## ✅ DANH SÁCH FORM ĐÃ HOÀN THÀNH
+## ✅ FORMS ĐÃ HOÀN THÀNH (4/18)
 
-### 1. frmCategories - Quản lý danh mục sản phẩm ✅
+### 1. frmCategories - Quản lý danh mục sản phẩm ⭐
 
 **Trạng thái:** `HOÀN THÀNH 100%` ✅
+
+**File:**
+- `frmCategories.cs` (720 dòng)
+- `frmCategories.Designer.cs` (494 dòng)
+- `Models/Category.cs`
 
 **Chức năng:**
 - ✅ Load danh sách danh mục
@@ -78,11 +83,6 @@ MilkTEA-POS/
 - ✅ Xóa ảnh cũ tự động
 - ✅ Validation trùng tên
 - ✅ Loading indicator
-
-**File liên quan:**
-- `frmCategories.cs` (720 dòng)
-- `frmCategories.Designer.cs` (494 dòng)
-- `Models/Category.cs`
 
 **Điểm chất lượng:** 100/100 🏆
 
@@ -99,30 +99,101 @@ MilkTEA-POS/
 
 ---
 
-## 🔜 FORM ĐANG PHÁT TRIỂN
+### 2. frmLogin - Đăng nhập
 
-*(Cập nhật khi có form mới)*
+**File:** `frmLogin.cs`
+
+**Chức năng:**
+- ✅ Đăng nhập với username/password
+- ✅ Phân quyền theo role
 
 ---
 
-## 📊 Database Schema
+### 3. frmMain - Form chính (MDI Container)
 
-### Các bảng chính:
-- `roles` - Vai trò người dùng
-- `users` - Người dùng (nhân viên)
-- `categories` - Danh mục sản phẩm ✅
-- `products` - Sản phẩm
-- `product_sizes` - Kích cỡ & giá
-- `toppings` - Topping
-- `customers` - Khách hàng
-- `memberships` - Hội viên
-- `vouchers` - Mã giảm giá
-- `orders` - Đơn hàng
-- `order_details` - Chi tiết đơn
-- `payments` - Thanh toán
-- `tables` - Bàn
+**File:** `frmMain.cs`
 
-Xem chi tiết trong `database.sql`
+**Chức năng:**
+- ✅ MDI Container cho các form con
+- ✅ Menu chính
+- ✅ Toolbar
+
+---
+
+### 4. frmDashboard - Màn hình tổng quan
+
+**File:** `frmDashboard.cs`
+
+**Chức năng:**
+- ✅ Charts, KPIs
+- ✅ Thống kê nhanh
+- ✅ Đọc dữ liệu từ orders, payments
+
+---
+
+## 🔜 FORMS SẮP LÀM (14/18)
+
+### Ưu tiên cao (Core Business):
+
+1. **frmProducts** - Quản lý sản phẩm
+   - CRUD sản phẩm
+   - Size matrix (S, M, L)
+   - Upload nhiều ảnh
+
+2. **frmToppings** - Quản lý topping
+   - CRUD topping
+   - Set giá
+
+3. **frmTables** - Quản lý bàn
+   - CRUD bàn
+   - Visual layout
+   - Status tracking
+
+4. **frmPOS** ⭐ - Bán hàng (QUAN TRỌNG NHẤT)
+   - Tạo đơn hàng
+   - Custom: size, đường, đá, toppings
+   - Tính tiền real-time
+
+5. **frmPayment** ⭐ - Thanh toán (QUAN TRỌNG NHẤT)
+   - Xử lý thanh toán
+   - Multiple payment methods
+   - In hóa đơn
+
+### Ưu tiên thấp hơn:
+
+6. **frmCustomers** - Quản lý khách hàng
+7. **frmMemberships** - Quản lý hội viên
+8. **frmVouchers** - Quản lý voucher
+9. **frmOrderHistory** - Lịch sử đơn hàng
+10. **frmSalesReport** - Báo cáo doanh thu
+11. **frmAuditLog** - Audit log
+12. **frmUsers** - Quản lý nhân viên
+13. **frmChangePassword** - Đổi mật khẩu
+14. **frmOrderDetail** - Chi tiết đơn hàng
+
+---
+
+## 📁 Cấu trúc dự án
+
+```
+MilkTEA-POS/
+├── Models/                 # Entity models
+│   ├── Category.cs
+│   ├── Product.cs
+│   ├── Order.cs
+│   ├── Customer.cs
+│   └── ...
+├── Images/
+│   └── Categories/        # Ảnh danh mục sản phẩm
+├── frmDashboard.cs        # Màn hình tổng quan
+├── frmLogin.cs            # Đăng nhập
+├── frmCategories.cs       # Quản lý danh mục ✅
+├── frmMain.cs             # Form chính
+├── database.sql           # Database schema
+├── db.config.txt          # Connection string
+├── README.md              # File này
+└── các form cần thiết kế.txt  # Danh sách chi tiết
+```
 
 ---
 
@@ -135,7 +206,6 @@ Xem chi tiết trong `database.sql`
 | **UI** | Windows Forms |
 | **Database** | PostgreSQL |
 | **ORM** | Entity Framework Core |
-| **Auth** | Supabase (planned) |
 
 ---
 
@@ -145,7 +215,7 @@ Xem chi tiết trong `database.sql`
 1. Tạo form: `Add → Windows Form`
 2. Đặt tên: `frm<TênForm>.cs`
 3. Implement logic
-4. Update file này
+4. Update README.md và `các form cần thiết kế.txt`
 
 ### Quy ước đặt tên:
 - Forms: `frm<Tên>.cs` (ví dụ: `frmCategories.cs`)
@@ -208,6 +278,7 @@ Nếu có vấn đề, tạo issue hoặc liên hệ team lead.
 
 ---
 
-**Cập nhật cuối:** April 3, 2026
-**Version:** 1.0.0
-**Status:** In Development 🚧
+**Cập nhật cuối:** April 3, 2026  
+**Version:** 1.0.0  
+**Status:** In Development 🚧  
+**Progress:** 4/18 forms (22%)

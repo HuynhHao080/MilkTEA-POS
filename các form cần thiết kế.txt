@@ -1,5 +1,5 @@
 =====================================================
-    DANH SÁCH CÁC FORM CẦN THIẾT KẾ - MilkTeaPOS
+    DANH SÁCH 18 FORMS - MilkTeaPOS
 =====================================================
 
 ✅ = HOÀN THÀNH
@@ -7,117 +7,264 @@
 ⏳ = CHƯA LÀM
 
 =====================================================
-FORM ĐÃ HOÀN THÀNH (100%)
+📊 TỔNG KẾT: 18 FORMS
 =====================================================
 
-✅ frmCategories - Quản lý danh mục sản phẩm
+┌────────────────┬──────────┬────────────────────────────────┐
+│ Nhóm           │ Số Forms │ Forms                          │
+├────────────────┼──────────┼────────────────────────────────┤
+│ Authentication │    2     │ Login, ChangePassword          │
+│ Main           │    1     │ MDI Container                  │
+│ Dashboard      │    1     │ Charts, KPIs                   │
+│ Products       │    3     │ Categories, Products, Toppings │
+│ Tables         │    1     │ Visual layout                  │
+│ POS & Orders   │    3     │ Core business                  │
+│ Customers      │    2     │ CRM + Membership               │
+│ Vouchers       │    1     │ Promotion                      │
+│ Order History  │    1     │ Search, Filter                 │
+│ Reports        │    2     │ Sales + Audit                  │
+│ Users          │    1     │ Staff management               │
+├────────────────┼──────────┼────────────────────────────────┤
+│ TỔNG           │   18     │                                │
+└────────────────┴──────────┴────────────────────────────────┘
+
+=====================================================
+🔐 1. AUTHENTICATION (2 forms)
+=====================================================
+
+✅ 1. frmLogin
+   File: frmLogin.cs (đã có)
+   Tables: users, roles
+   CRUD: Read
+   Status: Đã tạo
+
+⏳ 2. frmChangePassword
+   Tables: users
+   CRUD: Update
+   Status: Chưa làm
+
+=====================================================
+🏠 2. MAIN DASHBOARD (1 form)
+=====================================================
+
+✅ 3. frmMain
+   File: frmMain.cs (đã có)
+   Tables: -
+   CRUD: MDI Container
+   Status: Đã tạo
+
+=====================================================
+📊 3. DASHBOARD (1 form)
+=====================================================
+
+✅ 4. frmDashboard
+   File: frmDashboard.cs (đã có)
+   Tables: orders, payments
+   CRUD: Read (charts)
+   Status: Đã tạo
+
+=====================================================
+📦 4. PRODUCT MANAGEMENT (3 forms)
+=====================================================
+
+✅ 5. frmCategories ⭐
    File: frmCategories.cs (720 dòng)
    Designer: frmCategories.Designer.cs (494 dòng)
-   Status: 100/100 - PRODUCTION READY
+   Tables: categories
+   CRUD: Full CRUD
+   Status: ✅ 100/100 - PRODUCTION READY
+   
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
    - Tìm kiếm theo tên, mô tả
-   - Upload ảnh (max 10MB, whitelist extensions)
+   - Upload ảnh (max 10MB, whitelist)
    - Auto-save ảnh khi duyệt
    - Preview ảnh (không lock file)
    - Xóa ảnh cũ tự động
    - Validation trùng tên
    - Loading indicator
    - Path traversal protection
-   - Backward compatible với data cũ
+   - Backward compatible
    
    Ảnh lưu tại: Images/Categories/
-   
-=====================================================
-FORM CHÍNH (CORE)
-=====================================================
 
-✅ frmLogin - Đăng nhập
-   File: frmLogin.cs
-   Status: Đã tạo
+🔜 6. frmProducts
+   Tables: products, product_sizes
+   CRUD: CRUD + Size matrix
+   Status: Chưa làm
    
-✅ frmMain - Form chính
-   File: frmMain.cs
-   Status: Đã tạo
-   
-✅ frmDashboard - Màn hình tổng quan
-   File: frmDashboard.cs
-   Status: Đã tạo
-
-=====================================================
-FORM CẦN THIẾT KẾ TIẾP THEO
-=====================================================
-
-🔜 frmProducts - Quản lý sản phẩm
-   Chức năng:
+   Features cần làm:
    - CRUD sản phẩm
    - Chọn category
    - Upload nhiều ảnh
    - Quản lý sizes (S, M, L)
-   - Quản lý toppings
    - Set giá theo size
+   - Toggle availability
+
+⏳ 7. frmToppings
+   Tables: toppings
+   CRUD: CRUD
+   Status: Chưa làm
    
-🔜 frmToppings - Quản lý topping
-   Chức năng:
+   Features cần làm:
    - CRUD topping
    - Set giá topping
+   - Toggle availability
+
+=====================================================
+🪑 5. TABLE MANAGEMENT (1 form)
+=====================================================
+
+⏳ 8. frmTables
+   Tables: tables
+   CRUD: CRUD + Visual layout
+   Status: Chưa làm
    
-🔜 frmTables - Quản lý bàn
-   Chức năng:
+   Features cần làm:
    - CRUD bàn
    - Set status (available, occupied, reserved)
-   - Sơ đồ bàn
+   - Sơ đồ bàn trực quan
+   - Filter theo khu vực
+
+=====================================================
+🛒 6. POS & ORDERS (3 forms) - CORE BUSINESS
+=====================================================
+
+⏳ 9. frmPOS
+   Tables: orders, order_details, order_toppings, 
+           products, toppings, tables
+   CRUD: Create, Update
+   Status: Chưa làm (QUAN TRỌNG)
    
-🔜 frmOrders - Quản lý đơn hàng
-   Chức năng:
+   Features cần làm:
    - Tạo đơn mới
    - Chọn bàn
    - Thêm sản phẩm
    - Custom: size, đường, đá
    - Thêm toppings
-   - Tính tiền
-   - In hóa đơn
+   - Tính tiền real-time
    
-🔜 frmPayments - Thanh toán
-   Chức năng:
+⏳ 10. frmOrderDetail
+   Tables: orders, order_details, order_toppings
+   CRUD: Read, Update
+   Status: Chưa làm
+   
+   Features cần làm:
+   - Xem chi tiết đơn
+   - Sửa đơn (trước khi thanh toán)
+   - Hủy đơn
+
+⏳ 11. frmPayment
+   Tables: orders, payments, vouchers, memberships
+   CRUD: Create payment
+   Status: Chưa làm (QUAN TRỌNG)
+   
+   Features cần làm:
    - Xử lý thanh toán
    - Nhiều phương thức (cash, card, QR)
+   - Áp voucher
+   - Membership discount
    - In hóa đơn
-   - Bo tròn tiền thừa
+   - Tiền thừa
 
-🔜 frmCustomers - Quản lý khách hàng
-   Chức năng:
+=====================================================
+👥 7. CUSTOMER MANAGEMENT (2 forms)
+=====================================================
+
+⏳ 12. frmCustomers
+   Tables: customers
+   CRUD: CRUD
+   Status: Chưa làm
+   
+   Features cần làm:
    - CRUD khách hàng
    - Lịch sử mua hàng
-   - Điểm tích lũy
+   - Search by phone, email
+
+⏳ 13. frmMemberships
+   Tables: memberships, customers
+   CRUD: Read (tier, points)
+   Status: Chưa làm
    
-🔜 frmMemberships - Quản lý hội viên
-   Chức năng:
-   - Set tier (Silver, Gold, Platinum)
+   Features cần làm:
+   - Xem tier (Silver, Gold, Platinum)
    - Quản lý điểm
    - Upgrade hạng
+   - Quyền lợi từng hạng
+
+=====================================================
+🎫 8. VOUCHER MANAGEMENT (1 form)
+=====================================================
+
+⏳ 14. frmVouchers
+   Tables: vouchers
+   CRUD: CRUD
+   Status: Chưa làm
    
-🔜 frmVouchers - Quản lý voucher
-   Chức năng:
+   Features cần làm:
    - CRUD voucher
    - Set discount (%, fixed)
    - Usage limit
    - Date range
+   - Applicable products/categories
 
-🔜 frmUsers - Quản lý nhân viên
-   Chức năng:
-   - CRUD users
-   - Set role
-   - Reset password
+=====================================================
+📜 9. ORDER HISTORY (1 form)
+=====================================================
+
+⏳ 15. frmOrderHistory
+   Tables: orders, order_details, customers
+   CRUD: Read, Filter, Export
+   Status: Chưa làm
    
-🔜 frmReports - Báo cáo
-   Chức năng:
+   Features cần làm:
+   - Xem lịch sử đơn
+   - Filter theo ngày, khách, status
+   - Export Excel
+   - Reprint invoice
+
+=====================================================
+📈 10. REPORTS (2 forms)
+=====================================================
+
+⏳ 16. frmSalesReport
+   Tables: orders, payments
+   CRUD: Read, Statistics
+   Status: Chưa làm
+   
+   Features cần làm:
    - Báo cáo doanh thu
    - Báo cáo sản phẩm bán chạy
    - Báo cáo theo ngày/tháng/năm
+   - Charts, graphs
+
+⏳ 17. frmAuditLog
+   Tables: audit_logs, users
+   CRUD: Read (admin only)
+   Status: Chưa làm
    
+   Features cần làm:
+   - Xem log hành động
+   - Filter theo user, action, date
+   - Admin only
+
 =====================================================
-HƯỚNG DẪN CODE FORM MỚI
+👨‍💼 11. USER MANAGEMENT (1 form)
+=====================================================
+
+⏳ 18. frmUsers
+   Tables: users, roles
+   CRUD: CRUD
+   Status: Chưa làm
+   
+   Features cần làm:
+   - CRUD users
+   - Set role
+   - Reset password
+   - Toggle active status
+
+=====================================================
+✅ HƯỚNG DẪN CODE FORM MỚI
 =====================================================
 
 1. Tạo form mới:
@@ -125,15 +272,15 @@ HƯỚNG DẪN CODE FORM MỚI
    - Đặt tên: frm<Tên>.cs (ví dụ: frmProducts.cs)
    
 2. Cấu trúc code (theo frmCategories):
-   - #region Constructor & Initialization
-   - #region Data Loading & Display
-   - #region Event Handlers
-   - #region Form Data Management
-   - #region Image Handling (nếu có)
-   - #region Search Functionality (nếu có)
-   - #region Toolbar Actions
-   - #region Database Operations
-   - #region Helper Methods
+   #region Constructor & Initialization
+   #region Data Loading & Display
+   #region Event Handlers
+   #region Form Data Management
+   #region Image Handling (nếu có)
+   #region Search Functionality (nếu có)
+   #region Toolbar Actions
+   #region Database Operations
+   #region Helper Methods
    
 3. Checklist khi làm form:
    [ ] Load data
@@ -154,31 +301,51 @@ HƯỚNG DẪN CODE FORM MỚI
    [ ] SQL injection safe (dùng EF Core)
    [ ] Null checks
    
-5. Update README.md:
-   - Thêm form vào danh sách
+5. Update file này:
+   - Đánh dấu ✅ khi hoàn thành
    - Note features đã làm
    - Note issues (nếu có)
 
 =====================================================
-QUY ƯỚC CODE
+📝 QUY ƯỚC CODE
 =====================================================
 
 Đặt tên:
 - Form: frm<Tên>.cs
 - Controls: <Type><Tên>
-  + Button: btnAdd, btnEdit, btnDelete
-  + TextBox: txtName, txtDescription
-  + Label: lblTitle, lblSearch
+  + Button: btnAdd, btnEdit, btnDelete, btnSearch
+  + TextBox: txtName, txtDescription, txtSearch
+  + Label: lblTitle, lblSearch, lblName
   + DataGridView: dgvCategories, dgvProducts
   + Panel: pnlHeader, pnlMain, pnlForm
   + PictureBox: picPreview
   
 Code style:
 - Dùng async/await cho DB calls
-- Try-catch với friendly messages
+- Try-catch với friendly messages (Vietnamese)
 - Validation trước khi save
-- Dùng #region để organize
+- Dùng #region để organize code
 - Comments khi cần thiết
+- Friendly error messages với emoji
+
+=====================================================
+📊 TIẾN ĐỘ DỰ ÁN
+=====================================================
+
+Đã hoàn thành: 4/18 forms (22%)
+- ✅ frmLogin
+- ✅ frmMain
+- ✅ frmDashboard
+- ✅ frmCategories (100/100 quality)
+
+Còn lại: 14/18 forms (78%)
+
+Ưu tiên tiếp theo:
+1. frmProducts (quan trọng)
+2. frmToppings (quan trọng)
+3. frmTables (quan trọng)
+4. frmPOS (CORE - quan trọng nhất)
+5. frmPayment (CORE - quan trọng nhất)
 
 =====================================================
 CẬP NHẬT CUỐI: April 3, 2026
