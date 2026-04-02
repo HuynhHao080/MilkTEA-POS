@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\accli\\source\\repos\\MilkTeaPOS\\MilkTeaPOS.csproj": {}
+    "C:\\Users\\accli\\source\\repos\\test\\MilkTEA-POS\\MilkTeaPOS.csproj": {}
   },
   "projects": {
-    "C:\\Users\\accli\\source\\repos\\MilkTeaPOS\\MilkTeaPOS.csproj": {
+    "C:\\Users\\accli\\source\\repos\\test\\MilkTEA-POS\\MilkTeaPOS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\accli\\source\\repos\\MilkTeaPOS\\MilkTeaPOS.csproj",
+        "projectUniqueName": "C:\\Users\\accli\\source\\repos\\test\\MilkTEA-POS\\MilkTeaPOS.csproj",
         "projectName": "MilkTeaPOS",
-        "projectPath": "C:\\Users\\accli\\source\\repos\\MilkTeaPOS\\MilkTeaPOS.csproj",
+        "projectPath": "C:\\Users\\accli\\source\\repos\\test\\MilkTEA-POS\\MilkTeaPOS.csproj",
         "packagesPath": "C:\\Users\\accli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\accli\\source\\repos\\MilkTeaPOS\\obj\\",
+        "outputPath": "C:\\Users\\accli\\source\\repos\\test\\MilkTEA-POS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

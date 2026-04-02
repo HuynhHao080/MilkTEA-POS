@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "jQvtbtuwC7Q=",
+  "dgSpecHash": "PkXbZWik6Rc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\accli\\source\\repos\\MilkTeaPOS\\MilkTeaPOS.csproj",
+  "projectFilePath": "C:\\Users\\accli\\source\\repos\\test\\MilkTEA-POS\\MilkTeaPOS.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\accli\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\accli\\.nuget\\packages\\microsoft.build.framework\\18.0.2\\microsoft.build.framework.18.0.2.nupkg.sha512",
