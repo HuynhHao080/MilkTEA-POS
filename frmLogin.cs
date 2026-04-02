@@ -1,0 +1,227 @@
+﻿using System;
+using System.Windows.Forms;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MilkTeaPOS.Models;
+
+namespace MilkTeaPOS
+{
+    public partial class frmLogin : Form
+    {
+        private User? _loggedInUser;
+
+        public frmLogin()
+        {
+            InitializeComponent();
+            setupDefaults();
+        }
+
+        private void setupDefaults()
+        {
+            // Default credentials for demo
+            txtUsername.Text = "admin";
+            txtPassword.Text = "admin123";
+        }
+
+        private void txtPassword_KeyPress(object? sender, KeyPressEventArgs e)
+        {
+            if (this.IsDisposed) return;
+
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                btnLogin_Click(this, EventArgs.Empty);
+            }
+        }
+
+        private async void btnLogin_Click(object? sender, EventArgs e)
+        {
+            if (this.IsDisposed) return;
+
+            string username = txtUsername.Text.Trim();
+            string password = txtPassword.Text;
+
+            // Validate input
+            if (string.IsNullOrEmpty(username))
+            {
+                MessageBox.Show(
+                    "Vui lòng nhập tên đăng nhập để tiếp tục.\n\n" +
+                    "📝 Gợi ý:\n" +
+                    "• Tên đăng nhập: admin\n" +
+                    "• Mật khẩu: admin123",
+                    "⚠️ Thiếu thông tin",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                txtUsername.Focus();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show(
+                    "Vui lòng nhập mật khẩu để đăng nhập.\n\n" +
+                    "🔒 Nếu bạn quên mật khẩu, vui lòng liên hệ quản trị viên.",
+                    "⚠️ Thiếu mật khẩu",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                txtPassword.Focus();
+                return;
+            }
+
+            // Disable button during login
+            btnLogin.Enabled = false;
+            btnLogin.Text = "Đang xác thực...";
+
+            try
+            {
+                User? user;
+
+                // BEST PRACTICE: Create new DbContext per operation
+                using (var context = new PostgresContext())
+                {
+                    user = await context.Users
+                        .Include(u => u.Role)
+                        .FirstOrDefaultAsync(u => u.Username == username);
+
+                    // Validate user exists
+                    if (user == null)
+                    {
+                        MessageBox.Show(
+                            $"❌ Không tìm thấy tài khoản với tên đăng nhập: \"{username}\"\n\n" +
+                            "📋 Vui lòng kiểm tra lại:\n" +
+                            "• Tên đăng nhập có đúng chính tả?\n" +
+                            "• Tài khoản đã được tạo chưa?\n\n" +
+                            "💡 Tài khoản demo: admin / admin123",
+                            "❌ Tên đăng nhập không hợp lệ",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        resetLoginButton();
+                        return;
+                    }
+
+                    // Validate password (TODO: Use password hashing in production)
+                    if (user.Password != password)
+                    {
+                        MessageBox.Show(
+                            "🔐 Mật khẩu không đúng!\n\n" +
+                            $"👤 Tài khoản: {username}\n" +
+                            "⚠️ Bạn đã nhập sai mật khẩu.\n\n" +
+                            "💡 Thử lại hoặc nhấn Cancel để thoát.",
+                            "🔒 Sai mật khẩu",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        resetLoginButton();
+                        return;
+                    }
+
+                    // Validate user is active
+                    if (user.IsActive == false)
+                    {
+                        MessageBox.Show(
+                            $"🚫 Tài khoản \"{username}\" đã bị khóa!\n\n" +
+                            "📞 Liên hệ quản trị viên để được hỗ trợ:\n" +
+                            "• Email: support@milkteapos.com\n" +
+                            "• Hotline: 1900 xxxx\n\n" +
+                            "⏰ Thời gian hỗ trợ: 8:00 - 17:00 (Thứ 2 - Thứ 6)",
+                            "🚫 Tài khoản bị khóa",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Stop);
+                        resetLoginButton();
+                        return;
+                    }
+
+                    _loggedInUser = user;
+                }
+
+                // Login successful
+                string welcomeMessage = $"✅ Đăng nhập thành công!\n\n";
+                welcomeMessage += $"👤 Thông tin tài khoản:\n";
+                welcomeMessage += $"   • Tên đăng nhập: {user.Username}\n";
+                welcomeMessage += $"   • Vai trò: {user.Role?.Name ?? "Người dùng"}\n";
+                welcomeMessage += $"   • Cấp quyền: {(user.Role?.Name ?? "N/A")}\n\n";
+                welcomeMessage += $"🎉 Chúc bạn một ngày làm việc hiệu quả!";
+
+                MessageBox.Show(
+                    welcomeMessage,
+                    "🎉 Đăng nhập thành công",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
+                // Open main form
+                var frmMain = new frmMain(_loggedInUser);
+                frmMain.Show();
+                this.Hide();
+
+                // Handle main form closed
+                frmMain.FormClosed += (s, args) =>
+                {
+                    if (!this.IsDisposed && this.IsHandleCreated)
+                    {
+                        this.Invoke(resetLoginForm);
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                if (!this.IsDisposed && this.IsHandleCreated)
+                {
+                    this.Invoke(() =>
+                    {
+                        string errorMessage = $"❌ Không thể kết nối cơ sở dữ liệu!\n\n";
+                        errorMessage += $"🔍 Chi tiết lỗi:\n";
+                        errorMessage += $"   {ex.Message}\n\n";
+                        errorMessage += $"📋 Hướng khắc phục:\n";
+                        errorMessage += $"   • Kiểm tra kết nối Internet\n";
+                        errorMessage += $"   • Xác nhận cấu hình database\n";
+                        errorMessage += $"   • Liên hệ bộ phận kỹ thuật nếu lỗi tiếp diễn.\n\n";
+                        errorMessage += $"💡 Mã lỗi: DB_CONNECTION_FAILED";
+
+                        MessageBox.Show(
+                            errorMessage,
+                            "❌ Lỗi kết nối",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        resetLoginButton();
+                    });
+                }
+            }
+        }
+
+        private void btnCancel_Click(object? sender, EventArgs e)
+        {
+            if (this.IsDisposed) return;
+
+            var result = MessageBox.Show(
+                "👋 Bạn có chắc muốn thoát ứng dụng?\n\n" +
+                "⏹️ Tất cả các phiên làm việc chưa lưu sẽ bị mất.\n\n" +
+                "💡 Nhấn Yes để thoát hoặc No để tiếp tục.",
+                "❓ Xác nhận thoát",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
+
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+
+        private void resetLoginButton()
+        {
+            btnLogin.Enabled = true;
+            btnLogin.Text = "Đăng nhập";
+        }
+
+        private void resetLoginForm()
+        {
+            this.Show();
+            txtPassword.Clear();
+            txtUsername.Focus();
+            resetLoginButton();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+        }
+    }
+}

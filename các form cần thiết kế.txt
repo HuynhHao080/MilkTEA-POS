@@ -1,0 +1,127 @@
+ 📋 DANH SÁCH FORMS CHÍNH XÁC
+
+    🔐 1. Authentication (2 forms)
+
+    ┌───┬───────────────────┬──────────────┬────────┐
+    │ # │ Form              │ Tables       │ CRUD   │
+    ├───┼───────────────────┼──────────────┼────────┤
+    │ 1 │ frmLogin          │ users, roles │ Read   │
+    │ 2 │ frmChangePassword │ users        │ Update │
+    └───┴───────────────────┴──────────────┴────────┘
+
+
+    🏠 2. Main Dashboard (1 form)
+
+    ┌───┬─────────┬────────┬───────────────┐
+    │ # │ Form    │ Tables │ CRUD          │
+    ├───┼─────────┼────────┼───────────────┤
+    │ 3 │ frmMain │ -      │ MDI Container │
+    └───┴─────────┴────────┴───────────────┘
+
+
+    📊 3. Dashboard (1 form)
+
+    ┌───┬──────────────┬──────────────────┬───────────────┐
+    │ # │ Form         │ Tables           │ CRUD          │
+    ├───┼──────────────┼──────────────────┼───────────────┤
+    │ 4 │ frmDashboard │ orders, payments │ Read (charts) │
+    └───┴──────────────┴──────────────────┴───────────────┘
+
+
+    📦 4. Product Management (3 forms)
+
+    ┌───┬───────────────┬─────────────────────────┬────────────────────┐
+    │ # │ Form          │ Tables                  │ CRUD               │
+    ├───┼───────────────┼─────────────────────────┼────────────────────┤
+    │ 5 │ frmCategories │ categories              │ CRUD               │
+    │ 6 │ frmProducts   │ products, product_sizes │ CRUD + Size matrix │
+    │ 7 │ frmToppings   │ toppings                │ CRUD               │
+    └───┴───────────────┴─────────────────────────┴────────────────────┘
+
+
+    🪑 5. Table Management (1 form)
+
+    ┌───┬───────────┬────────┬──────────────────────┐
+    │ # │ Form      │ Tables │ CRUD                 │
+    ├───┼───────────┼────────┼──────────────────────┤
+    │ 8 │ frmTables │ tables │ CRUD + Visual layout │
+    └───┴───────────┴────────┴──────────────────────┘
+
+
+    🛒 6. POS & Orders (3 forms)
+
+    ┌────┬────────────────┬─────────────────────────────────────────────────────────────────┬────────────────┐
+    │ #  │ Form           │ Tables                                                          │ CRUD           │
+    ├────┼────────────────┼─────────────────────────────────────────────────────────────────┼────────────────┤
+    │ 9  │ frmPOS         │ orders, order_details, order_toppings, products, toppings, tables │ Create, Update │
+    │ 10 │ frmOrderDetail │ orders, order_details, order_toppings                             │ Read, Update   │
+    │ 11 │ frmPayment     │ orders, payments, vouchers, memberships                         │ Create payment │
+    └────┴────────────────┴─────────────────────────────────────────────────────────────────┴────────────────┘
+
+
+    👥 7. Customer Management (2 forms)
+
+    ┌────┬────────────────┬────────────────────────┬─────────────────────┐
+    │ #  │ Form           │ Tables                 │ CRUD                │
+    ├────┼────────────────┼────────────────────────┼─────────────────────┤
+    │ 12 │ frmCustomers   │ customers              │ CRUD                │
+    │ 13 │ frmMemberships │ memberships, customers │ Read (tier, points) │
+    └────┴────────────────┴────────────────────────┴─────────────────────┘
+
+
+    🎫 8. Voucher Management (1 form)
+
+    ┌────┬─────────────┬──────────┬──────┐
+    │ #  │ Form        │ Tables   │ CRUD │
+    ├────┼─────────────┼──────────┼──────┤
+    │ 14 │ frmVouchers │ vouchers │ CRUD │
+    └────┴─────────────┴──────────┴──────┘
+
+
+    📜 9. Order History (1 form)
+
+    ┌────┬─────────────────┬──────────────────────────────────┬──────────────────────┐
+    │ #  │ Form            │ Tables                           │ CRUD                 │
+    ├────┼─────────────────┼──────────────────────────────────┼──────────────────────┤
+    │ 15 │ frmOrderHistory │ orders, order_details, customers │ Read, Filter, Export │
+    └────┴─────────────────┴──────────────────────────────────┴──────────────────────┘
+
+
+    📈 10. Reports (2 forms)
+
+    ┌────┬────────────────┬───────────────────┬───────────────────┐
+    │ #  │ Form           │ Tables            │ CRUD              │
+    ├────┼────────────────┼───────────────────┼───────────────────┤
+    │ 16 │ frmSalesReport │ orders, payments  │ Read, Statistics  │
+    │ 17 │ frmAuditLog    │ audit_logs, users │ Read (admin only) │
+    └────┴────────────────┴───────────────────┴───────────────────┘
+
+
+    👨‍💼 11. User Management (1 form)
+
+    ┌────┬──────────┬──────────────┬──────┐
+    │ #  │ Form     │ Tables       │ CRUD │
+    ├────┼──────────┼──────────────┼──────┤
+    │ 18 │ frmUsers │ users, roles │ CRUD │
+    └────┴──────────┴──────────────┴──────┘
+
+    ---
+
+    ✅ TỔNG KẾT: 18 FORMS
+
+
+    ┌────────────────┬──────────┬────────────────────────────────┐
+    │ Nhóm           │ Số Forms │ Ghi chú                        │
+    ├────────────────┼──────────┼────────────────────────────────┤
+    │ Authentication │ 2        │ Login, ChangePassword          │
+    │ Main           │ 1        │ MDI Container                  │
+    │ Dashboard      │ 1        │ Charts, KPIs                   │
+    │ Products       │ 3        │ Categories, Products, Toppings │
+    │ Tables         │ 1        │ Visual layout                  │
+    │ POS & Orders   │ 3        │ Core business                  │
+    │ Customers      │ 2        │ CRM + Membership               │
+    │ Vouchers       │ 1        │ Promotion                      │
+    │ Order History  │ 1        │ Search, Filter                 │
+    │ Reports        │ 2        │ Sales + Audit                  │
+    │ Users          │ 1        │ Staff management               │
+    │ TỔNG           │ 18       │            
