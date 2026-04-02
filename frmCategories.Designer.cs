@@ -55,6 +55,7 @@
 
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             pnlHeader = new Panel();
             lblTitle = new Label();
             pnlToolbar = new Panel();
@@ -225,9 +226,9 @@
             txtSearch.Size = new Size(300, 29);
             txtSearch.TabIndex = 1;
             txtSearch.KeyPress += txtSearch_KeyPress;
-            //
+            // 
             // pnlMain
-            //
+            // 
             pnlMain.BackColor = Color.FromArgb(247, 249, 252);
             pnlMain.Controls.Add(dgvCategories);
             pnlMain.Controls.Add(pnlForm);
@@ -237,38 +238,20 @@
             pnlMain.Padding = new Padding(20);
             pnlMain.Size = new Size(1198, 698);
             pnlMain.TabIndex = 0;
-            //
+            // 
             // dgvCategories
-            //
+            // 
             dgvCategories.AllowUserToAddRows = false;
             dgvCategories.AllowUserToDeleteRows = false;
             dgvCategories.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvCategories.BackgroundColor = Color.White;
             dgvCategories.BorderStyle = BorderStyle.None;
-            dgvCategories.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
-            {
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                BackColor = Color.FromArgb(45, 55, 72),
-                ForeColor = Color.White,
-                Alignment = DataGridViewContentAlignment.MiddleCenter
-            };
+            dgvCategories.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgvCategories.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvCategories.ColumnHeadersHeight = 45;
-            dgvCategories.DefaultCellStyle = new DataGridViewCellStyle
-            {
-                Font = new Font("Segoe UI", 11F),
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(45, 55, 72),
-                SelectionBackColor = Color.FromArgb(255, 107, 107),
-                SelectionForeColor = Color.White
-            };
-            dgvCategories.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = Color.FromArgb(247, 249, 252)
-            };
             dgvCategories.Dock = DockStyle.Top;
             dgvCategories.EnableHeadersVisualStyles = false;
             dgvCategories.GridColor = Color.FromArgb(226, 232, 240);
-            dgvCategories.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvCategories.Location = new Point(20, 20);
             dgvCategories.MultiSelect = false;
             dgvCategories.Name = "dgvCategories";
@@ -278,9 +261,9 @@
             dgvCategories.Size = new Size(1158, 300);
             dgvCategories.TabIndex = 0;
             dgvCategories.CellClick += dgvCategories_CellClick;
-            //
+            // 
             // pnlForm
-            //
+            // 
             pnlForm.BackColor = Color.White;
             pnlForm.Controls.Add(lblName);
             pnlForm.Controls.Add(txtName);
@@ -298,14 +281,14 @@
             pnlForm.Controls.Add(lblActiveText);
             pnlForm.Controls.Add(picPreview);
             pnlForm.Dock = DockStyle.Bottom;
-            pnlForm.Location = new Point(20, 320);
+            pnlForm.Location = new Point(20, 398);
             pnlForm.Name = "pnlForm";
             pnlForm.Padding = new Padding(30);
             pnlForm.Size = new Size(1158, 280);
             pnlForm.TabIndex = 1;
-            //
+            // 
             // lblName
-            //
+            // 
             lblName.Font = new Font("Segoe UI", 11F);
             lblName.ForeColor = Color.FromArgb(45, 55, 72);
             lblName.Location = new Point(30, 30);
@@ -314,18 +297,18 @@
             lblName.TabIndex = 0;
             lblName.Text = "Tên danh mục:";
             lblName.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // txtName
-            //
+            // 
             txtName.BorderStyle = BorderStyle.FixedSingle;
             txtName.Font = new Font("Segoe UI", 11F);
             txtName.Location = new Point(160, 30);
             txtName.Name = "txtName";
             txtName.Size = new Size(300, 27);
             txtName.TabIndex = 1;
-            //
+            // 
             // lblDescription
-            //
+            // 
             lblDescription.Font = new Font("Segoe UI", 11F);
             lblDescription.ForeColor = Color.FromArgb(45, 55, 72);
             lblDescription.Location = new Point(30, 70);
@@ -334,18 +317,18 @@
             lblDescription.TabIndex = 2;
             lblDescription.Text = "Mô tả:";
             lblDescription.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // txtDescription
-            //
+            // 
             txtDescription.BorderStyle = BorderStyle.FixedSingle;
             txtDescription.Font = new Font("Segoe UI", 11F);
             txtDescription.Location = new Point(160, 70);
             txtDescription.Name = "txtDescription";
             txtDescription.Size = new Size(300, 27);
             txtDescription.TabIndex = 3;
-            //
+            // 
             // lblDisplayOrder
-            //
+            // 
             lblDisplayOrder.Font = new Font("Segoe UI", 11F);
             lblDisplayOrder.ForeColor = Color.FromArgb(45, 55, 72);
             lblDisplayOrder.Location = new Point(30, 110);
@@ -354,18 +337,18 @@
             lblDisplayOrder.TabIndex = 4;
             lblDisplayOrder.Text = "Thứ tự hiển thị:";
             lblDisplayOrder.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // numDisplayOrder
-            //
+            // 
             numDisplayOrder.Font = new Font("Segoe UI", 11F);
             numDisplayOrder.Location = new Point(160, 110);
             numDisplayOrder.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numDisplayOrder.Name = "numDisplayOrder";
             numDisplayOrder.Size = new Size(300, 27);
             numDisplayOrder.TabIndex = 5;
-            //
+            // 
             // lblCreatedAt
-            //
+            // 
             lblCreatedAt.Font = new Font("Segoe UI", 11F);
             lblCreatedAt.ForeColor = Color.FromArgb(45, 55, 72);
             lblCreatedAt.Location = new Point(30, 150);
@@ -374,20 +357,20 @@
             lblCreatedAt.TabIndex = 6;
             lblCreatedAt.Text = "Ngày tạo:";
             lblCreatedAt.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // dtpCreatedAt
-            //
+            // 
             dtpCreatedAt.CalendarFont = new Font("Segoe UI", 11F);
             dtpCreatedAt.CustomFormat = "dd/MM/yyyy HH:mm:ss";
             dtpCreatedAt.Format = DateTimePickerFormat.Custom;
             dtpCreatedAt.Location = new Point(160, 150);
             dtpCreatedAt.Name = "dtpCreatedAt";
             dtpCreatedAt.ShowCheckBox = true;
-            dtpCreatedAt.Size = new Size(300, 30);
+            dtpCreatedAt.Size = new Size(300, 23);
             dtpCreatedAt.TabIndex = 7;
-            //
+            // 
             // lblImageUrl
-            //
+            // 
             lblImageUrl.Font = new Font("Segoe UI", 11F);
             lblImageUrl.ForeColor = Color.FromArgb(45, 55, 72);
             lblImageUrl.Location = new Point(30, 190);
@@ -396,18 +379,18 @@
             lblImageUrl.TabIndex = 8;
             lblImageUrl.Text = "URL hình ảnh:";
             lblImageUrl.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // txtImageUrl
-            //
+            // 
             txtImageUrl.BorderStyle = BorderStyle.FixedSingle;
             txtImageUrl.Font = new Font("Segoe UI", 11F);
             txtImageUrl.Location = new Point(160, 190);
             txtImageUrl.Name = "txtImageUrl";
             txtImageUrl.Size = new Size(220, 27);
             txtImageUrl.TabIndex = 9;
-            //
+            // 
             // btnBrowseImage
-            //
+            // 
             btnBrowseImage.BackColor = Color.FromArgb(108, 117, 125);
             btnBrowseImage.Cursor = Cursors.Hand;
             btnBrowseImage.FlatAppearance.BorderSize = 0;
@@ -421,44 +404,44 @@
             btnBrowseImage.Text = "📁 Duyệt";
             btnBrowseImage.UseVisualStyleBackColor = false;
             btnBrowseImage.Click += btnBrowseImage_Click;
-            //
+            // 
             // lblIsActive
-            //
+            // 
             lblIsActive.Font = new Font("Segoe UI", 11F);
             lblIsActive.ForeColor = Color.FromArgb(45, 55, 72);
-            lblIsActive.Location = new Point(520, 30);
+            lblIsActive.Location = new Point(503, 30);
             lblIsActive.Name = "lblIsActive";
-            lblIsActive.Size = new Size(120, 30);
+            lblIsActive.Size = new Size(91, 30);
             lblIsActive.TabIndex = 11;
             lblIsActive.Text = "Trạng thái:";
             lblIsActive.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // chkIsActive
-            //
+            // 
             chkIsActive.Checked = true;
             chkIsActive.CheckState = CheckState.Checked;
-            chkIsActive.Location = new Point(650, 35);
+            chkIsActive.Location = new Point(604, 35);
             chkIsActive.Name = "chkIsActive";
-            chkIsActive.Size = new Size(30, 25);
+            chkIsActive.Size = new Size(20, 25);
             chkIsActive.TabIndex = 12;
-            //
+            // 
             // lblActiveText
-            //
+            // 
             lblActiveText.Font = new Font("Segoe UI", 11F);
             lblActiveText.ForeColor = Color.FromArgb(45, 55, 72);
-            lblActiveText.Location = new Point(685, 35);
+            lblActiveText.Location = new Point(620, 35);
             lblActiveText.Name = "lblActiveText";
             lblActiveText.Size = new Size(200, 25);
             lblActiveText.TabIndex = 13;
             lblActiveText.Text = "Hoạt động";
-            //
+            // 
             // picPreview
-            //
+            // 
             picPreview.BackColor = Color.FromArgb(247, 249, 252);
             picPreview.BorderStyle = BorderStyle.FixedSingle;
-            picPreview.Location = new Point(520, 70);
+            picPreview.Location = new Point(532, 70);
             picPreview.Name = "picPreview";
-            picPreview.Size = new Size(250, 150);
+            picPreview.Size = new Size(150, 150);
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 14;
             picPreview.TabStop = false;

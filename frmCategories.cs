@@ -534,7 +534,7 @@ namespace MilkTeaPOS
                 }
 
                 string fileName = Path.GetFileName(ofd.FileName);
-                string imagesFolder = GetProjectImagesPath();
+                string imagesFolder = Path.Combine(GetProjectImagesPath(), "Categories");
 
                 if (!Directory.Exists(imagesFolder))
                 {
@@ -547,7 +547,7 @@ namespace MilkTeaPOS
 
                 File.Copy(ofd.FileName, destPath, true);
 
-                string relativePath = Path.Combine("Images", newFileName);
+                string relativePath = Path.Combine("Images", "Categories", newFileName);
                 txtImageUrl.Text = relativePath;
                 LoadImagePreview(destPath);
 
