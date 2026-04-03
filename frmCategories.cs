@@ -12,7 +12,6 @@ namespace MilkTeaPOS
 {
     public partial class frmCategories : Form
     {
-        private readonly PostgresContext _context;
         private Category? _selectedCategory;
 
         #region Constants
@@ -27,7 +26,6 @@ namespace MilkTeaPOS
         public frmCategories()
         {
             InitializeComponent();
-            _context = new PostgresContext();
             InitializeForm();
         }
 
@@ -45,23 +43,26 @@ namespace MilkTeaPOS
             try
             {
                 ShowLoading(true);
-                Application.DoEvents(); // Process UI events immediately
 
-                var categories = await _context.Categories
-                    .OrderBy(c => c.DisplayOrder)
-                    .ThenBy(c => c.CreatedAt)
-                    .ToListAsync();
-
-                dgvCategories.DataSource = categories.Select(c => new
+                using (var context = new PostgresContext())
                 {
-                    c.Id,
-                    c.Name,
-                    c.Description,
-                    c.DisplayOrder,
-                    c.IsActive,
-                    c.ImageUrl,
-                    c.CreatedAt
-                }).ToList();
+                    var categories = await context.Categories
+                        .OrderBy(c => c.DisplayOrder)
+                        .ThenBy(c => c.CreatedAt)
+                        .ToListAsync();
+
+                    dgvCategories.DataSource = categories.Select(c => new
+                    {
+                        c.Id,
+                        c.Name,
+                        c.Description,
+                        c.DisplayOrder,
+                        c.IsActive,
+                        c.ImageUrl,
+                        c.CreatedAt,
+                        c.UpdatedAt
+                    }).ToList();
+                }
 
                 CustomizeColumns();
             }
@@ -133,24 +134,20 @@ namespace MilkTeaPOS
                 columns["UpdatedAt"].HeaderText = "Ngày cập nhật";
                 columns["UpdatedAt"].Width = 150;
                 columns["UpdatedAt"].DefaultCellStyle.Format = "dd/MM/yyyy HH:mm:ss";
-                columns["UpdatedAt"].Visible = true;
             }
+        }
 
-            dgvCategories.CellFormatting += (s, e) =>
+        private void dgvCategories_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dgvCategories.Columns["IsActive"] == null || e.ColumnIndex != dgvCategories.Columns["IsActive"].Index || e.Value == null)
+                return;
+
+            if (e.Value is bool isActive)
             {
-                if (columns["IsActive"] == null || e.ColumnIndex != columns["IsActive"].Index || e.Value == null)
-                    return;
-
-                var row = dgvCategories.Rows[e.RowIndex];
-                var cellValue = row.Cells["IsActive"].Value;
-
-                if (cellValue is bool isActive)
-                {
-                    e.Value = isActive ? "✓ Đúng" : "✗ Sai";
-                    e.CellStyle.ForeColor = isActive ? Color.FromArgb(72, 187, 120) : Color.FromArgb(220, 53, 69);
-                    e.CellStyle.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-                }
-            };
+                e.Value = isActive ? "✓ Đúng" : "✗ Sai";
+                e.CellStyle.ForeColor = isActive ? Color.FromArgb(72, 187, 120) : Color.FromArgb(220, 53, 69);
+                e.CellStyle.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            }
         }
 
         #endregion
@@ -171,10 +168,87 @@ namespace MilkTeaPOS
                 Description = row.Cells["Description"].Value?.ToString(),
                 ImageUrl = row.Cells["ImageUrl"]?.Value?.ToString(),
                 DisplayOrder = Convert.ToInt32(row.Cells["DisplayOrder"].Value ?? 0),
-                IsActive = Convert.ToBoolean(row.Cells["IsActive"].Value ?? true)
+                IsActive = Convert.ToBoolean(row.Cells["IsActive"].Value ?? true),
+                CreatedAt = row.Cells["CreatedAt"].Value != null ? Convert.ToDateTime(row.Cells["CreatedAt"].Value) : DateTime.UtcNow,
+                UpdatedAt = row.Cells["UpdatedAt"].Value != null ? Convert.ToDateTime(row.Cells["UpdatedAt"].Value) : DateTime.UtcNow
             };
 
             FillFormData();
+        }
+
+        #endregion
+
+        #region Keyboard Navigation
+
+        private void txtName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                txtDescription.Focus();
+            }
+        }
+
+        private void txtDescription_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                numDisplayOrder.Focus();
+            }
+        }
+
+        private void numDisplayOrder_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                dtpCreatedAt.Focus();
+            }
+        }
+
+        private void dtpCreatedAt_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                dtpUpdatedAt.Focus();
+            }
+        }
+
+        private void dtpUpdatedAt_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                txtImageUrl.Focus();
+            }
+        }
+
+        private void txtImageUrl_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                chkIsActive.Focus();
+            }
+        }
+
+        private void chkIsActive_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                // If editing existing category, save; otherwise add new
+                if (_selectedCategory != null)
+                {
+                    btnEdit_Click(sender, e);
+                }
+                else
+                {
+                    btnAdd_Click(sender, e);
+                }
+            }
         }
 
         #endregion
@@ -189,6 +263,7 @@ namespace MilkTeaPOS
             txtDescription.Text = _selectedCategory.Description ?? string.Empty;
             numDisplayOrder.Value = _selectedCategory.DisplayOrder ?? 0;
             dtpCreatedAt.Value = _selectedCategory.CreatedAt ?? DateTime.UtcNow;
+            dtpUpdatedAt.Value = _selectedCategory.UpdatedAt ?? DateTime.UtcNow;
             txtImageUrl.Text = _selectedCategory.ImageUrl ?? string.Empty;
             chkIsActive.Checked = _selectedCategory.IsActive ?? true;
 
@@ -209,6 +284,7 @@ namespace MilkTeaPOS
             txtDescription.Clear();
             numDisplayOrder.Value = 0;
             dtpCreatedAt.Value = DateTime.UtcNow;
+            dtpUpdatedAt.Value = DateTime.UtcNow;
             txtImageUrl.Clear();
             chkIsActive.Checked = true;
             picPreview.Image = null;
@@ -296,22 +372,25 @@ namespace MilkTeaPOS
 
             try
             {
-                var category = await _context.Categories.FindAsync(_selectedCategory.Id);
-                if (category != null)
+                using (var context = new PostgresContext())
                 {
-                    string oldImageUrl = category.ImageUrl;
-                    if (!string.IsNullOrEmpty(oldImageUrl) && oldImageUrl != newImageUrl)
+                    var category = await context.Categories.FindAsync(_selectedCategory.Id);
+                    if (category != null)
                     {
-                        DeleteOldImage(oldImageUrl);
+                        string oldImageUrl = category.ImageUrl;
+                        if (!string.IsNullOrEmpty(oldImageUrl) && oldImageUrl != newImageUrl)
+                        {
+                            DeleteOldImage(oldImageUrl);
+                        }
+
+                        category.ImageUrl = newImageUrl;
+                        category.UpdatedAt = DateTime.UtcNow;
+                        await context.SaveChangesAsync();
+
+                        _selectedCategory.ImageUrl = newImageUrl;
+                        LoadCategories();
+                        ReselectCurrentRow();
                     }
-
-                    category.ImageUrl = newImageUrl;
-                    category.UpdatedAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-
-                    _selectedCategory.ImageUrl = newImageUrl;
-                    LoadCategories();
-                    ReselectCurrentRow();
                 }
             }
             catch
@@ -379,27 +458,30 @@ namespace MilkTeaPOS
             try
             {
                 ShowLoading(true);
-                Application.DoEvents();
 
-                var categories = await _context.Categories
-                    .AsNoTracking()
-                    .Where(c => string.IsNullOrEmpty(searchText) ||
-                               c.Name.ToLower().Contains(searchText) ||
-                               (c.Description != null && c.Description.ToLower().Contains(searchText)))
-                    .OrderBy(c => c.DisplayOrder)
-                    .ThenBy(c => c.CreatedAt)
-                    .ToListAsync();
-
-                dgvCategories.DataSource = categories.Select(c => new
+                using (var context = new PostgresContext())
                 {
-                    c.Id,
-                    c.Name,
-                    c.Description,
-                    c.DisplayOrder,
-                    c.IsActive,
-                    c.ImageUrl,
-                    c.CreatedAt
-                }).ToList();
+                    var categories = await context.Categories
+                        .AsNoTracking()
+                        .Where(c => string.IsNullOrEmpty(searchText) ||
+                                   c.Name.ToLower().Contains(searchText) ||
+                                   (c.Description != null && c.Description.ToLower().Contains(searchText)))
+                        .OrderBy(c => c.DisplayOrder)
+                        .ThenBy(c => c.CreatedAt)
+                        .ToListAsync();
+
+                    dgvCategories.DataSource = categories.Select(c => new
+                    {
+                        c.Id,
+                        c.Name,
+                        c.Description,
+                        c.DisplayOrder,
+                        c.IsActive,
+                        c.ImageUrl,
+                        c.CreatedAt,
+                        c.UpdatedAt
+                    }).ToList();
+                }
 
                 CustomizeColumns();
             }
@@ -453,24 +535,27 @@ namespace MilkTeaPOS
 
             try
             {
-                var category = await _context.Categories.FindAsync(_selectedCategory.Id);
-                if (category != null)
+                using (var context = new PostgresContext())
                 {
-                    string oldImageUrl = category.ImageUrl;
-                    _context.Categories.Remove(category);
-                    await _context.SaveChangesAsync();
-
-                    if (!string.IsNullOrEmpty(oldImageUrl))
+                    var category = await context.Categories.FindAsync(_selectedCategory.Id);
+                    if (category != null)
                     {
-                        DeleteOldImage(oldImageUrl);
+                        string oldImageUrl = category.ImageUrl;
+                        context.Categories.Remove(category);
+                        await context.SaveChangesAsync();
+
+                        if (!string.IsNullOrEmpty(oldImageUrl))
+                        {
+                            DeleteOldImage(oldImageUrl);
+                        }
                     }
-
-                    MessageBox.Show("✅ Xóa danh mục thành công!", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    LoadCategories();
-                    ClearForm();
                 }
+
+                MessageBox.Show("✅ Xóa danh mục thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                LoadCategories();
+                ClearForm();
             }
             catch (DbUpdateException dbEx)
             {
@@ -574,11 +659,16 @@ namespace MilkTeaPOS
                 return;
             }
 
-            var existingCategory = await _context.Categories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
+            // Check duplicate name
+            bool exists;
+            using (var context = new PostgresContext())
+            {
+                exists = await context.Categories
+                    .AsNoTracking()
+                    .AnyAsync(c => c.Name.ToLower() == categoryName.ToLower());
+            }
 
-            if (existingCategory != null)
+            if (exists)
             {
                 MessageBox.Show($"⚠️ Danh mục '{categoryName}' đã tồn tại!\nVui lòng nhập tên khác.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -589,20 +679,23 @@ namespace MilkTeaPOS
 
             try
             {
-                var category = new Category
+                using (var context = new PostgresContext())
                 {
-                    Id = Guid.NewGuid(),
-                    Name = categoryName,
-                    Description = txtDescription.Text,
-                    DisplayOrder = (int)numDisplayOrder.Value,
-                    CreatedAt = DateTime.UtcNow,
-                    ImageUrl = txtImageUrl.Text,
-                    IsActive = chkIsActive.Checked,
-                    UpdatedAt = DateTime.UtcNow
-                };
+                    var category = new Category
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = categoryName,
+                        Description = txtDescription.Text,
+                        DisplayOrder = (int)numDisplayOrder.Value,
+                        CreatedAt = dtpCreatedAt.Value.ToUniversalTime(),
+                        UpdatedAt = dtpUpdatedAt.Value.ToUniversalTime(),
+                        ImageUrl = txtImageUrl.Text,
+                        IsActive = chkIsActive.Checked,
+                    };
 
-                _context.Categories.Add(category);
-                await _context.SaveChangesAsync();
+                    context.Categories.Add(category);
+                    await context.SaveChangesAsync();
+                }
 
                 MessageBox.Show("✅ Thêm danh mục thành công!", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -632,11 +725,16 @@ namespace MilkTeaPOS
                 return;
             }
 
-            var existingCategory = await _context.Categories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower() && c.Id != _selectedCategory!.Id);
+            // Check duplicate name (excluding current)
+            bool exists;
+            using (var context = new PostgresContext())
+            {
+                exists = await context.Categories
+                    .AsNoTracking()
+                    .AnyAsync(c => c.Name.ToLower() == categoryName.ToLower() && c.Id != _selectedCategory!.Id);
+            }
 
-            if (existingCategory != null)
+            if (exists)
             {
                 MessageBox.Show($"⚠️ Danh mục '{categoryName}' đã tồn tại!\nVui lòng nhập tên khác.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -647,30 +745,34 @@ namespace MilkTeaPOS
 
             try
             {
-                var category = await _context.Categories.FindAsync(_selectedCategory!.Id);
-                if (category != null)
+                using (var context = new PostgresContext())
                 {
-                    string oldImageUrl = category.ImageUrl;
-                    if (!string.IsNullOrEmpty(oldImageUrl) && oldImageUrl != txtImageUrl.Text)
+                    var category = await context.Categories.FindAsync(_selectedCategory!.Id);
+                    if (category != null)
                     {
-                        DeleteOldImage(oldImageUrl);
+                        string oldImageUrl = category.ImageUrl;
+                        if (!string.IsNullOrEmpty(oldImageUrl) && oldImageUrl != txtImageUrl.Text)
+                        {
+                            DeleteOldImage(oldImageUrl);
+                        }
+
+                        category.Name = categoryName;
+                        category.Description = txtDescription.Text;
+                        category.DisplayOrder = (int)numDisplayOrder.Value;
+                        category.ImageUrl = txtImageUrl.Text;
+                        category.IsActive = chkIsActive.Checked;
+                        category.CreatedAt = dtpCreatedAt.Value.ToUniversalTime();
+                        category.UpdatedAt = dtpUpdatedAt.Value.ToUniversalTime();
+
+                        await context.SaveChangesAsync();
                     }
-
-                    category.Name = categoryName;
-                    category.Description = txtDescription.Text;
-                    category.DisplayOrder = (int)numDisplayOrder.Value;
-                    category.ImageUrl = txtImageUrl.Text;
-                    category.IsActive = chkIsActive.Checked;
-                    category.UpdatedAt = DateTime.UtcNow;
-
-                    await _context.SaveChangesAsync();
-
-                    MessageBox.Show("✅ Cập nhật danh mục thành công!", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    LoadCategories();
-                    ClearForm();
                 }
+
+                MessageBox.Show("✅ Cập nhật danh mục thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                LoadCategories();
+                ClearForm();
             }
             catch (DbUpdateException dbEx)
             {
@@ -692,6 +794,14 @@ namespace MilkTeaPOS
             pnlMain.Enabled = !isLoading;
             pnlToolbar.Enabled = !isLoading;
             pnlSearch.Enabled = !isLoading;
+            
+            // Force UI update without DoEvents
+            if (isLoading)
+            {
+                pnlMain.Refresh();
+                pnlToolbar.Refresh();
+                pnlSearch.Refresh();
+            }
         }
 
         private void ShowDbError(string action, DbUpdateException ex)

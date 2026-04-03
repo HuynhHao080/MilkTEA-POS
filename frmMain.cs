@@ -77,6 +77,7 @@ namespace MilkTeaPOS
                 {
                     "frmDashboard" => new frmDashboard(),
                     "frmCategories" => new frmCategories(),
+                    "frmUsers" => new frmUsers(),
                     _ => createPlaceholderForm(formName)
                 };
 

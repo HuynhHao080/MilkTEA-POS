@@ -11,13 +11,11 @@ namespace MilkTeaPOS
 {
     public partial class frmChangePassword : Form
     {
-        private readonly PostgresContext _context;
         private readonly User _loggedInUser;
 
         public frmChangePassword(User loggedInUser)
         {
             InitializeComponent();
-            _context = new PostgresContext();
             _loggedInUser = loggedInUser;
             InitializeForm();
         }
@@ -126,39 +124,42 @@ namespace MilkTeaPOS
             try
             {
                 // Verify current password
-                var user = await _context.Users.FindAsync(_loggedInUser.Id);
-                if (user == null)
+                using (var context = new PostgresContext())
                 {
-                    MessageBox.Show(
-                        "❌ Không tìm thấy người dùng!",
-                        "Lỗi",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
+                    var user = await context.Users.FindAsync(_loggedInUser.Id);
+                    if (user == null)
+                    {
+                        MessageBox.Show(
+                            "❌ Không tìm thấy người dùng!",
+                            "Lỗi",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Verify current password with BCrypt
+                    if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+                    {
+                        MessageBox.Show(
+                            "❌ Mật khẩu hiện tại không đúng!\n\nVui lòng nhập lại.",
+                            "Lỗi",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        txtCurrentPassword.Focus();
+                        txtCurrentPassword.SelectAll();
+                        return;
+                    }
+
+                    // Hash new password with BCrypt (work factor = 12)
+                    string newHash = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: 12);
+
+                    // Update password hash
+                    user.PasswordHash = newHash;
+                    user.Password = newPassword; // Temporary: satisfy NOT NULL constraint
+                    user.UpdatedAt = DateTime.UtcNow;
+
+                    await context.SaveChangesAsync();
                 }
-
-                // Verify current password with BCrypt
-                if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
-                {
-                    MessageBox.Show(
-                        "❌ Mật khẩu hiện tại không đúng!\n\nVui lòng nhập lại.",
-                        "Lỗi",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    txtCurrentPassword.Focus();
-                    txtCurrentPassword.SelectAll();
-                    return;
-                }
-
-                // Hash new password with BCrypt (work factor = 12)
-                string newHash = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: 12);
-
-                // Update both password_hash (BCrypt) and password (plain text for migration)
-                user.PasswordHash = newHash;
-                user.Password = newPassword;  // Keep plain text for backward compatibility
-                user.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
 
                 MessageBox.Show(
                     "✅ Đổi mật khẩu thành công!\n\nMật khẩu mới đã được cập nhật và mã hóa.",

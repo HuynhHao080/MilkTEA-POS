@@ -36,6 +36,8 @@
         private System.Windows.Forms.NumericUpDown numDisplayOrder;
         private System.Windows.Forms.Label lblCreatedAt;
         private System.Windows.Forms.DateTimePicker dtpCreatedAt;
+        private System.Windows.Forms.Label lblUpdatedAt;
+        private System.Windows.Forms.DateTimePicker dtpUpdatedAt;
         private System.Windows.Forms.Label lblImageUrl;
         private System.Windows.Forms.TextBox txtImageUrl;
         private System.Windows.Forms.Button btnBrowseImage;
@@ -77,6 +79,8 @@
             numDisplayOrder = new NumericUpDown();
             lblCreatedAt = new Label();
             dtpCreatedAt = new DateTimePicker();
+            lblUpdatedAt = new Label();
+            dtpUpdatedAt = new DateTimePicker();
             lblImageUrl = new Label();
             txtImageUrl = new TextBox();
             btnBrowseImage = new Button();
@@ -238,17 +242,35 @@
             pnlMain.Padding = new Padding(20);
             pnlMain.Size = new Size(1198, 698);
             pnlMain.TabIndex = 0;
-            // 
+            //
             // dgvCategories
-            // 
+            //
             dgvCategories.AllowUserToAddRows = false;
             dgvCategories.AllowUserToDeleteRows = false;
             dgvCategories.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvCategories.BackgroundColor = Color.White;
             dgvCategories.BorderStyle = BorderStyle.None;
-            dgvCategories.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvCategories.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvCategories.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+            {
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                BackColor = Color.FromArgb(45, 55, 72),
+                ForeColor = Color.White,
+                Alignment = DataGridViewContentAlignment.MiddleCenter
+            };
             dgvCategories.ColumnHeadersHeight = 45;
+            dgvCategories.DefaultCellStyle = new DataGridViewCellStyle
+            {
+                Font = new Font("Segoe UI", 11F),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(45, 55, 72),
+                SelectionBackColor = Color.FromArgb(255, 107, 107),
+                SelectionForeColor = Color.White
+            };
+            dgvCategories.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+            {
+                BackColor = Color.FromArgb(247, 249, 252)
+            };
+            dgvCategories.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvCategories.Dock = DockStyle.Top;
             dgvCategories.EnableHeadersVisualStyles = false;
             dgvCategories.GridColor = Color.FromArgb(226, 232, 240);
@@ -261,7 +283,8 @@
             dgvCategories.Size = new Size(1158, 300);
             dgvCategories.TabIndex = 0;
             dgvCategories.CellClick += dgvCategories_CellClick;
-            // 
+            dgvCategories.CellFormatting += dgvCategories_CellFormatting;
+            //
             // pnlForm
             // 
             pnlForm.BackColor = Color.White;
@@ -273,6 +296,8 @@
             pnlForm.Controls.Add(numDisplayOrder);
             pnlForm.Controls.Add(lblCreatedAt);
             pnlForm.Controls.Add(dtpCreatedAt);
+            pnlForm.Controls.Add(lblUpdatedAt);
+            pnlForm.Controls.Add(dtpUpdatedAt);
             pnlForm.Controls.Add(lblImageUrl);
             pnlForm.Controls.Add(txtImageUrl);
             pnlForm.Controls.Add(btnBrowseImage);
@@ -306,6 +331,7 @@
             txtName.Name = "txtName";
             txtName.Size = new Size(300, 27);
             txtName.TabIndex = 1;
+            txtName.KeyPress += txtName_KeyPress;
             // 
             // lblDescription
             // 
@@ -326,6 +352,7 @@
             txtDescription.Name = "txtDescription";
             txtDescription.Size = new Size(300, 27);
             txtDescription.TabIndex = 3;
+            txtDescription.KeyPress += txtDescription_KeyPress;
             // 
             // lblDisplayOrder
             // 
@@ -346,6 +373,7 @@
             numDisplayOrder.Name = "numDisplayOrder";
             numDisplayOrder.Size = new Size(300, 27);
             numDisplayOrder.TabIndex = 5;
+            numDisplayOrder.KeyPress += numDisplayOrder_KeyPress;
             // 
             // lblCreatedAt
             // 
@@ -368,12 +396,36 @@
             dtpCreatedAt.ShowCheckBox = true;
             dtpCreatedAt.Size = new Size(300, 23);
             dtpCreatedAt.TabIndex = 7;
+            dtpCreatedAt.KeyPress += dtpCreatedAt_KeyPress;
+            // 
+            // lblUpdatedAt
+            // 
+            lblUpdatedAt.Font = new Font("Segoe UI", 11F);
+            lblUpdatedAt.ForeColor = Color.FromArgb(45, 55, 72);
+            lblUpdatedAt.Location = new Point(30, 190);
+            lblUpdatedAt.Name = "lblUpdatedAt";
+            lblUpdatedAt.Size = new Size(120, 30);
+            lblUpdatedAt.TabIndex = 15;
+            lblUpdatedAt.Text = "Ngày cập nhật:";
+            lblUpdatedAt.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // dtpUpdatedAt
+            // 
+            dtpUpdatedAt.CalendarFont = new Font("Segoe UI", 11F);
+            dtpUpdatedAt.CustomFormat = "dd/MM/yyyy HH:mm:ss";
+            dtpUpdatedAt.Format = DateTimePickerFormat.Custom;
+            dtpUpdatedAt.Location = new Point(160, 190);
+            dtpUpdatedAt.Name = "dtpUpdatedAt";
+            dtpUpdatedAt.ShowCheckBox = true;
+            dtpUpdatedAt.Size = new Size(300, 23);
+            dtpUpdatedAt.TabIndex = 16;
+            dtpUpdatedAt.KeyPress += dtpUpdatedAt_KeyPress;
             // 
             // lblImageUrl
             // 
             lblImageUrl.Font = new Font("Segoe UI", 11F);
             lblImageUrl.ForeColor = Color.FromArgb(45, 55, 72);
-            lblImageUrl.Location = new Point(30, 190);
+            lblImageUrl.Location = new Point(30, 230);
             lblImageUrl.Name = "lblImageUrl";
             lblImageUrl.Size = new Size(120, 30);
             lblImageUrl.TabIndex = 8;
@@ -384,10 +436,11 @@
             // 
             txtImageUrl.BorderStyle = BorderStyle.FixedSingle;
             txtImageUrl.Font = new Font("Segoe UI", 11F);
-            txtImageUrl.Location = new Point(160, 190);
+            txtImageUrl.Location = new Point(160, 230);
             txtImageUrl.Name = "txtImageUrl";
             txtImageUrl.Size = new Size(220, 27);
             txtImageUrl.TabIndex = 9;
+            txtImageUrl.KeyPress += txtImageUrl_KeyPress;
             // 
             // btnBrowseImage
             // 
@@ -397,7 +450,7 @@
             btnBrowseImage.FlatStyle = FlatStyle.Flat;
             btnBrowseImage.Font = new Font("Segoe UI", 10F);
             btnBrowseImage.ForeColor = Color.White;
-            btnBrowseImage.Location = new Point(390, 190);
+            btnBrowseImage.Location = new Point(390, 230);
             btnBrowseImage.Name = "btnBrowseImage";
             btnBrowseImage.Size = new Size(70, 30);
             btnBrowseImage.TabIndex = 10;
@@ -409,7 +462,7 @@
             // 
             lblIsActive.Font = new Font("Segoe UI", 11F);
             lblIsActive.ForeColor = Color.FromArgb(45, 55, 72);
-            lblIsActive.Location = new Point(503, 30);
+            lblIsActive.Location = new Point(504, 30);
             lblIsActive.Name = "lblIsActive";
             lblIsActive.Size = new Size(91, 30);
             lblIsActive.TabIndex = 11;
@@ -420,16 +473,17 @@
             // 
             chkIsActive.Checked = true;
             chkIsActive.CheckState = CheckState.Checked;
-            chkIsActive.Location = new Point(604, 35);
+            chkIsActive.Location = new Point(615, 35);
             chkIsActive.Name = "chkIsActive";
             chkIsActive.Size = new Size(20, 25);
             chkIsActive.TabIndex = 12;
+            chkIsActive.KeyPress += chkIsActive_KeyPress;
             // 
             // lblActiveText
             // 
             lblActiveText.Font = new Font("Segoe UI", 11F);
             lblActiveText.ForeColor = Color.FromArgb(45, 55, 72);
-            lblActiveText.Location = new Point(620, 35);
+            lblActiveText.Location = new Point(630, 35);
             lblActiveText.Name = "lblActiveText";
             lblActiveText.Size = new Size(200, 25);
             lblActiveText.TabIndex = 13;
@@ -439,9 +493,9 @@
             // 
             picPreview.BackColor = Color.FromArgb(247, 249, 252);
             picPreview.BorderStyle = BorderStyle.FixedSingle;
-            picPreview.Location = new Point(532, 70);
+            picPreview.Location = new Point(521, 73);
             picPreview.Name = "picPreview";
-            picPreview.Size = new Size(150, 150);
+            picPreview.Size = new Size(187, 187);
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 14;
             picPreview.TabStop = false;
