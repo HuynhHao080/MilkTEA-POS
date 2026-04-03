@@ -311,13 +311,12 @@ dotnet run
 
 ### Ưu tiên thấp hơn:
 
-6. **frmCustomers** - Quản lý khách hàng
-7. **frmMemberships** - Quản lý hội viên
-8. **frmVouchers** - Quản lý voucher
-9. **frmOrderHistory** - Lịch sử đơn hàng
-10. **frmSalesReport** - Báo cáo doanh thu
-11. **frmAuditLog** - Audit log
-12. **frmOrderDetail** - Chi tiết đơn hàng
+6. **frmMemberships** - Quản lý hội viên
+7. **frmVouchers** - Quản lý voucher
+8. **frmOrderHistory** - Lịch sử đơn hàng
+9. **frmSalesReport** - Báo cáo doanh thu
+10. **frmAuditLog** - Audit log
+11. **frmOrderDetail** - Chi tiết đơn hàng
 
 ---
 
