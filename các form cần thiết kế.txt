@@ -28,10 +28,10 @@
 │ TỔNG           │   18     │                                │
 └────────────────┴──────────┴────────────────────────────────┘
 
-Tiến độ: 6/18 forms (33%) ✅
+Tiến độ: 7/18 forms (39%) ✅
 
 =====================================================
-✅ FORM ĐÃ HOÀN THÀNH (6/18)
+✅ FORM ĐÃ HOÀN THÀNH (7/18)
 =====================================================
 
 ✅ 1. frmCategories ⭐
@@ -181,8 +181,46 @@ Tiến độ: 6/18 forms (33%) ✅
 
    Ảnh lưu tại: Images/Categories/
 
+✅ 7. frmCustomers ⭐
+   File: frmCustomers.cs (989 dòng)
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - CRUD đầy đủ (Thêm, Sửa, Xóa)
+   - Tìm kiếm theo tên, SĐT, email
+   - Upload ảnh đại diện (max 10MB, whitelist)
+   - Auto-save ảnh khi duyệt
+   - Preview ảnh (không lock file - MemoryStream)
+   - Xóa ảnh cũ tự động
+   - Validation trùng SĐT, email
+   - Loading indicators (proper async, no DoEvents)
+   - Path traversal protection
+   - Keyboard navigation (9 fields → Enter → submit)
+   - Editable dtpDateOfBirth, dtpCreatedAt, dtpUpdatedAt
+   - Short-lived DbContext (using pattern)
+   - DataGridView styling hoàn hảo
+   - Gender mapping (VN ↔ DB: Nam/Nữ/Khác ↔ male/female/other)
+   - Gender color coding (Nam=blue, Nữ=red)
+   - Avatar-only update (không cần full form save)
+
+   Security:
+   - Path traversal protection
+   - File size limit (10MB)
+   - Extension whitelist (.jpg, .jpeg, .png, .gif, .webp)
+   - SQL injection safe (EF Core)
+   - Short-lived DbContext
+
+   UI/UX:
+   - DataGridView styling (header, cells, alternating rows)
+   - Gender color-coded trong DataGridView
+   - Avatar preview (120x120px, Zoom mode)
+   - Keyboard shortcuts cho tất cả fields (9 fields)
+   - ComboBox naming: cb (không phải cbo)
+   - Two-column layout
+
+   Ảnh lưu tại: Images/Customers/
+
 =====================================================
-🔜 FORM CẦN LÀM TIẾP THEO (12/18)
+🔜 FORM CẦN LÀM TIẾP THEO (11/18)
 =====================================================
 
 Ưu tiên cao (Core Business):
@@ -225,7 +263,7 @@ Tiến độ: 6/18 forms (33%) ✅
 
 Ưu tiên thấp hơn:
 
-⏳ 12. frmCustomers
+⏳ 12. frmCustomers ✅ (ĐÃ HOÀN THÀNH)
 ⏳ 13. frmMemberships
 ⏳ 14. frmVouchers
 ⏳ 15. frmOrderHistory

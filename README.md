@@ -56,11 +56,11 @@ dotnet run
 | Users | 1 | Staff management |
 | **TỔNG** | **18** | |
 
-**Tiến độ:** 6/18 forms (33%) ✅ - All completed forms rated 10/10 ⭐
+**Tiến độ:** 7/18 forms (39%) ✅ - All completed forms rated 10/10 ⭐
 
 ---
 
-## ✅ FORMS ĐÃ HOÀN THÀNH (6/18)
+## ✅ FORMS ĐÃ HOÀN THÀNH (7/18)
 
 ### 1. frmCategories - Quản lý danh mục sản phẩm ⭐
 
@@ -235,7 +235,53 @@ dotnet run
 
 ---
 
-## 🔜 FORMS SẮP LÀM (12/18)
+### 7. frmCustomers - Quản lý khách hàng ⭐ NEW
+
+**File:**
+- `frmCustomers.cs` (989 dòng)
+- `frmCustomers.Designer.cs` (601 dòng)
+
+**Trạng thái:** `HOÀN THÀNH 10/10` 🏆
+
+**Chức năng:**
+- ✅ CRUD khách hàng
+- ✅ Tìm kiếm theo tên, SĐT, email
+- ✅ Upload ảnh đại diện (max 10MB, whitelist)
+- ✅ Auto-save ảnh khi duyệt
+- ✅ Preview ảnh (không lock file - MemoryStream)
+- ✅ Xóa ảnh cũ tự động
+- ✅ Validation trùng SĐT, email
+- ✅ Loading indicators (proper async)
+- ✅ Keyboard navigation (9 fields → Enter → submit)
+- ✅ Editable dtpDateOfBirth, dtpCreatedAt, dtpUpdatedAt
+- ✅ Short-lived DbContext (using pattern)
+- ✅ DataGridView styling hoàn hảo
+- ✅ Gender mapping (VN ↔ DB)
+- ✅ Gender color coding (Nam=blue, Nữ=red)
+- ✅ Avatar-only update (không cần full form save)
+
+**Bảo mật:**
+- ✅ BCrypt hashing (work factor 12)
+- ✅ Password strength validation (min 6 chars)
+- ✅ No plain-text password storage (temporary for constraint)
+- ✅ Role-based access control
+- ✅ Short-lived DbContext
+
+**UI/UX:**
+- ✅ DataGridView styling (header, cells, alternating rows)
+- ✅ Gender color-coded trong DataGridView
+- ✅ Avatar preview (120x120px, Zoom mode)
+- ✅ Keyboard shortcuts cho tất cả fields (9 fields)
+- ✅ ComboBox naming: cb (không phải cbo)
+- ✅ Two-column layout
+
+**Lưu ý:**
+- Ảnh lưu trong: `Images/Customers/`
+- Gender mapping: `Nam` ↔ `male`, `Nữ` ↔ `female`, `Khác` ↔ `other`
+
+---
+
+## 🔜 FORMS SẮP LÀM (11/18)
 
 ### Ưu tiên cao (Core Business):
 
@@ -340,6 +386,9 @@ MilkTEA-POS/
 - ✅ ComboBox naming: `cb` (không phải `cbo`)
 - ✅ CellFormatting wired in Designer (no memory leak)
 - ✅ Spam-proof connection handling (`Max Auto Prepare=0`)
+- ✅ Image upload with path traversal protection
+- ✅ Gender mapping (VN ↔ DB)
+- ✅ Avatar preview với MemoryStream (không lock file)
 
 ---
 
@@ -390,7 +439,7 @@ Nếu có vấn đề, tạo issue hoặc liên hệ team lead.
 
 ---
 
-**Cập nhật cuối:** April 3, 2026 - All forms 10/10, short-lived DbContext, spam-proof ⭐
+**Cập nhật cuối:** April 3, 2026 - 7/18 forms 10/10, short-lived DbContext, spam-proof ⭐
 **Version:** 1.0.0
 **Status:** In Development 🚧
-**Progress:** 6/18 forms (33%) - Production Ready ⭐
+**Progress:** 7/18 forms (39%) - Production Ready ⭐

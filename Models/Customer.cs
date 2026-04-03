@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MilkTeaPOS.Models;
 
@@ -20,6 +21,9 @@ public partial class Customer
     public string? Address { get; set; }
 
     public string? Notes { get; set; }
+
+    [Column("avatar_url")]
+    public string? AvatarUrl { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
