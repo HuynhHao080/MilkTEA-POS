@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-
+using System.ComponentModel.DataAnnotations.Schema;
 namespace MilkTeaPOS.Models;
 
 public partial class Voucher
@@ -38,4 +38,13 @@ public partial class Voucher
     public DateTime? UpdatedAt { get; set; }
 
     public virtual User? CreatedByNavigation { get; set; }
+
+
+    [Column("voucher_type", TypeName = "voucher_type")]
+    public string VoucherType { get; set; } = "percentage";
+
+    // Chỉ định rõ kiểu dữ liệu Enum cho Postgres
+    [Column("status", TypeName = "voucher_status")]
+    public string status { get; set; } = "active";
+
 }
