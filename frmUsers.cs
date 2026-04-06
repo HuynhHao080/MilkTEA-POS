@@ -14,6 +14,17 @@ namespace MilkTeaPOS
     {
         private User? _selectedUser;
 
+        #region Constants
+
+        private const long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        private static readonly string[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        
+        // Cached fonts to avoid GDI leaks
+        private readonly Font _fontActiveGreen = new Font("Segoe UI", 11F, FontStyle.Bold);
+        private readonly Font _fontActiveRed = new Font("Segoe UI", 11F, FontStyle.Bold);
+
+        #endregion
+
         #region Constructor & Initialization
 
         public frmUsers()
@@ -76,6 +87,7 @@ namespace MilkTeaPOS
                         u.Id,
                         u.Username,
                         RoleName = u.Role != null ? u.Role.Name : "Chưa gán",
+                        u.AvatarUrl,
                         u.IsActive,
                         u.CreatedAt,
                         u.UpdatedAt
@@ -134,6 +146,11 @@ namespace MilkTeaPOS
                 columns["UpdatedAt"].HeaderText = "Ngày cập nhật";
                 columns["UpdatedAt"].DefaultCellStyle.Format = "dd/MM/yyyy HH:mm:ss";
             }
+
+            if (columns["AvatarUrl"] != null)
+            {
+                columns["AvatarUrl"].Visible = false;
+            }
         }
 
         private void dgvUsers_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
@@ -145,8 +162,15 @@ namespace MilkTeaPOS
             {
                 e.Value = isActive ? "✓ Đúng" : "✗ Sai";
                 e.CellStyle.ForeColor = isActive ? Color.FromArgb(72, 187, 120) : Color.FromArgb(220, 53, 69);
-                e.CellStyle.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+                e.CellStyle.Font = isActive ? _fontActiveGreen : _fontActiveRed;
             }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _fontActiveGreen?.Dispose();
+            _fontActiveRed?.Dispose();
+            base.OnFormClosing(e);
         }
 
         #endregion
@@ -164,10 +188,212 @@ namespace MilkTeaPOS
             {
                 Id = Guid.Parse(row.Cells["Id"].Value.ToString()),
                 Username = row.Cells["Username"].Value?.ToString() ?? string.Empty,
+                AvatarUrl = row.Cells["AvatarUrl"].Value?.ToString(),
                 IsActive = Convert.ToBoolean(row.Cells["IsActive"].Value ?? true)
             };
 
             FillFormData();
+        }
+
+        #endregion
+
+        #region Image Handling
+
+        private void LoadImagePreview(string imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+                picAvatar.Image = null;
+                return;
+            }
+
+            try
+            {
+                if (File.Exists(imageUrl))
+                {
+                    using var fs = new FileStream(imageUrl, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var ms = new MemoryStream();
+                    fs.CopyTo(ms);
+                    ms.Position = 0;
+                    picAvatar.Image = Image.FromStream(ms);
+                }
+                else
+                {
+                    picAvatar.Image = null;
+                }
+            }
+            catch
+            {
+                picAvatar.Image = null;
+            }
+        }
+
+        private string GetProjectPath()
+        {
+            string projectPath = AppDomain.CurrentDomain.BaseDirectory;
+            while (!string.IsNullOrEmpty(projectPath) &&
+                   !File.Exists(Path.Combine(projectPath, "MilkTeaPOS.csproj")))
+            {
+                projectPath = Directory.GetParent(projectPath)?.FullName;
+            }
+            return projectPath ?? string.Empty;
+        }
+
+        private string GetFullImagePath(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath)) return string.Empty;
+
+            string normalizedPath = relativePath.TrimStart('/', '\\');
+
+            if (relativePath.Contains("..") || normalizedPath.Contains("..") ||
+                Path.IsPathRooted(normalizedPath))
+            {
+                throw new ArgumentException("Invalid path format", nameof(relativePath));
+            }
+
+            string fullPath = Path.Combine(GetProjectPath(), normalizedPath);
+
+            string projectPath = GetProjectPath();
+            if (!fullPath.StartsWith(projectPath, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Path traversal detected", nameof(relativePath));
+            }
+
+            return fullPath;
+        }
+
+        private string GetProjectImagesPath()
+        {
+            return Path.Combine(GetProjectPath(), "Images");
+        }
+
+        private async void btnBrowseAvatar_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.webp|All Files|*.*",
+                Title = "Chọn ảnh đại diện",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                var fileInfo = new FileInfo(ofd.FileName);
+                if (fileInfo.Length > MAX_FILE_SIZE)
+                {
+                    MessageBox.Show(
+                        $"⚠️ File quá lớn!\n\nKích thước: {fileInfo.Length / 1024 / 1024:.0}MB\nTối đa: {MAX_FILE_SIZE / 1024 / 1024}MB",
+                        "Cảnh báo",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string extension = Path.GetExtension(ofd.FileName).ToLower();
+                if (!ALLOWED_EXTENSIONS.Contains(extension))
+                {
+                    MessageBox.Show(
+                        $"⚠️ Định dạng file không hợp lệ!\n\nChỉ chấp nhận: {string.Join(", ", ALLOWED_EXTENSIONS)}",
+                        "Cảnh báo",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string fileName = Path.GetFileName(ofd.FileName);
+                string imagesFolder = Path.Combine(GetProjectImagesPath(), "Users");
+
+                if (!Directory.Exists(imagesFolder))
+                {
+                    Directory.CreateDirectory(imagesFolder);
+                }
+
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
+                string newFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{timestamp}{extension}";
+                string destPath = Path.Combine(imagesFolder, newFileName);
+
+                File.Copy(ofd.FileName, destPath, true);
+
+                string relativePath = Path.Combine("Images", "Users", newFileName);
+                txtAvatarUrl.Text = relativePath;
+                LoadImagePreview(destPath);
+
+                if (_selectedUser != null)
+                {
+                    await UpdateUserAvatarOnly(relativePath);
+                }
+            }
+        }
+
+        private async Task UpdateUserAvatarOnly(string newAvatarUrl)
+        {
+            if (_selectedUser == null) return;
+
+            try
+            {
+                using (var context = new PostgresContext())
+                {
+                    var user = await context.Users.FindAsync(_selectedUser.Id);
+                    if (user != null)
+                    {
+                        string oldAvatarUrl = user.AvatarUrl;
+                        if (!string.IsNullOrEmpty(oldAvatarUrl) && oldAvatarUrl != newAvatarUrl)
+                        {
+                            DeleteOldAvatar(oldAvatarUrl);
+                        }
+
+                        user.AvatarUrl = newAvatarUrl;
+                        user.UpdatedAt = DateTime.UtcNow;
+                        await context.SaveChangesAsync();
+
+                        _selectedUser.AvatarUrl = newAvatarUrl;
+                        LoadUsers();
+                        ReselectCurrentRow();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"⚠️ Lỗi khi cập nhật ảnh:\n{ex.Message}",
+                    "Cảnh báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+        }
+
+        private void DeleteOldAvatar(string oldAvatarUrl)
+        {
+            if (string.IsNullOrEmpty(oldAvatarUrl)) return;
+
+            try
+            {
+                string fullPath = GetFullImagePath(oldAvatarUrl);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+            catch
+            {
+                // Ignore delete errors
+            }
+        }
+
+        private void ReselectCurrentRow()
+        {
+            if (_selectedUser == null || dgvUsers.Rows.Count == 0) return;
+
+            foreach (DataGridViewRow row in dgvUsers.Rows)
+            {
+                if (row.Cells["Id"].Value?.ToString() == _selectedUser.Id.ToString())
+                {
+                    dgvUsers.ClearSelection();
+                    row.Selected = true;
+                    dgvUsers.CurrentCell = row.Cells[0];
+                    break;
+                }
+            }
         }
 
         #endregion
@@ -300,6 +526,17 @@ namespace MilkTeaPOS
 
             txtUsername.Text = _selectedUser.Username;
             chkIsActive.Checked = _selectedUser.IsActive ?? true;
+            txtAvatarUrl.Text = _selectedUser.AvatarUrl ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(_selectedUser.AvatarUrl))
+            {
+                string fullPath = GetFullImagePath(_selectedUser.AvatarUrl);
+                LoadImagePreview(fullPath);
+            }
+            else
+            {
+                picAvatar.Image = null;
+            }
 
             // Set role
             if (cbRole.DataSource != null)
@@ -324,6 +561,8 @@ namespace MilkTeaPOS
             txtConfirmPassword.Clear();
             chkIsActive.Checked = true;
             cbRole.SelectedIndex = 0;
+            txtAvatarUrl.Clear();
+            picAvatar.Image = null;
             _selectedUser = null;
         }
 
@@ -368,6 +607,7 @@ namespace MilkTeaPOS
                         u.Id,
                         u.Username,
                         RoleName = u.Role != null ? u.Role.Name : "Chưa gán",
+                        u.AvatarUrl,
                         u.IsActive,
                         u.CreatedAt,
                         u.UpdatedAt
@@ -544,6 +784,7 @@ namespace MilkTeaPOS
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12),
                         Password = password, // Temporary: satisfy NOT NULL constraint
                         RoleId = selectedRole?.Id,
+                        AvatarUrl = txtAvatarUrl.Text,
                         IsActive = chkIsActive.Checked,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
@@ -630,10 +871,17 @@ namespace MilkTeaPOS
                     var user = await context.Users.FindAsync(_selectedUser!.Id);
                     if (user != null)
                     {
+                        string oldAvatarUrl = user.AvatarUrl;
+                        if (!string.IsNullOrEmpty(oldAvatarUrl) && oldAvatarUrl != txtAvatarUrl.Text)
+                        {
+                            DeleteOldAvatar(oldAvatarUrl);
+                        }
+
                         var selectedRole = cbRole.SelectedItem as Role;
 
                         user.Username = username;
                         user.RoleId = selectedRole?.Id;
+                        user.AvatarUrl = txtAvatarUrl.Text;
                         user.IsActive = chkIsActive.Checked;
                         user.UpdatedAt = DateTime.UtcNow;
 

@@ -56,11 +56,97 @@ dotnet run
 | Users | 1 | Staff management |
 | **TỔNG** | **18** | |
 
-**Tiến độ:** 7/18 forms (39%) ✅ - All completed forms rated 10/10 ⭐
+**Tiến độ:** 11/18 forms (61%) ✅ - All completed forms rated 10/10 ⭐
 
 ---
 
-## ✅ FORMS ĐÃ HOÀN THÀNH (7/18)
+## ✅ FORMS ĐÃ HOÀN THÀNH (11/18)
+
+### 9. frmSalesReport - Báo cáo doanh thu ⭐
+
+**File:**
+- `frmSalesReport.cs` (~690 dòng)
+- `frmSalesReport.Designer.cs` (~670 dòng)
+
+**Trạng thái:** `HOÀN THÀNH 10/10` 🏆
+
+**Chức năng:**
+- ✅ Báo cáo doanh thu theo khoảng ngày tùy chọn
+- ✅ Quick filters: Hôm nay, 7 ngày, 30 ngày
+- ✅ 8 KPI cards (Tổng doanh thu, Tổng đơn hàng, TB/đơn, Giảm giá, Chờ xử lý, Đã hủy, Khách hàng, TB/KH)
+- ✅ Doanh thu theo ngày (Daily Revenue với thứ trong tuần)
+- ✅ Thanh toán theo phương thức (Payment Breakdown với tỷ lệ %)
+- ✅ Hiệu suất sản phẩm (Top 20 products theo số lượng & doanh thu)
+- ✅ Thống kê đơn hàng theo trạng thái (Served, Pending, Preparing, Cancelled)
+- ✅ Phân bố giờ cao điểm (Hourly Distribution 6h-22h với bar chart)
+- ✅ Top 5 khách hàng chi tiêu nhiều nhất
+- ✅ Export báo cáo ra CSV (UTF-8 encoding)
+- ✅ Short-lived DbContext (using pattern)
+- ✅ AsNoTracking() cho tất cả read queries
+- ✅ Loading indicators
+- ✅ Keyboard navigation (Enter → filter)
+- ✅ Không GDI leak (tất cả fonts được dispose)
+
+**Reports:**
+- 📊 Daily Revenue (Ngày, Thứ, SL đơn, Doanh thu)
+- 💳 Payment Breakdown (Phương thức, Số GD, Tổng, TB, Tỷ lệ %)
+- 🏆 Product Performance (Top 20, Xếp hạng, SL, Doanh thu, Giá TB)
+- 📈 Order Statistics (Theo trạng thái, Dine-in vs Delivery)
+- ⏰ Hourly Distribution (6h-22h, Bar chart visualization ███)
+- 👥 Customer Analytics (Top 5 KH chi tiêu)
+
+**Bảo mật:**
+- ✅ Short-lived DbContext
+- ✅ AsNoTracking() cho read queries
+- ✅ Proper font disposal on form close
+
+**UI/UX:**
+- ✅ Color-coded KPIs (Green=Revenue, Blue=Orders, Purple=Avg, Red=Discount)
+- ✅ Medal ranking system (🥇🥈🥉)
+- ✅ Hourly bar chart visualization (███)
+- ✅ Peak hour highlighting (vàng)
+- ✅ CSV export với UTF-8 encoding
+- ✅ Two-panel layout (Left: Reports, Right: Stats)
+- ✅ Full HD 1920x1060, Maximized
+- ✅ AutoSizeColumnsMode = Fill
+- ✅ Row height 35px, Font 10F + Padding 8px
+
+---
+
+### 10. frmAuditLog - Lịch sử hành động người dùng ⭐
+
+**File:**
+- `frmAuditLog.cs` (~900 dòng)
+- `frmAuditLog.Designer.cs` (~550 dòng)
+
+**Trạng thái:** `HOÀN THÀNH 10/10` 🏆
+
+**Chức năng:**
+- ✅ Xem lịch sử hành động (INSERT/UPDATE/DELETE/LOGIN/LOGOUT)
+- ✅ Filter: Date range, Action, Table, User
+- ✅ Tìm kiếm theo username, action, table, IP
+- ✅ Color-coded actions (Insert=Xanh, Update=Vàng, Delete=Đỏ, Login=Xanh dương, Logout=Xám)
+- ✅ Double-click xem chi tiết với Material Design cards
+- ✅ JSON viewer dark theme (VS Code style)
+- ✅ Export audit log ra CSV
+- ✅ Xóa log cũ (>30 ngày)
+- ✅ Pagination (max 500 records)
+- ✅ Short-lived DbContext (using pattern)
+- ✅ Loading indicators
+- ✅ Keyboard navigation (Enter → filter)
+
+**UI/UX:**
+- ✅ FlowLayoutPanel - không bị dính/chồng
+- ✅ Header với icon circle + gradient effect
+- ✅ Card layout với shadow, accent bars, icon circles
+- ✅ JSON viewer dark theme (`#1e1e28` bg, `#a6e22e` text)
+- ✅ Stats bar hiển thị tổng số bản ghi
+- ✅ Nút Đóng trong footer
+
+**Database:**
+- ✅ Trigger tự động ghi audit log cho 11 bảng
+- ✅ Session variables (user_id, client_ip) từ C#
+- ✅ `SET app.current_user_id` + `SET app.client_ip` trước mỗi SaveChanges
 
 ### 1. frmCategories - Quản lý danh mục sản phẩm ⭐
 
@@ -281,7 +367,47 @@ dotnet run
 
 ---
 
-## 🔜 FORMS SẮP LÀM (11/18)
+### 8. frmDashboard - Màn hình tổng quan ⭐ NEW
+
+**File:**
+- `frmDashboard.cs`
+- `frmDashboard.Designer.cs`
+
+**Trạng thái:** `HOÀN THÀNH 10/10` 🏆
+
+**Chức năng:**
+- ✅ 5 KPI cards (Doanh thu hôm nay, Đơn hàng, Bàn đang dùng, Tổng KH, Doanh thu tuần)
+- ✅ Real-time data từ database
+- ✅ Đơn hàng gần đây (10 mới nhất) với status color coding
+- ✅ Top 8 sản phẩm bán chạy theo số lượng
+- ✅ Tổng quan bàn theo vị trí và sức chứa
+- ✅ Thống kê thanh toán theo phương thức hôm nay
+- ✅ Loading overlay khi đang tải dữ liệu
+- ✅ Short-lived DbContext pattern
+- ✅ Font caching (không GDI leak)
+- ✅ Responsive scrollable layout
+
+**KPI Cards:**
+- 💰 Doanh thu hôm nay (Coral Red)
+- 📦 Đơn hàng hôm nay (Green)
+- 🪑 Bàn đang dùng (Yellow)
+- 👥 Tổng khách hàng (Teal)
+- 📈 Doanh thu tuần này (Purple)
+
+**DataGridViews:**
+- Recent Orders (Mã đơn, Khách hàng, Bàn, Tổng tiền, Trạng thái, Giờ)
+- Top Products (Top, Sản phẩm, SL bán, Doanh thu)
+- Tables (Tên bàn, Vị trí, Sức chứa, Trạng thái)
+- Payments (Phương thức, Số giao dịch, Tổng tiền)
+
+**Bảo mật:**
+- ✅ Short-lived DbContext
+- ✅ AsNoTracking() cho read queries
+- ✅ Proper font disposal on form close
+
+---
+
+## 🔜 FORMS SẮP LÀM (9/18)
 
 ### Ưu tiên cao (Core Business):
 
@@ -314,13 +440,39 @@ dotnet run
 6. **frmMemberships** - Quản lý hội viên
 7. **frmVouchers** - Quản lý voucher
 8. **frmOrderHistory** - Lịch sử đơn hàng
-9. **frmSalesReport** - Báo cáo doanh thu
-10. **frmAuditLog** - Audit log
-11. **frmOrderDetail** - Chi tiết đơn hàng
+9. **frmOrderDetail** - Chi tiết đơn hàng
 
 ---
 
-## 📁 Cấu trúc dự án
+## ✅ frmSalesReport - Báo cáo doanh thu
+
+**File:** `frmSalesReport.cs` (~720 dòng), `frmSalesReport.Designer.cs` (~770 dòng)
+
+**Trạng thái:** `HOÀN THÀNH 10/10` 🏆
+
+**Chức năng:**
+- ✅ Báo cáo doanh thu theo khoảng ngày tùy chọn
+- ✅ Quick filters: Hôm nay, 7 ngày, 30 ngày
+- ✅ 6 KPI cards (Tổng doanh thu, Đơn hàng, TB/đơn, Giảm giá, Chờ xử lý, Đã hủy)
+- ✅ Doanh thu theo ngày (Daily Revenue với thứ trong tuần)
+- ✅ Thanh toán theo phương thức (Payment Breakdown với tỷ lệ %)
+- ✅ Hiệu suất sản phẩm (Top 20 products theo số lượng & doanh thu)
+- ✅ Thống kê đơn hàng theo trạng thái
+- ✅ Phân bố giờ cao điểm (Hourly Distribution 6h-22h với bar chart)
+- ✅ Khách hàng analytics (Unique customers, Top 5 spenders)
+- ✅ Export báo cáo ra CSV (UTF-8 encoding)
+
+**Reports:**
+- 📊 Daily Revenue
+- 💳 Payment Breakdown
+- 🏆 Product Performance
+- 📈 Order Statistics
+- ⏰ Hourly Distribution
+- 👥 Customer Analytics
+
+---
+
+## 🔧 Troubleshooting
 
 ```
 MilkTEA-POS/
@@ -438,7 +590,7 @@ Nếu có vấn đề, tạo issue hoặc liên hệ team lead.
 
 ---
 
-**Cập nhật cuối:** April 3, 2026 - 7/18 forms 10/10, short-lived DbContext, spam-proof ⭐
+**Cập nhật cuối:** April 3, 2026 - 8/18 forms 10/10, real-time dashboard ⭐
 **Version:** 1.0.0
 **Status:** In Development 🚧
-**Progress:** 7/18 forms (39%) - Production Ready ⭐
+**Progress:** 8/18 forms (44%) - Production Ready ⭐

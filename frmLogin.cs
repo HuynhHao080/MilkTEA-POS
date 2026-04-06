@@ -168,6 +168,9 @@ namespace MilkTeaPOS
                     }
 
                     _loggedInUser = user;
+
+                    // Set global current user for audit logging
+                    Models.PostgresContext.CurrentUserId = user.Id;
                 }
 
                 // Login successful

@@ -12,6 +12,10 @@ namespace MilkTeaPOS
     public partial class frmChangePassword : Form
     {
         private readonly User _loggedInUser;
+        private readonly Font _fontWeak = new Font("Segoe UI", 9F);
+        private readonly Font _fontMedium = new Font("Segoe UI", 9F);
+        private readonly Font _fontGood = new Font("Segoe UI", 9F);
+        private readonly Font _fontStrong = new Font("Segoe UI", 9F);
 
         public frmChangePassword(User loggedInUser)
         {
@@ -109,6 +113,28 @@ namespace MilkTeaPOS
                 return;
             }
 
+            // Password complexity validation
+            int complexityScore = 0;
+            if (newPassword.Length >= 6) complexityScore++;
+            if (newPassword.Length >= 8) complexityScore++;
+            if (newPassword.Length >= 12) complexityScore++;
+            if (newPassword.Any(char.IsUpper)) complexityScore++;
+            if (newPassword.Any(char.IsLower)) complexityScore++;
+            if (newPassword.Any(char.IsDigit)) complexityScore++;
+            if (newPassword.Any(c => !char.IsLetterOrDigit(c))) complexityScore++;
+
+            if (complexityScore < 4)
+            {
+                MessageBox.Show(
+                    "⚠️ Mật khẩu mới quá yếu!\n\nVui lòng sử dụng mật khẩu phức tạp hơn:\n- Ít nhất 8 ký tự\n- Chữ hoa, chữ thường\n- Số\n- Ký tự đặc biệt (!@#$%^&*)",
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                txtNewPassword.Focus();
+                txtNewPassword.SelectAll();
+                return;
+            }
+
             if (newPassword != confirmPassword)
             {
                 MessageBox.Show(
@@ -190,11 +216,11 @@ namespace MilkTeaPOS
         private void frmChangePassword_Load(object sender, EventArgs e)
         {
             StylePasswordTextBox();
+            txtNewPassword.TextChanged += txtNewPassword_TextChanged;
         }
 
         private void StylePasswordTextBox()
         {
-            // Style textboxes
             var textboxes = new[] { txtCurrentPassword, txtNewPassword, txtConfirmPassword };
             foreach (var txt in textboxes)
             {
@@ -203,6 +229,64 @@ namespace MilkTeaPOS
                 txt.PasswordChar = '●';
                 txt.UseSystemPasswordChar = false;
             }
+        }
+
+        private void txtNewPassword_TextChanged(object sender, EventArgs e)
+        {
+            UpdatePasswordStrengthIndicator(txtNewPassword.Text);
+        }
+
+        private void UpdatePasswordStrengthIndicator(string password)
+        {
+            if (string.IsNullOrEmpty(password))
+            {
+                lblPasswordStrength.Text = "Độ mạnh mật khẩu: Yếu";
+                lblPasswordStrength.ForeColor = Color.FromArgb(108, 117, 125);
+                return;
+            }
+
+            int score = 0;
+            if (password.Length >= 6) score++;
+            if (password.Length >= 8) score++;
+            if (password.Length >= 12) score++;
+            if (password.Any(char.IsUpper)) score++;
+            if (password.Any(char.IsLower)) score++;
+            if (password.Any(char.IsDigit)) score++;
+            if (password.Any(c => !char.IsLetterOrDigit(c))) score++;
+
+            if (score <= 2)
+            {
+                lblPasswordStrength.Text = "Độ mạnh mật khẩu: 🔴 Yếu";
+                lblPasswordStrength.ForeColor = Color.FromArgb(220, 53, 69);
+                lblPasswordStrength.Font = _fontWeak;
+            }
+            else if (score <= 4)
+            {
+                lblPasswordStrength.Text = "Độ mạnh mật khẩu: 🟡 Trung bình";
+                lblPasswordStrength.ForeColor = Color.FromArgb(255, 193, 7);
+                lblPasswordStrength.Font = _fontMedium;
+            }
+            else if (score <= 5)
+            {
+                lblPasswordStrength.Text = "Độ mạnh mật khẩu: 🟠 Khá tốt";
+                lblPasswordStrength.ForeColor = Color.FromArgb(253, 126, 20);
+                lblPasswordStrength.Font = _fontGood;
+            }
+            else
+            {
+                lblPasswordStrength.Text = "Độ mạnh mật khẩu: 🟢 Mạnh";
+                lblPasswordStrength.ForeColor = Color.FromArgb(72, 187, 120);
+                lblPasswordStrength.Font = _fontStrong;
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _fontWeak?.Dispose();
+            _fontMedium?.Dispose();
+            _fontGood?.Dispose();
+            _fontStrong?.Dispose();
+            base.OnFormClosing(e);
         }
 
         #endregion

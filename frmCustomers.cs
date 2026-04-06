@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,10 @@ namespace MilkTeaPOS
 
         private const long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
         private static readonly string[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        
+        // Cached fonts to avoid GDI leaks
+        private readonly Font _fontGenderMale = new Font("Segoe UI", 10F, FontStyle.Bold);
+        private readonly Font _fontGenderFemale = new Font("Segoe UI", 10F, FontStyle.Bold);
 
         #endregion
 
@@ -172,13 +177,20 @@ namespace MilkTeaPOS
             if (genderText == "Nam")
             {
                 e.CellStyle.ForeColor = Color.FromArgb(23, 162, 184);
-                e.CellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+                e.CellStyle.Font = _fontGenderMale;
             }
             else if (genderText == "Nữ")
             {
                 e.CellStyle.ForeColor = Color.FromArgb(220, 53, 69);
-                e.CellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+                e.CellStyle.Font = _fontGenderFemale;
             }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _fontGenderMale?.Dispose();
+            _fontGenderFemale?.Dispose();
+            base.OnFormClosing(e);
         }
 
         #endregion
@@ -465,9 +477,13 @@ namespace MilkTeaPOS
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silent fail - avatar path remains in textbox
+                MessageBox.Show(
+                    $"⚠️ Lỗi khi cập nhật ảnh:\n{ex.Message}",
+                    "Cảnh báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
             }
         }
 
@@ -737,6 +753,16 @@ namespace MilkTeaPOS
             var phone = txtPhone.Text.Trim();
             if (!string.IsNullOrEmpty(phone))
             {
+                // Validate phone format (Vietnamese: 9-11 digits)
+                if (!Regex.IsMatch(phone, @"^[0-9]{9,11}$"))
+                {
+                    MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtPhone.Focus();
+                    txtPhone.SelectAll();
+                    return;
+                }
+
                 bool phoneExists;
                 using (var context = new PostgresContext())
                 {
@@ -759,6 +785,16 @@ namespace MilkTeaPOS
             var email = txtEmail.Text.Trim();
             if (!string.IsNullOrEmpty(email))
             {
+                // Validate email format
+                if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                {
+                    MessageBox.Show("⚠️ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    txtEmail.SelectAll();
+                    return;
+                }
+
                 bool emailExists;
                 using (var context = new PostgresContext())
                 {
@@ -846,6 +882,16 @@ namespace MilkTeaPOS
             var phone = txtPhone.Text.Trim();
             if (!string.IsNullOrEmpty(phone))
             {
+                // Validate phone format (Vietnamese: 9-11 digits)
+                if (!Regex.IsMatch(phone, @"^[0-9]{9,11}$"))
+                {
+                    MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtPhone.Focus();
+                    txtPhone.SelectAll();
+                    return;
+                }
+
                 bool phoneExists;
                 using (var context = new PostgresContext())
                 {
@@ -868,6 +914,16 @@ namespace MilkTeaPOS
             var email = txtEmail.Text.Trim();
             if (!string.IsNullOrEmpty(email))
             {
+                // Validate email format
+                if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                {
+                    MessageBox.Show("⚠️ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    txtEmail.SelectAll();
+                    return;
+                }
+
                 bool emailExists;
                 using (var context = new PostgresContext())
                 {

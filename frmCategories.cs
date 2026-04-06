@@ -18,6 +18,10 @@ namespace MilkTeaPOS
 
         private const long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
         private static readonly string[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        
+        // Cached fonts to avoid GDI leaks
+        private readonly Font _fontActiveGreen = new Font("Segoe UI", 11F, FontStyle.Bold);
+        private readonly Font _fontActiveRed = new Font("Segoe UI", 11F, FontStyle.Bold);
 
         #endregion
 
@@ -146,8 +150,15 @@ namespace MilkTeaPOS
             {
                 e.Value = isActive ? "✓ Đúng" : "✗ Sai";
                 e.CellStyle.ForeColor = isActive ? Color.FromArgb(72, 187, 120) : Color.FromArgb(220, 53, 69);
-                e.CellStyle.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+                e.CellStyle.Font = isActive ? _fontActiveGreen : _fontActiveRed;
             }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _fontActiveGreen?.Dispose();
+            _fontActiveRed?.Dispose();
+            base.OnFormClosing(e);
         }
 
         #endregion
@@ -393,9 +404,13 @@ namespace MilkTeaPOS
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silent fail - image path remains in textbox
+                MessageBox.Show(
+                    $"⚠️ Lỗi khi cập nhật ảnh:\n{ex.Message}",
+                    "Cảnh báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
             }
         }
 

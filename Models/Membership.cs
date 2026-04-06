@@ -19,6 +19,8 @@ public partial class Membership
 
     public DateTime? LastOrderAt { get; set; }
 
+    public string? Tier { get; set; }
+
     public DateTime? ExpiresAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

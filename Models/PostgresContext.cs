@@ -1,12 +1,41 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.Intrinsics.X86;
 
 namespace MilkTeaPOS.Models;
 
 public partial class PostgresContext : DbContext
 {
+    // Global current user tracking for audit logs
+    public static Guid? CurrentUserId { get; set; }
+    public static string CurrentUserIP { get; set; } = "127.0.0.1"; // Default fallback
+
+    // Static constructor - auto-detect local IP
+    static PostgresContext()
+    {
+        try
+        {
+            // Get first non-loopback IPv4 address
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                    !System.Net.IPAddress.IsLoopback(ip))
+                {
+                    CurrentUserIP = ip.ToString();
+                    return;
+                }
+            }
+            // Keep default 127.0.0.1
+        }
+        catch
+        {
+            // Keep default 127.0.0.1
+        }
+    }
+
     public PostgresContext()
     {
     }
@@ -14,6 +43,85 @@ public partial class PostgresContext : DbContext
     public PostgresContext(DbContextOptions<PostgresContext> options)
         : base(options)
     {
+    }
+
+    /// <summary>
+    /// Automatically set audit context before save changes
+    /// Uses connection-level SET so trigger can access it in same transaction
+    /// </summary>
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        // Always set both user_id and ip_address if available
+        if (CurrentUserId.HasValue || !string.IsNullOrEmpty(CurrentUserIP))
+        {
+            try
+            {
+                var conn = Database.GetDbConnection();
+                bool wasClosed = conn.State == System.Data.ConnectionState.Closed;
+                if (wasClosed) await conn.OpenAsync(cancellationToken);
+
+                // Set user_id
+                if (CurrentUserId.HasValue)
+                {
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = $"SET app.current_user_id = '{CurrentUserId.Value}'";
+                    await cmd.ExecuteNonQueryAsync(cancellationToken);
+                }
+
+                // Set client_ip (always if not empty)
+                if (!string.IsNullOrEmpty(CurrentUserIP))
+                {
+                    using var cmd2 = conn.CreateCommand();
+                    cmd2.CommandText = $"SET app.client_ip = '{CurrentUserIP}'";
+                    await cmd2.ExecuteNonQueryAsync(cancellationToken);
+                }
+            }
+            catch { }
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        // Always set both user_id and ip_address if available
+        if (CurrentUserId.HasValue || !string.IsNullOrEmpty(CurrentUserIP))
+        {
+            try
+            {
+                var conn = Database.GetDbConnection();
+                bool wasClosed = conn.State == System.Data.ConnectionState.Closed;
+                if (wasClosed) conn.Open();
+
+                // Set user_id
+                if (CurrentUserId.HasValue)
+                {
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = $"SET app.current_user_id = '{CurrentUserId.Value}'";
+                    cmd.ExecuteNonQuery();
+                }
+
+                // Set client_ip (always if not empty)
+                if (!string.IsNullOrEmpty(CurrentUserIP))
+                {
+                    using var cmd2 = conn.CreateCommand();
+                    cmd2.CommandText = $"SET app.client_ip = '{CurrentUserIP}'";
+                    cmd2.ExecuteNonQuery();
+                }
+            }
+            catch { }
+        }
+
+        return base.SaveChanges();
+    }
+
+    /// <summary>
+    /// Factory method to create DbContext with audit context automatically set
+    /// Usage: using var context = PostgresContext.CreateWithAudit();
+    /// </summary>
+    public static PostgresContext CreateWithAudit()
+    {
+        return new PostgresContext();
     }
 
     public virtual DbSet<AuditLog> AuditLogs { get; set; }

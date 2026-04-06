@@ -1,7 +1,3 @@
-# Build outputs - Skip để clone là chạy, không cần build lại
-bin/
-obj/
-
 # Visual Studio user settings - Mỗi người dùng setting riêng
 .vs/
 *.user
@@ -13,3 +9,6 @@ TestResults/
 # Temporary files
 *.log
 *.cache
+
+# NOTE: bin/ and obj/ are now tracked by Git (removed from ignore list)
+# This ensures build outputs (.exe, .dll) are included in pull/push

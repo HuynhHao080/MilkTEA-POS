@@ -251,3 +251,8 @@ C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPO
 C:\Users\accli\source\repos\test\MilkTEA-POS\bin\Debug\net10.0-windows\BCrypt.Net-Next.dll
 C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPOS.frmUsers.resources
 C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPOS.frmCustomers.resources
+C:\Users\accli\source\repos\test\MilkTEA-POS\bin\Debug\net10.0-windows\Dapper.dll
+C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPOS.frmVouchers.resources
+C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPOS.Properties.Resources.resources
+C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPOS.frmSalesReport.resources
+C:\Users\accli\source\repos\test\MilkTEA-POS\obj\Debug\net10.0-windows\MilkTeaPOS.frmAuditLog.resources

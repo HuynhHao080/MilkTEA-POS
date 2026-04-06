@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using MilkTeaPOS.Models;
 using FormsTimer = System.Windows.Forms.Timer;
@@ -9,6 +10,17 @@ namespace MilkTeaPOS
     {
         private readonly User _currentUser;
         private FormsTimer? _clockTimer;
+        private Button? _activeButton;
+        private Form? _currentChildForm;
+
+        // Professional color scheme
+        private static readonly Color ColorSidebarBg = Color.FromArgb(20, 27, 36);
+        private static readonly Color ColorButtonDefault = Color.FromArgb(30, 40, 50);
+        private static readonly Color ColorButtonHover = Color.FromArgb(40, 55, 75);
+        private static readonly Color ColorButtonActive = Color.FromArgb(52, 152, 219);
+        private static readonly Color ColorAccentBar = Color.FromArgb(52, 152, 219);
+        private static readonly Color ColorTextDefault = Color.FromArgb(165, 175, 185);
+        private static readonly Color ColorTextActive = Color.White;
 
         public frmMain(User user)
         {
@@ -24,6 +36,8 @@ namespace MilkTeaPOS
         {
             setupClock();
             updateUserInfo();
+            setupButtonHoverEffects();
+            setupChildFormEvents();
         }
 
         private void setupClock()
@@ -54,8 +68,132 @@ namespace MilkTeaPOS
                 $"👤 {_currentUser.Username ?? "Unknown"} | {_currentUser.Role?.Name ?? "User"}";
         }
 
+        #region Button Hover & Active State Management
+
+        private void setupButtonHoverEffects()
+        {
+            // Attach hover events to all menu buttons
+            var menuButtons = new[] { btnDashboard, btnCategories, btnProducts, btnToppings,
+                btnTables, btnPOS, btnOrderHistory, btnCustomers, btnMemberships,
+                btnVouchers, btnReports, btnUsers, btnAuditLog };
+
+            foreach (var btn in menuButtons)
+            {
+                if (btn != null)
+                {
+                    btn.MouseEnter += Button_MouseEnter;
+                    btn.MouseLeave += Button_MouseLeave;
+                    // Use MouseDown for instant active (fires BEFORE Click)
+                    btn.MouseDown += Button_MouseDown;
+                }
+            }
+
+            // Auto-select Dashboard on startup
+            setActiveButton(btnDashboard);
+        }
+
+        private void Button_MouseDown(object? sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                // Reset previous active button
+                if (_activeButton != null && _activeButton != btn && !_activeButton.IsDisposed)
+                {
+                    _activeButton.BackColor = ColorButtonDefault;
+                    _activeButton.ForeColor = ColorTextDefault;
+                    _activeButton.FlatAppearance.MouseOverBackColor = ColorButtonHover;
+                    var oldFont = _activeButton.Font;
+                    _activeButton.Font = new Font("Segoe UI", 11.5F, FontStyle.Regular);
+                    oldFont?.Dispose();
+                }
+
+                // Set new active button
+                _activeButton = btn;
+                btn.BackColor = ColorButtonActive;
+                btn.ForeColor = ColorTextActive;
+                // QUAN TRỌNG: Set MouseOverBackColor = ActiveColor để Windows Forms ko override
+                btn.FlatAppearance.MouseOverBackColor = ColorButtonActive;
+                var newFont = btn.Font;
+                btn.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
+                newFont?.Dispose();
+
+                btn.Refresh();
+            }
+        }
+
+        private void Button_MouseEnter(object? sender, EventArgs e)
+        {
+            // Active button KHÔNG BAO GIỜ bị hover override
+            if (sender is Button btn && btn != _activeButton)
+            {
+                btn.BackColor = ColorButtonHover;
+                btn.ForeColor = ColorTextActive;
+            }
+        }
+
+        private void Button_MouseLeave(object? sender, EventArgs e)
+        {
+            // Active button KHÔNG BAO GIỜ bị hover override
+            if (sender is Button btn && btn != _activeButton)
+            {
+                btn.BackColor = ColorButtonDefault;
+                btn.ForeColor = ColorTextDefault;
+            }
+        }
+
+        private void setActiveButton(Button? activeBtn)
+        {
+            if (activeBtn == null) return;
+
+            // Reset previous active button instantly
+            if (_activeButton != null && !_activeButton.IsDisposed)
+            {
+                _activeButton.BackColor = ColorButtonDefault;
+                _activeButton.ForeColor = ColorTextDefault;
+                var oldFont = _activeButton.Font;
+                _activeButton.Font = new Font("Segoe UI", 11.5F, FontStyle.Regular);
+                _activeButton.Refresh();
+                oldFont?.Dispose();
+            }
+
+            // Set new active button instantly
+            _activeButton = activeBtn;
+            _activeButton.BackColor = ColorButtonActive;
+            _activeButton.ForeColor = ColorTextActive;
+            var newFont = _activeButton.Font;
+            _activeButton.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
+            _activeButton.Refresh(); // Force immediate repaint
+            newFont?.Dispose();
+        }
+
+        #endregion
+
+        #region Child Form Management
+
+        private void setupChildFormEvents()
+        {
+            // Track when child forms are closed
+            pnlContent.ControlAdded += (s, e) =>
+            {
+                if (e.Control is Form childForm)
+                {
+                    _currentChildForm = childForm;
+                    childForm.FormClosed += ChildForm_FormClosed;
+                }
+            };
+        }
+
+        private void ChildForm_FormClosed(object? sender, FormClosedEventArgs e)
+        {
+            _currentChildForm = null;
+            pnlWelcome.Visible = true;
+        }
+
+        #endregion
+
         private void btnMenu_Click(object? sender, EventArgs e)
         {
+            // Button đã được active trong MouseDown rồi, chỉ cần mở form
             if (sender is Button btn && btn.Tag is string formName)
             {
                 if (formName == "Logout")
@@ -73,12 +211,17 @@ namespace MilkTeaPOS
         {
             try
             {
+                // Close existing form if any
+                closeCurrentChildForm();
+
                 Form frm = formName switch
                 {
                     "frmDashboard" => new frmDashboard(),
                     "frmCategories" => new frmCategories(),
                     "frmUsers" => new frmUsers(),
                     "frmCustomers" => new frmCustomers(),
+                    "frmSalesReport" => new frmSalesReport(),
+                    "frmAuditLog" => new frmAuditLog(),
                     _ => createPlaceholderForm(formName)
                 };
 
@@ -86,20 +229,14 @@ namespace MilkTeaPOS
                 frm.TopLevel = false;
                 frm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
                 frm.Dock = System.Windows.Forms.DockStyle.Fill;
-                
+
                 // Hide welcome panel and bring form to front
                 pnlWelcome.Visible = false;
-                
+
                 // Add form and bring to front (index 0 = topmost)
                 pnlContent.Controls.Add(frm);
                 pnlContent.Controls.SetChildIndex(frm, 0);
-                
-                // Show welcome panel when form is closed
-                frm.FormClosed += (s, e) =>
-                {
-                    pnlWelcome.Visible = true;
-                };
-                
+
                 frm.Show();
             }
             catch (Exception ex)
@@ -109,6 +246,17 @@ namespace MilkTeaPOS
                     "❌ Lỗi",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+            }
+        }
+
+        private void closeCurrentChildForm()
+        {
+            if (_currentChildForm != null && !_currentChildForm.IsDisposed)
+            {
+                _currentChildForm.FormClosed -= ChildForm_FormClosed;
+                _currentChildForm.Close();
+                _currentChildForm.Dispose();
+                _currentChildForm = null;
             }
         }
 
@@ -158,6 +306,14 @@ namespace MilkTeaPOS
         {
             _clockTimer?.Stop();
             _clockTimer?.Dispose();
+
+            // Dispose active button font
+            if (_activeButton?.Font != null && _activeButton.Font != Font)
+            {
+                _activeButton.Font.Dispose();
+            }
+
+            closeCurrentChildForm();
             base.OnFormClosing(e);
         }
 

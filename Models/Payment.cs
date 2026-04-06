@@ -42,5 +42,9 @@ public partial class Payment
 
     public string? Notes { get; set; }
 
+    public string? Status { get; set; }
+
+    public string? Method { get; set; }
+
     public virtual Order Order { get; set; } = null!;
 }

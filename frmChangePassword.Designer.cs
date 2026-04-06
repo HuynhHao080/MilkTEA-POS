@@ -19,6 +19,7 @@ namespace MilkTeaPOS
         private System.Windows.Forms.TextBox txtCurrentPassword;
         private System.Windows.Forms.Label lblNewPassword;
         private System.Windows.Forms.TextBox txtNewPassword;
+        private System.Windows.Forms.Label lblPasswordStrength;
         private System.Windows.Forms.Label lblConfirmPassword;
         private System.Windows.Forms.TextBox txtConfirmPassword;
 
@@ -47,6 +48,7 @@ namespace MilkTeaPOS
             txtCurrentPassword = new TextBox();
             lblNewPassword = new Label();
             txtNewPassword = new TextBox();
+            lblPasswordStrength = new Label();
             lblConfirmPassword = new Label();
             txtConfirmPassword = new TextBox();
             btnChangePassword = new Button();
@@ -119,6 +121,7 @@ namespace MilkTeaPOS
             pnlForm.Controls.Add(txtCurrentPassword);
             pnlForm.Controls.Add(lblNewPassword);
             pnlForm.Controls.Add(txtNewPassword);
+            pnlForm.Controls.Add(lblPasswordStrength);
             pnlForm.Controls.Add(lblConfirmPassword);
             pnlForm.Controls.Add(txtConfirmPassword);
             pnlForm.Controls.Add(btnChangePassword);
@@ -172,14 +175,24 @@ namespace MilkTeaPOS
             txtNewPassword.TabIndex = 3;
             txtNewPassword.KeyPress += txtNewPassword_KeyPress;
             //
+            // lblPasswordStrength
+            //
+            lblPasswordStrength.Font = new Font("Segoe UI", 9F);
+            lblPasswordStrength.ForeColor = Color.FromArgb(108, 117, 125);
+            lblPasswordStrength.Location = new Point(190, 115);
+            lblPasswordStrength.Name = "lblPasswordStrength";
+            lblPasswordStrength.Size = new Size(240, 20);
+            lblPasswordStrength.TabIndex = 4;
+            lblPasswordStrength.Text = "Độ mạnh mật khẩu: Yếu";
+            //
             // lblConfirmPassword
             //
             lblConfirmPassword.Font = new Font("Segoe UI", 11F);
             lblConfirmPassword.ForeColor = Color.FromArgb(45, 55, 72);
-            lblConfirmPassword.Location = new Point(30, 130);
+            lblConfirmPassword.Location = new Point(30, 145);
             lblConfirmPassword.Name = "lblConfirmPassword";
             lblConfirmPassword.Size = new Size(150, 30);
-            lblConfirmPassword.TabIndex = 4;
+            lblConfirmPassword.TabIndex = 5;
             lblConfirmPassword.Text = "Xác nhận mật khẩu:";
             lblConfirmPassword.TextAlign = ContentAlignment.MiddleRight;
             //
@@ -187,10 +200,10 @@ namespace MilkTeaPOS
             //
             txtConfirmPassword.BorderStyle = BorderStyle.FixedSingle;
             txtConfirmPassword.Font = new Font("Segoe UI", 11F);
-            txtConfirmPassword.Location = new Point(190, 130);
+            txtConfirmPassword.Location = new Point(190, 145);
             txtConfirmPassword.Name = "txtConfirmPassword";
             txtConfirmPassword.Size = new Size(240, 27);
-            txtConfirmPassword.TabIndex = 5;
+            txtConfirmPassword.TabIndex = 6;
             txtConfirmPassword.KeyPress += txtConfirmPassword_KeyPress;
             //
             // btnChangePassword
@@ -201,10 +214,10 @@ namespace MilkTeaPOS
             btnChangePassword.FlatStyle = FlatStyle.Flat;
             btnChangePassword.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             btnChangePassword.ForeColor = Color.White;
-            btnChangePassword.Location = new Point(30, 190);
+            btnChangePassword.Location = new Point(30, 205);
             btnChangePassword.Name = "btnChangePassword";
             btnChangePassword.Size = new Size(190, 45);
-            btnChangePassword.TabIndex = 6;
+            btnChangePassword.TabIndex = 7;
             btnChangePassword.Text = "✅ Đổi mật khẩu";
             btnChangePassword.UseVisualStyleBackColor = false;
             btnChangePassword.Click += btnChangePassword_Click;
@@ -217,10 +230,10 @@ namespace MilkTeaPOS
             btnClose.FlatStyle = FlatStyle.Flat;
             btnClose.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             btnClose.ForeColor = Color.White;
-            btnClose.Location = new Point(240, 190);
+            btnClose.Location = new Point(240, 205);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(190, 45);
-            btnClose.TabIndex = 7;
+            btnClose.TabIndex = 8;
             btnClose.Text = "❌ Đóng";
             btnClose.UseVisualStyleBackColor = false;
             btnClose.Click += btnClose_Click;

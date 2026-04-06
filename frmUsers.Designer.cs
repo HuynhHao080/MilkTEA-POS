@@ -41,6 +41,10 @@ namespace MilkTeaPOS
         private System.Windows.Forms.Label lblIsActive;
         private System.Windows.Forms.CheckBox chkIsActive;
         private System.Windows.Forms.Label lblActiveText;
+        private System.Windows.Forms.Label lblAvatar;
+        private System.Windows.Forms.TextBox txtAvatarUrl;
+        private System.Windows.Forms.Button btnBrowseAvatar;
+        private System.Windows.Forms.PictureBox picAvatar;
 
         protected override void Dispose(bool disposing)
         {
@@ -79,16 +83,21 @@ namespace MilkTeaPOS
             lblIsActive = new Label();
             chkIsActive = new CheckBox();
             lblActiveText = new Label();
+            lblAvatar = new Label();
+            txtAvatarUrl = new TextBox();
+            btnBrowseAvatar = new Button();
+            picAvatar = new PictureBox();
             pnlHeader.SuspendLayout();
             pnlToolbar.SuspendLayout();
             pnlSearch.SuspendLayout();
             pnlMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             pnlForm.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picAvatar).BeginInit();
             SuspendLayout();
-            //
+            // 
             // pnlHeader
-            //
+            // 
             pnlHeader.BackColor = Color.White;
             pnlHeader.Controls.Add(lblTitle);
             pnlHeader.Dock = DockStyle.Top;
@@ -96,9 +105,9 @@ namespace MilkTeaPOS
             pnlHeader.Name = "pnlHeader";
             pnlHeader.Size = new Size(1198, 80);
             pnlHeader.TabIndex = 3;
-            //
+            // 
             // lblTitle
-            //
+            // 
             lblTitle.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
             lblTitle.ForeColor = Color.FromArgb(45, 55, 72);
             lblTitle.Location = new Point(20, 20);
@@ -107,9 +116,9 @@ namespace MilkTeaPOS
             lblTitle.TabIndex = 0;
             lblTitle.Text = "👨‍💼 Quản lý người dùng";
             lblTitle.TextAlign = ContentAlignment.MiddleLeft;
-            //
+            // 
             // pnlToolbar
-            //
+            // 
             pnlToolbar.BackColor = Color.White;
             pnlToolbar.Controls.Add(btnAdd);
             pnlToolbar.Controls.Add(btnEdit);
@@ -120,9 +129,9 @@ namespace MilkTeaPOS
             pnlToolbar.Name = "pnlToolbar";
             pnlToolbar.Size = new Size(1198, 60);
             pnlToolbar.TabIndex = 2;
-            //
+            // 
             // btnAdd
-            //
+            // 
             btnAdd.BackColor = Color.FromArgb(72, 187, 120);
             btnAdd.Cursor = Cursors.Hand;
             btnAdd.FlatAppearance.BorderSize = 0;
@@ -136,9 +145,9 @@ namespace MilkTeaPOS
             btnAdd.Text = "➕ Thêm";
             btnAdd.UseVisualStyleBackColor = false;
             btnAdd.Click += btnAdd_Click;
-            //
+            // 
             // btnEdit
-            //
+            // 
             btnEdit.BackColor = Color.FromArgb(255, 193, 7);
             btnEdit.Cursor = Cursors.Hand;
             btnEdit.FlatAppearance.BorderSize = 0;
@@ -152,9 +161,9 @@ namespace MilkTeaPOS
             btnEdit.Text = "✏️ Sửa";
             btnEdit.UseVisualStyleBackColor = false;
             btnEdit.Click += btnEdit_Click;
-            //
+            // 
             // btnDelete
-            //
+            // 
             btnDelete.BackColor = Color.FromArgb(220, 53, 69);
             btnDelete.Cursor = Cursors.Hand;
             btnDelete.FlatAppearance.BorderSize = 0;
@@ -168,9 +177,9 @@ namespace MilkTeaPOS
             btnDelete.Text = "🗑️ Xóa";
             btnDelete.UseVisualStyleBackColor = false;
             btnDelete.Click += btnDelete_Click;
-            //
+            // 
             // btnRefresh
-            //
+            // 
             btnRefresh.BackColor = Color.FromArgb(23, 162, 184);
             btnRefresh.Cursor = Cursors.Hand;
             btnRefresh.FlatAppearance.BorderSize = 0;
@@ -184,9 +193,9 @@ namespace MilkTeaPOS
             btnRefresh.Text = "🔄 Làm mới";
             btnRefresh.UseVisualStyleBackColor = false;
             btnRefresh.Click += btnRefresh_Click;
-            //
+            // 
             // pnlSearch
-            //
+            // 
             pnlSearch.BackColor = Color.White;
             pnlSearch.Controls.Add(lblSearch);
             pnlSearch.Controls.Add(txtSearch);
@@ -195,9 +204,9 @@ namespace MilkTeaPOS
             pnlSearch.Name = "pnlSearch";
             pnlSearch.Size = new Size(1198, 60);
             pnlSearch.TabIndex = 1;
-            //
+            // 
             // lblSearch
-            //
+            // 
             lblSearch.Cursor = Cursors.Hand;
             lblSearch.Font = new Font("Segoe UI", 12F);
             lblSearch.ForeColor = Color.FromArgb(45, 55, 72);
@@ -208,9 +217,9 @@ namespace MilkTeaPOS
             lblSearch.Text = "🔍 Tìm kiếm:";
             lblSearch.TextAlign = ContentAlignment.MiddleRight;
             lblSearch.Click += lblSearch_Click;
-            //
+            // 
             // txtSearch
-            //
+            // 
             txtSearch.BackColor = Color.FromArgb(247, 249, 252);
             txtSearch.BorderStyle = BorderStyle.FixedSingle;
             txtSearch.Font = new Font("Segoe UI", 12F);
@@ -219,9 +228,9 @@ namespace MilkTeaPOS
             txtSearch.Size = new Size(300, 29);
             txtSearch.TabIndex = 1;
             txtSearch.KeyPress += txtSearch_KeyPress;
-            //
+            // 
             // pnlMain
-            //
+            // 
             pnlMain.BackColor = Color.FromArgb(247, 249, 252);
             pnlMain.Controls.Add(dgvUsers);
             pnlMain.Controls.Add(pnlForm);
@@ -231,9 +240,9 @@ namespace MilkTeaPOS
             pnlMain.Padding = new Padding(20);
             pnlMain.Size = new Size(1198, 698);
             pnlMain.TabIndex = 0;
-            //
+            // 
             // dgvUsers
-            //
+            // 
             dgvUsers.AllowUserToAddRows = false;
             dgvUsers.AllowUserToDeleteRows = false;
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -259,10 +268,10 @@ namespace MilkTeaPOS
             {
                 BackColor = Color.FromArgb(247, 249, 252)
             };
+            dgvUsers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvUsers.Dock = DockStyle.Top;
             dgvUsers.EnableHeadersVisualStyles = false;
             dgvUsers.GridColor = Color.FromArgb(226, 232, 240);
-            dgvUsers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvUsers.Location = new Point(20, 20);
             dgvUsers.MultiSelect = false;
             dgvUsers.Name = "dgvUsers";
@@ -273,9 +282,9 @@ namespace MilkTeaPOS
             dgvUsers.TabIndex = 0;
             dgvUsers.CellClick += dgvUsers_CellClick;
             dgvUsers.CellFormatting += dgvUsers_CellFormatting;
-            //
+            // 
             // pnlForm
-            //
+            // 
             pnlForm.BackColor = Color.White;
             pnlForm.Controls.Add(lblUsername);
             pnlForm.Controls.Add(txtUsername);
@@ -290,15 +299,19 @@ namespace MilkTeaPOS
             pnlForm.Controls.Add(lblIsActive);
             pnlForm.Controls.Add(chkIsActive);
             pnlForm.Controls.Add(lblActiveText);
+            pnlForm.Controls.Add(lblAvatar);
+            pnlForm.Controls.Add(txtAvatarUrl);
+            pnlForm.Controls.Add(btnBrowseAvatar);
+            pnlForm.Controls.Add(picAvatar);
             pnlForm.Dock = DockStyle.Bottom;
-            pnlForm.Location = new Point(20, 320);
+            pnlForm.Location = new Point(20, 398);
             pnlForm.Name = "pnlForm";
             pnlForm.Padding = new Padding(30);
             pnlForm.Size = new Size(1158, 280);
             pnlForm.TabIndex = 1;
-            //
+            // 
             // lblUsername
-            //
+            // 
             lblUsername.Font = new Font("Segoe UI", 11F);
             lblUsername.ForeColor = Color.FromArgb(45, 55, 72);
             lblUsername.Location = new Point(30, 40);
@@ -307,9 +320,9 @@ namespace MilkTeaPOS
             lblUsername.TabIndex = 0;
             lblUsername.Text = "Tên đăng nhập:";
             lblUsername.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // txtUsername
-            //
+            // 
             txtUsername.BorderStyle = BorderStyle.FixedSingle;
             txtUsername.Font = new Font("Segoe UI", 11F);
             txtUsername.Location = new Point(190, 40);
@@ -317,9 +330,9 @@ namespace MilkTeaPOS
             txtUsername.Size = new Size(300, 27);
             txtUsername.TabIndex = 1;
             txtUsername.KeyPress += txtUsername_KeyPress;
-            //
+            // 
             // lblPassword
-            //
+            // 
             lblPassword.Font = new Font("Segoe UI", 11F);
             lblPassword.ForeColor = Color.FromArgb(45, 55, 72);
             lblPassword.Location = new Point(30, 85);
@@ -328,9 +341,9 @@ namespace MilkTeaPOS
             lblPassword.TabIndex = 2;
             lblPassword.Text = "Mật khẩu:";
             lblPassword.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // txtPassword
-            //
+            // 
             txtPassword.BorderStyle = BorderStyle.FixedSingle;
             txtPassword.Font = new Font("Segoe UI", 11F);
             txtPassword.Location = new Point(190, 85);
@@ -340,9 +353,9 @@ namespace MilkTeaPOS
             txtPassword.TabIndex = 3;
             txtPassword.TextChanged += txtPassword_TextChanged;
             txtPassword.KeyPress += txtPassword_KeyPress;
-            //
+            // 
             // lblPasswordStrength
-            //
+            // 
             lblPasswordStrength.Font = new Font("Segoe UI", 9F);
             lblPasswordStrength.ForeColor = Color.FromArgb(108, 117, 125);
             lblPasswordStrength.Location = new Point(190, 115);
@@ -350,17 +363,17 @@ namespace MilkTeaPOS
             lblPasswordStrength.Size = new Size(300, 20);
             lblPasswordStrength.TabIndex = 4;
             lblPasswordStrength.Text = "Độ mạnh mật khẩu: Yếu";
-            //
+            // 
             // pbPasswordStrength
-            //
+            // 
             pbPasswordStrength.Location = new Point(190, 138);
             pbPasswordStrength.Name = "pbPasswordStrength";
             pbPasswordStrength.Size = new Size(300, 8);
-            pbPasswordStrength.TabIndex = 5;
             pbPasswordStrength.Style = ProgressBarStyle.Continuous;
-            //
+            pbPasswordStrength.TabIndex = 5;
+            // 
             // lblConfirmPassword
-            //
+            // 
             lblConfirmPassword.Font = new Font("Segoe UI", 11F);
             lblConfirmPassword.ForeColor = Color.FromArgb(45, 55, 72);
             lblConfirmPassword.Location = new Point(30, 165);
@@ -369,9 +382,9 @@ namespace MilkTeaPOS
             lblConfirmPassword.TabIndex = 6;
             lblConfirmPassword.Text = "Xác nhận mật khẩu:";
             lblConfirmPassword.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // txtConfirmPassword
-            //
+            // 
             txtConfirmPassword.BorderStyle = BorderStyle.FixedSingle;
             txtConfirmPassword.Font = new Font("Segoe UI", 11F);
             txtConfirmPassword.Location = new Point(190, 165);
@@ -380,9 +393,9 @@ namespace MilkTeaPOS
             txtConfirmPassword.Size = new Size(300, 27);
             txtConfirmPassword.TabIndex = 7;
             txtConfirmPassword.KeyPress += txtConfirmPassword_KeyPress;
-            //
+            // 
             // lblRole
-            //
+            // 
             lblRole.Font = new Font("Segoe UI", 11F);
             lblRole.ForeColor = Color.FromArgb(45, 55, 72);
             lblRole.Location = new Point(550, 40);
@@ -391,9 +404,9 @@ namespace MilkTeaPOS
             lblRole.TabIndex = 6;
             lblRole.Text = "Vai trò:";
             lblRole.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // cbRole
-            //
+            // 
             cbRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cbRole.Font = new Font("Segoe UI", 11F);
             cbRole.FormattingEnabled = true;
@@ -402,9 +415,9 @@ namespace MilkTeaPOS
             cbRole.Size = new Size(250, 28);
             cbRole.TabIndex = 7;
             cbRole.KeyPress += cbRole_KeyPress;
-            //
+            // 
             // lblIsActive
-            //
+            // 
             lblIsActive.Font = new Font("Segoe UI", 11F);
             lblIsActive.ForeColor = Color.FromArgb(45, 55, 72);
             lblIsActive.Location = new Point(550, 85);
@@ -413,29 +426,76 @@ namespace MilkTeaPOS
             lblIsActive.TabIndex = 8;
             lblIsActive.Text = "Trạng thái:";
             lblIsActive.TextAlign = ContentAlignment.MiddleRight;
-            //
+            // 
             // chkIsActive
-            //
+            // 
             chkIsActive.Checked = true;
             chkIsActive.CheckState = CheckState.Checked;
             chkIsActive.Location = new Point(680, 90);
             chkIsActive.Name = "chkIsActive";
-            chkIsActive.Size = new Size(30, 25);
+            chkIsActive.Size = new Size(21, 25);
             chkIsActive.TabIndex = 9;
             chkIsActive.KeyPress += chkIsActive_KeyPress;
-            //
+            // 
             // lblActiveText
-            //
+            // 
             lblActiveText.Font = new Font("Segoe UI", 11F);
             lblActiveText.ForeColor = Color.FromArgb(45, 55, 72);
-            lblActiveText.Location = new Point(715, 90);
+            lblActiveText.Location = new Point(697, 90);
             lblActiveText.Name = "lblActiveText";
             lblActiveText.Size = new Size(200, 25);
             lblActiveText.TabIndex = 10;
             lblActiveText.Text = "Hoạt động";
-            //
+            // 
+            // lblAvatar
+            // 
+            lblAvatar.Font = new Font("Segoe UI", 11F);
+            lblAvatar.ForeColor = Color.FromArgb(45, 55, 72);
+            lblAvatar.Location = new Point(30, 206);
+            lblAvatar.Name = "lblAvatar";
+            lblAvatar.Size = new Size(150, 30);
+            lblAvatar.TabIndex = 11;
+            lblAvatar.Text = "Ảnh đại diện:";
+            lblAvatar.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // txtAvatarUrl
+            // 
+            txtAvatarUrl.BorderStyle = BorderStyle.FixedSingle;
+            txtAvatarUrl.Font = new Font("Segoe UI", 11F);
+            txtAvatarUrl.Location = new Point(190, 206);
+            txtAvatarUrl.Name = "txtAvatarUrl";
+            txtAvatarUrl.Size = new Size(220, 27);
+            txtAvatarUrl.TabIndex = 12;
+            // 
+            // btnBrowseAvatar
+            // 
+            btnBrowseAvatar.BackColor = Color.FromArgb(108, 117, 125);
+            btnBrowseAvatar.Cursor = Cursors.Hand;
+            btnBrowseAvatar.FlatAppearance.BorderSize = 0;
+            btnBrowseAvatar.FlatStyle = FlatStyle.Flat;
+            btnBrowseAvatar.Font = new Font("Segoe UI", 10F);
+            btnBrowseAvatar.ForeColor = Color.White;
+            btnBrowseAvatar.Location = new Point(420, 206);
+            btnBrowseAvatar.Name = "btnBrowseAvatar";
+            btnBrowseAvatar.Size = new Size(70, 27);
+            btnBrowseAvatar.TabIndex = 13;
+            btnBrowseAvatar.Text = "📁 Duyệt";
+            btnBrowseAvatar.UseVisualStyleBackColor = false;
+            btnBrowseAvatar.Click += btnBrowseAvatar_Click;
+            // 
+            // picAvatar
+            // 
+            picAvatar.BackColor = Color.FromArgb(247, 249, 252);
+            picAvatar.BorderStyle = BorderStyle.FixedSingle;
+            picAvatar.Location = new Point(617, 124);
+            picAvatar.Name = "picAvatar";
+            picAvatar.Size = new Size(113, 112);
+            picAvatar.SizeMode = PictureBoxSizeMode.Zoom;
+            picAvatar.TabIndex = 14;
+            picAvatar.TabStop = false;
+            // 
             // frmUsers
-            //
+            // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(247, 249, 252);
@@ -456,6 +516,7 @@ namespace MilkTeaPOS
             ((System.ComponentModel.ISupportInitialize)dgvUsers).EndInit();
             pnlForm.ResumeLayout(false);
             pnlForm.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)picAvatar).EndInit();
             ResumeLayout(false);
         }
     }
