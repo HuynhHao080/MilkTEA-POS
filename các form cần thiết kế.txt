@@ -28,10 +28,10 @@
 │ TỔNG           │   18     │                                │
 └────────────────┴──────────┴────────────────────────────────┘
 
-Tiến độ: 11/18 forms (61%) ✅
+Tiến độ: 12/18 forms (67%) ✅
 
 =====================================================
-✅ FORM ĐÃ HOÀN THÀNH (11/18)
+✅ FORM ĐÃ HOÀN THÀNH (12/18)
 =====================================================
 
 ✅ 1. frmCategories ⭐
@@ -294,7 +294,45 @@ Tiến độ: 11/18 forms (61%) ✅
 
 ⏳ 12. frmCustomers ✅ (ĐÃ HOÀN THÀNH)
 ⏳ 13. frmMemberships
-⏳ 14. frmVouchers
+✅ 11. frmVouchers ⭐
+   File: frmVouchers.cs (522 dòng)
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - CRUD đầy đủ (Thêm, Sửa, Xóa) với PostgreSQL ENUM types
+   - Tìm kiếm theo mã, tên, mô tả
+   - Filter theo trạng thái (Tất cả, Hoạt động, Hết hạn, Đã dùng hết, Không hoạt động)
+   - 4 Stats cards (Tổng, Hoạt động, Hết hạn, Đã dùng hết) với color-coding
+   - Validation: Mã UPPER_CASE, discount 0-100%, check trùng mã
+   - Date validation: valid_until > valid_from
+   - Color-coded Status column (Green/Yellow/Gray/Red backgrounds)
+   - Highlight cảnh báo khi remaining ≤ 5
+   - ExecuteSqlInterpolatedAsync với explicit ENUM casting
+   - Audit Log cho INSERT/UPDATE/DELETE
+   - Tracking created_by với CurrentUserId
+   - Short-lived DbContext (using pattern)
+   - Loading indicators
+   - Keyboard navigation (Enter → next field → submit)
+   - ComboBox reset về "Tất cả" khi refresh
+
+   Database:
+   - voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
+   - voucher_status ENUM (active, inactive, expired, used_up)
+   - uuid[] arrays (applicable_products, applicable_categories) mapped đúng kiểu
+   - created_by FK to users (audit tracking)
+
+   UI/UX:
+   - Header xanh đậm "QUẢN LÝ VOUCHER"
+   - Stats cards với icon và số liệu
+   - Grid view (Left) + Form nhập liệu (Right)
+   - Font Segoe UI 10F đồng nhất, không chữ to chữ nhỏ
+   - Tiếng Việt hiển thị đầy đủ, không lỗi encoding
+   - Button layout: Thêm | Sửa | Làm mới | Xóa
+
+   Security:
+   - ExecuteSqlInterpolatedAsync (SQL injection safe)
+   - Explicit ENUM casting (::voucher_type, ::voucher_status)
+   - Audit trail (ai làm gì, lúc nào)
+   - Short-lived DbContext
 ⏳ 15. frmOrderHistory
 ✅ 16. frmSalesReport ⭐
    File: frmSalesReport.cs (~720 dòng)
@@ -411,7 +449,48 @@ Tiến độ: 11/18 forms (61%) ✅
    - Short-lived DbContext
    - AsNoTracking() cho read queries
    - Proper font disposal on form close
-⏳ 18. frmOrderDetail
+
+✅ 11. frmVouchers ⭐
+   File: frmVouchers.cs (522 dòng)
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - CRUD đầy đủ (Thêm, Sửa, Xóa) với PostgreSQL ENUM types
+   - Tìm kiếm theo mã, tên, mô tả
+   - Filter theo trạng thái (Tất cả, Hoạt động, Hết hạn, Đã dùng hết, Không hoạt động)
+   - 4 Stats cards (Tổng, Hoạt động, Hết hạn, Đã dùng hết) với color-coding
+   - Validation: Mã UPPER_CASE, discount 0-100%, check trùng mã
+   - Date validation: valid_until > valid_from
+   - Color-coded Status column (Green/Yellow/Gray/Red backgrounds)
+   - Highlight cảnh báo khi remaining ≤ 5
+   - ExecuteSqlInterpolatedAsync với explicit ENUM casting
+   - Audit Log cho INSERT/UPDATE/DELETE
+   - Tracking created_by với CurrentUserId
+   - Short-lived DbContext (using pattern)
+   - Loading indicators
+   - Keyboard navigation (Enter → next field → submit)
+   - ComboBox reset về "Tất cả" khi refresh
+
+   Database:
+   - voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
+   - voucher_status ENUM (active, inactive, expired, used_up)
+   - uuid[] arrays (applicable_products, applicable_categories) mapped đúng kiểu
+   - created_by FK to users (audit tracking)
+
+   UI/UX:
+   - Header xanh đậm "QUẢN LÝ VOUCHER"
+   - Stats cards với icon và số liệu
+   - Grid view (Left) + Form nhập liệu (Right)
+   - Font Segoe UI 10F đồng nhất, không chữ to chữ nhỏ
+   - Tiếng Việt hiển thị đầy đủ, không lỗi encoding
+   - Button layout: Thêm | Sửa | Làm mới | Xóa
+
+   Security:
+   - ExecuteSqlInterpolatedAsync (SQL injection safe)
+   - Explicit ENUM casting (::voucher_type, ::voucher_status)
+   - Audit trail (ai làm gì, lúc nào)
+   - Short-lived DbContext
+
+⏳ 12. frmOrderDetail
 
 =====================================================
 🔐 PASSWORD SECURITY (BCrypt) - PRODUCTION READY
@@ -531,5 +610,5 @@ Security checklist:
 - ✅ No plain-text secrets
 
 =====================================================
-CẬP NHẬT CUỐI: April 3, 2026 - All forms upgraded to 10/10 ⭐
+CẬP NHẬT CUỐI: April 6, 2026 - frmVouchers 10/10 ⭐
 =====================================================

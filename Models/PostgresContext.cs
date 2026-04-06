@@ -848,8 +848,12 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
-            entity.Property(e => e.ApplicableCategories).HasColumnName("applicable_categories");
-            entity.Property(e => e.ApplicableProducts).HasColumnName("applicable_products");
+            entity.Property(e => e.ApplicableCategories)
+                .HasColumnName("applicable_categories")
+                .HasColumnType("uuid[]");
+            entity.Property(e => e.ApplicableProducts)
+                .HasColumnName("applicable_products")
+                .HasColumnType("uuid[]");
             entity.Property(e => e.Code)
                 .HasMaxLength(50)
                 .HasColumnName("code");
@@ -882,6 +886,16 @@ public partial class PostgresContext : DbContext
                 .HasDefaultValueSql("now()")
                 .HasColumnName("valid_from");
             entity.Property(e => e.ValidUntil).HasColumnName("valid_until");
+            
+            // Map PostgreSQL ENUM types
+            entity.Property(e => e.status)
+                .HasColumnType("voucher_status")
+                .HasColumnName("status")
+                .HasConversion<string>();
+            entity.Property(e => e.VoucherType)
+                .HasColumnType("voucher_type")
+                .HasColumnName("voucher_type")
+                .HasConversion<string>();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Vouchers)
                 .HasForeignKey(d => d.CreatedBy)

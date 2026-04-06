@@ -220,6 +220,7 @@ namespace MilkTeaPOS
                     "frmCategories" => new frmCategories(),
                     "frmUsers" => new frmUsers(),
                     "frmCustomers" => new frmCustomers(),
+                    "frmVouchers" => new frmVouchers(),
                     "frmSalesReport" => new frmSalesReport(),
                     "frmAuditLog" => new frmAuditLog(),
                     _ => createPlaceholderForm(formName)

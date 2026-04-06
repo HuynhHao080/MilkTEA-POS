@@ -1,672 +1,515 @@
-﻿using Dapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MilkTeaPOS.Models;
-using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Reflection.Emit;
-using System.Text;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
 namespace MilkTeaPOS
 {
     public partial class frmVouchers : Form
     {
         private Voucher _selectedVoucher;
+
+        #region Constants
+
+        private static readonly string[] VOUCHER_TYPES = { "percentage", "fixed_amount", "free_item", "buy_one_get_one" };
+        private static readonly string[] STATUSES = { "active", "inactive", "expired", "used_up" };
+        private static readonly string[] FILTER_STATUSES = { "Tất cả", "Hoạt động", "Hết hạn", "Đã dùng hết", "Không hoạt động" };
+
+        #endregion
+
+        #region Constructor & Initialization
+
         public frmVouchers()
         {
             InitializeComponent();
+            InitializeForm();
         }
-        #region THIẾT KẾ GIAO DIỆN CONTROL BO GÓC
-        private void BoGoc(Control ctrl, int radius)
+
+        private void InitializeForm()
         {
-            if (ctrl.Width <= 0 || ctrl.Height <= 0) return;
-
-            GraphicsPath path = new GraphicsPath();
-            int d = radius * 2;
-
-            path.AddArc(0, 0, d, d, 180, 90);
-            path.AddArc(ctrl.Width - d, 0, d, d, 270, 90);
-            path.AddArc(ctrl.Width - d, ctrl.Height - d, d, d, 0, 90);
-            path.AddArc(0, ctrl.Height - d, d, d, 90, 90);
-
-            path.CloseFigure();
-            ctrl.Region = new Region(path);
+            InitializeComboBoxes();
+            LoadVoucherData();
         }
+
+        private void InitializeComboBoxes()
+        {
+            cbVoucherType.Items.AddRange(VOUCHER_TYPES);
+            cbVoucherType.SelectedIndex = 0;
+
+            cbStatus.Items.AddRange(STATUSES);
+            cbStatus.SelectedIndex = 0;
+
+            cbFilterStatus.Items.AddRange(FILTER_STATUSES);
+            cbFilterStatus.SelectedIndex = 0;
+        }
+
         #endregion
 
-        //Load form, hiển thị ...
-        private void frmVouchers_Load(object sender, EventArgs e)
-        {
+        #region Data Loading & Display
 
-
-        }
-
-        #region Đếm Vouchers
         private async void LoadVoucherData()
         {
             try
             {
-                // Sử dụng Context có sẵn của dự án
-                using (var context = new PostgresContext())
-                {
-                    // Lấy toàn bộ danh sách Voucher từ Database bằng EF Core
-                    var vouchers = await context.Vouchers.ToListAsync<Voucher>();
+                ShowLoading(true);
 
-                    if (vouchers != null)
-                    {
-                        UpdateVoucherStatistics(vouchers);
-                    }
-                }
+                using var context = new PostgresContext();
+                var vouchers = await context.Vouchers
+                    .AsNoTracking()
+                    .OrderByDescending(v => v.CreatedAt)
+                    .ToListAsync();
+
+                UpdateVoucherStatistics(vouchers);
+                LoadVouchersToGrid(vouchers);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Lỗi tải dữ liệu Voucher:\n{ex.Message}", "Lỗi",
+                MessageBox.Show($"Lỗi tải dữ liệu Voucher:\n{ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ShowLoading(false);
             }
         }
 
         private void UpdateVoucherStatistics(List<Voucher> vouchers)
         {
-            DateTime now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
-            // Tính toán các con số trước
             int total = vouchers.Count;
+            int active = vouchers.Count(v => v.status == "active" && (v.ValidUntil == null || v.ValidUntil >= now));
+            int expired = vouchers.Count(v => v.status == "expired" || (v.ValidUntil != null && v.ValidUntil < now));
+            int usedUp = vouchers.Count(v => v.status == "used_up" || (v.UsageLimit.HasValue && v.UsageCount.HasValue && v.UsageCount >= v.UsageLimit));
+            int inactive = vouchers.Count(v => v.status == "inactive");
 
-            int active = vouchers.Count(v =>
-                v.status == "active" &&
-                (v.ValidUntil == null || v.ValidUntil >= now));
-
-            int expired = vouchers.Count(v =>
-                v.status == "expired" ||
-                (v.ValidUntil != null && v.ValidUntil < now));
-
-            int usedUp = vouchers.Count(v =>
-                v.UsageLimit > 0 && v.UsageCount >= v.UsageLimit);
-
-            // Hiển thị: Tên nhãn + Xuống hàng (\n) + Con số
-            // Sử dụng ký tự $ trước chuỗi để dùng biến trực tiếp trong ngoặc nhọn { }
-            lbl1.Text = $"Tổng Vouchers\n{total}";
-            lbl2.Text = $"Đang hoạt động\n{active}";
-            lbl3.Text = $"Hết hạn\n{expired}";
-            lbl4.Text = $"Đã dùng hết\n{usedUp}";
+            lblTotalValue.Text = total.ToString();
+            lblActiveValue.Text = active.ToString();
+            lblExpiredValue.Text = expired.ToString();
+            lblUsedUpValue.Text = usedUp.ToString();
         }
-        #endregion
 
-
-        #region HÀM TÌM KIẾM VOUCHER
-        private async void PerformVoucherSearch()
+        private void LoadVouchersToGrid(List<Voucher> vouchers = null)
         {
-            var searchText = txtSearch.Text.Trim().ToLower();
-
             try
             {
-                using (var context = new PostgresContext())
+                if (vouchers == null)
                 {
-                    var vouchers = await context.Vouchers
+                    using var context = new PostgresContext();
+                    vouchers = context.Vouchers
                         .AsNoTracking()
-                        .Where(v => string.IsNullOrEmpty(searchText) ||
-                                   v.Code.ToLower().Contains(searchText) ||
-                                   v.Name.ToLower().Contains(searchText))
                         .OrderByDescending(v => v.CreatedAt)
-                        .ToListAsync();
-                    dgvVouchers.DataSource = vouchers.Select(v => new
-                    {
-                        v.Id,
-                        Code = v.Code,
-                        Name = v.Name,
-
-                        Description = string.IsNullOrEmpty(v.Description) ? "" : v.Description,
-
-                        Loai = v.VoucherType,
-
-                        GiamGia = v.VoucherType == "percentage"
-         ? $"{v.DiscountValue}%"
-         : $"{v.DiscountValue:N0}",
-
-                        MinOrder = v.MinOrderAmount.HasValue
-         ? $"{v.MinOrderAmount:N0}"
-         : "0",
-
-                        MaxDiscount = v.MaxDiscountAmount.HasValue
-         ? $"{v.MaxDiscountAmount:N0}"
-         : "Không giới hạn",
-
-                        ConLai = v.UsageLimit.HasValue
-         ? (v.UsageLimit.Value - v.UsageCount).ToString()
-         : "∞",
-
-                        BatDau = v.ValidFrom?.ToString("dd/MM/yyyy") ?? "",
-
-                        HanDung = v.ValidUntil.HasValue
-         ? v.ValidUntil.Value.ToString("dd/MM/yyyy")
-         : "Vô thời hạn",
-
-                        TrangThai = v.status
-                    }).ToList();
+                        .ToList();
                 }
-                CustomizeVoucherColumns();
+
+                var searchText = txtSearch.Text.Trim().ToLower();
+                var statusFilter = cbFilterStatus.SelectedItem?.ToString();
+
+                if (statusFilter != "Tất cả")
+                {
+                    var now = DateTime.UtcNow;
+                    vouchers = statusFilter switch
+                    {
+                        "Hoạt động" => vouchers.Where(v => v.status == "active" && (v.ValidUntil == null || v.ValidUntil >= now)).ToList(),
+                        "Hết hạn" => vouchers.Where(v => v.status == "expired" || (v.ValidUntil != null && v.ValidUntil < now)).ToList(),
+                        "Đã dùng hết" => vouchers.Where(v => v.status == "used_up" || (v.UsageLimit.HasValue && v.UsageCount.HasValue && v.UsageCount >= v.UsageLimit)).ToList(),
+                        "Không hoạt động" => vouchers.Where(v => v.status == "inactive").ToList(),
+                        _ => vouchers
+                    };
+                }
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    vouchers = vouchers.Where(v =>
+                        v.Code.ToLower().Contains(searchText) ||
+                        v.Name.ToLower().Contains(searchText) ||
+                        (v.Description != null && v.Description.ToLower().Contains(searchText))).ToList();
+                }
+
+                dgvVouchers.DataSource = null;
+                dgvVouchers.Rows.Clear();
+                dgvVouchers.Columns.Clear();
+
+                var data = vouchers.Select(v => new
+                {
+                    v.Id,
+                    Code = v.Code,
+                    Name = v.Name,
+                    Type = GetVoucherTypeDisplay(v.VoucherType),
+                    Discount = v.VoucherType == "percentage" ? $"{v.DiscountValue}%" : $"{v.DiscountValue:N0}đ",
+                    MinOrder = v.MinOrderAmount.HasValue ? $"{v.MinOrderAmount:N0}đ" : "Không yêu cầu",
+                    MaxDiscount = v.MaxDiscountAmount.HasValue ? $"{v.MaxDiscountAmount:N0}đ" : "Không giới hạn",
+                    Remaining = v.UsageLimit.HasValue ? $"{v.UsageLimit.Value - (v.UsageCount ?? 0)}" : "∞",
+                    ValidFrom = v.ValidFrom?.ToLocalTime().ToString("dd/MM/yyyy") ?? "-",
+                    ValidUntil = v.ValidUntil?.ToLocalTime().ToString("dd/MM/yyyy") ?? "∞",
+                    Status = GetStatusDisplay(v.status)
+                }).ToList();
+
+                dgvVouchers.DataSource = data;
+                CustomizeGridColumns();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi tìm kiếm Voucher:\n{ex.Message}", "Lỗi",
+                MessageBox.Show($"Lỗi tải danh sách Voucher:\n{ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        #endregion
 
-
-        #region lấy dữ liệu từ postgreSQL
-        private void CustomizeVoucherColumns()
+        private void CustomizeGridColumns()
         {
             if (dgvVouchers.Columns.Count == 0) return;
 
-            dgvVouchers.Columns["Id"].Visible = false;
+            var columns = dgvVouchers.Columns;
 
-            dgvVouchers.Columns["Code"].HeaderText = "Mã Voucher";
-            dgvVouchers.Columns["Name"].HeaderText = "Tên chương trình";
-            dgvVouchers.Columns["Description"].HeaderText = "Mô tả";
-            dgvVouchers.Columns["Loai"].HeaderText = "Loại";
-            dgvVouchers.Columns["GiamGia"].HeaderText = "Giá trị giảm";
-            dgvVouchers.Columns["MinOrder"].HeaderText = "Đơn tối thiểu";
-            dgvVouchers.Columns["MaxDiscount"].HeaderText = "Giảm tối đa";
-            dgvVouchers.Columns["ConLai"].HeaderText = "Lượt còn lại";
-            dgvVouchers.Columns["BatDau"].HeaderText = "Ngày Bắt Đầu";
-            dgvVouchers.Columns["HanDung"].HeaderText = "Hạn dùng";
-            dgvVouchers.Columns["TrangThai"].HeaderText = "Trạng thái";
+            if (columns["Id"] != null) columns["Id"].Visible = false;
+            if (columns["Code"] != null) { columns["Code"].HeaderText = "Mã"; columns["Code"].Width = 120; }
+            if (columns["Name"] != null) { columns["Name"].HeaderText = "Tên voucher"; columns["Name"].Width = 180; }
+            if (columns["Type"] != null) { columns["Type"].HeaderText = "Loại"; columns["Type"].Width = 120; }
+            if (columns["Discount"] != null) { columns["Discount"].HeaderText = "Giá trị giảm"; columns["Discount"].Width = 110; }
+            if (columns["MinOrder"] != null) { columns["MinOrder"].HeaderText = "Đơn tối thiểu"; columns["MinOrder"].Width = 120; }
+            if (columns["MaxDiscount"] != null) { columns["MaxDiscount"].HeaderText = "Giảm tối đa"; columns["MaxDiscount"].Width = 120; }
+            if (columns["Remaining"] != null) { columns["Remaining"].HeaderText = "Còn lại"; columns["Remaining"].Width = 90; }
+            if (columns["ValidFrom"] != null) { columns["ValidFrom"].HeaderText = "Bắt đầu"; columns["ValidFrom"].Width = 110; }
+            if (columns["ValidUntil"] != null) { columns["ValidUntil"].HeaderText = "Hết hạn"; columns["ValidUntil"].Width = 110; }
+            if (columns["Status"] != null) { columns["Status"].HeaderText = "Trạng thái"; columns["Status"].Width = 130; }
 
-            dgvVouchers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvVouchers.DefaultCellStyle.Font = new Font("Segoe UI", 10F);
+            dgvVouchers.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dgvVouchers.RowTemplate.Height = 38;
         }
 
-        private async void LoadVouchersToGrid()
+        private void dgvVouchers_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            try
+            var statusColIndex = -1;
+            if (dgvVouchers.Columns["Status"] != null) statusColIndex = dgvVouchers.Columns["Status"].Index;
+
+            // Color coding cho status column
+            if (e.ColumnIndex == statusColIndex && e.Value != null)
             {
-                using (var context = new PostgresContext())
+                var statusText = e.Value.ToString();
+                e.CellStyle.BackColor = statusText switch
                 {
-                    var vouchers = await context.Vouchers
-                        .OrderByDescending(v => v.CreatedAt)
-                        .ToListAsync();
-
-                    var data = vouchers.Select(v => new
-                    {
-                        v.Id,
-                        Code = v.Code,
-                        Name = v.Name,
-                        Description = string.IsNullOrEmpty(v.Description) ? "" : v.Description,
-                        Loai = v.VoucherType,
-                        GiamGia = v.VoucherType == "percentage"
-                            ? $"{v.DiscountValue}%"
-                            : $"{v.DiscountValue:N0}",
-                        MinOrder = v.MinOrderAmount.HasValue
-                            ? $"{v.MinOrderAmount:N0}"
-                            : "0",
-                        MaxDiscount = v.MaxDiscountAmount.HasValue
-                            ? $"{v.MaxDiscountAmount:N0}"
-                            : "Không giới hạn",
-
-                        ConLai = v.UsageLimit.HasValue
-                            ? (v.UsageLimit.Value - v.UsageCount).ToString()
-                            : "∞",
-                        //BatDau = v.ValidFrom.ToString("dd/MM/yyyy"),
-                        BatDau = v.ValidFrom?.ToString("dd/MM/yyyy") ?? "",
-                        HanDung = v.ValidUntil.HasValue
-                                ? v.ValidUntil.Value.ToString("dd/MM/yyyy")
-                                : "Vô thời hạn",
-                        TrangThai = v.status
-                    }).ToList();
-
-                    dgvVouchers.DataSource = data;
-
-                    UpdateVoucherStatistics(vouchers);
-                }
-
-                CustomizeVoucherColumns();
+                    "Hoạt động" => Color.FromArgb(212, 237, 218),
+                    "Không hoạt động" => Color.FromArgb(226, 228, 230),
+                    "Hết hạn" => Color.FromArgb(255, 243, 205),
+                    "Đã dùng hết" => Color.FromArgb(206, 212, 218),
+                    _ => Color.White
+                };
+                e.CellStyle.ForeColor = statusText switch
+                {
+                    "Hoạt động" => Color.FromArgb(21, 87, 36),
+                    "Không hoạt động" => Color.FromArgb(108, 117, 125),
+                    "Hết hạn" => Color.FromArgb(133, 100, 4),
+                    "Đã dùng hết" => Color.FromArgb(73, 80, 87),
+                    _ => Color.FromArgb(45, 55, 72)
+                };
+                e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
-            catch (Exception ex)
+
+            // Discount column - red color
+            if (dgvVouchers.Columns["Discount"] != null && e.ColumnIndex == dgvVouchers.Columns["Discount"].Index)
             {
-                MessageBox.Show($"❌ Lỗi: {ex.Message}");
+                e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                e.CellStyle.ForeColor = Color.FromArgb(231, 76, 60);
+            }
+
+            // MinOrder column
+            if (dgvVouchers.Columns["MinOrder"] != null && e.ColumnIndex == dgvVouchers.Columns["MinOrder"].Index)
+            {
+                e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            }
+
+            // MaxDiscount column
+            if (dgvVouchers.Columns["MaxDiscount"] != null && e.ColumnIndex == dgvVouchers.Columns["MaxDiscount"].Index)
+            {
+                e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            }
+
+            // Remaining column - highlight low stock
+            if (dgvVouchers.Columns["Remaining"] != null && e.ColumnIndex == dgvVouchers.Columns["Remaining"].Index)
+            {
+                e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                if (e.Value != null && e.Value.ToString() != "∞")
+                {
+                    if (int.TryParse(e.Value.ToString(), out int remaining) && remaining <= 5 && remaining > 0)
+                    {
+                        e.CellStyle.ForeColor = Color.FromArgb(231, 76, 60);
+                    }
+                }
+            }
+
+            // Code column - blue color
+            if (dgvVouchers.Columns["Code"] != null && e.ColumnIndex == dgvVouchers.Columns["Code"].Index)
+            {
+                e.CellStyle.ForeColor = Color.FromArgb(52, 152, 219);
             }
         }
 
         #endregion
 
-        #region sự kiện hàm làm mới
+        #region Form Data Management
 
-        private void ResetForm()
+        private void FillFormData()
         {
-            txtSearch.Clear();
-            textBox1.Clear();
-            textBox2.Clear();
-            textBox3.Clear();
-            textBox4.Clear();
-            textBox5.Clear();
-            dtp_handung.Value = DateTime.Now;
-            dtp_batdau.Value = DateTime.Now;
-            txtMinOrder.Clear();
-            txtMaxDiscount.Clear();
-            _selectedVoucher = null;
+            if (_selectedVoucher == null) return;
 
-            LoadVouchersToGrid();
+            txtCode.Text = _selectedVoucher.Code;
+            txtName.Text = _selectedVoucher.Name;
+            txtDescription.Text = _selectedVoucher.Description;
+            cbVoucherType.Text = _selectedVoucher.VoucherType;
+            txtDiscountValue.Text = _selectedVoucher.DiscountValue.ToString();
+            txtMinOrder.Text = _selectedVoucher.MinOrderAmount?.ToString() ?? "";
+            txtMaxDiscount.Text = _selectedVoucher.MaxDiscountAmount?.ToString() ?? "";
+            txtUsageLimit.Text = _selectedVoucher.UsageLimit?.ToString() ?? "";
+
+            if (_selectedVoucher.ValidFrom.HasValue) dtpValidFrom.Value = _selectedVoucher.ValidFrom.Value.ToLocalTime();
+            if (_selectedVoucher.ValidUntil.HasValue) dtpValidUntil.Value = _selectedVoucher.ValidUntil.Value.ToLocalTime();
+
+            // Chọn đúng status trong ComboBox
+            var statusToSelect = _selectedVoucher.status?.ToLower() ?? "active";
+            cbStatus.SelectedItem = STATUSES.Contains(statusToSelect) ? statusToSelect : "active";
         }
+
+        private void ClearForm()
+        {
+            txtCode.Clear(); txtName.Clear(); txtDescription.Clear(); txtDiscountValue.Clear();
+            txtMinOrder.Clear(); txtMaxDiscount.Clear(); txtUsageLimit.Clear();
+            dtpValidFrom.Value = DateTime.Now; dtpValidUntil.Value = DateTime.Now.AddYears(1);
+            cbVoucherType.SelectedIndex = 0; cbStatus.SelectedIndex = 0; _selectedVoucher = null;
+            txtCode.Focus();
+        }
+
         #endregion
 
-        private void lbl1_Click(object sender, EventArgs e)
+        #region Event Handlers
+
+        private void dgvVouchers_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-
-        }
-
-        private void lbl1_hieuung_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lbl4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Lọc_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dgv_vouchers_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void btt_lammoi_Click(object sender, EventArgs e)
-        {
-            ResetForm();
-            MessageBox.Show("Đã làm mới dữ liệu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (e.RowIndex < 0) return;
+            var row = dgvVouchers.Rows[e.RowIndex];
+            if (row.Cells["Id"].Value == null) return;
+            var id = Guid.Parse(row.Cells["Id"].Value.ToString());
+            using var context = new PostgresContext();
+            _selectedVoucher = context.Vouchers.AsNoTracking().FirstOrDefault(v => v.Id == id);
+            if (_selectedVoucher != null) FillFormData();
         }
 
         private void dgvVouchers_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            if (e.RowIndex < 0) return;
+            dgvVouchers_CellClick(sender, e);
         }
 
-        // Xóa voucher đã chọn
-        private async void btt_xoa_Click(object sender, EventArgs e)
-        {
+        #endregion
 
-            if (dgvVouchers.CurrentRow == null)
-            {
-                MessageBox.Show("⚠️ Vui lòng chọn Voucher cần xóa!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            // Lấy ID và Code từ dòng đang chọn
-            var row = dgvVouchers.CurrentRow;
-            Guid idCanXoa = (Guid)row.Cells["Id"].Value;
-            string maVoucher = row.Cells["Code"].Value?.ToString() ?? "";
-            var result = MessageBox.Show(
-            $"🗑️ Bạn có chắc muốn xóa Voucher '{maVoucher}'?\n\n⚠️ Hành động này không thể hoàn tác!",
-            "Xác nhận xóa",
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Warning);
+        #region Keyboard Navigation
+
+        private void txtCode_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; txtName.Focus(); } }
+        private void txtName_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; txtDescription.Focus(); } }
+        private void txtDescription_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; cbVoucherType.Focus(); } }
+        private void cbVoucherType_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; txtDiscountValue.Focus(); } }
+        private void txtDiscountValue_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; txtMinOrder.Focus(); } if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) e.Handled = true; }
+        private void txtMinOrder_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; txtMaxDiscount.Focus(); } if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) e.Handled = true; }
+        private void txtMaxDiscount_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; txtUsageLimit.Focus(); } if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) e.Handled = true; }
+        private void txtUsageLimit_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; dtpValidFrom.Focus(); } if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) e.Handled = true; }
+        private void dtpValidFrom_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; dtpValidUntil.Focus(); } }
+        private void dtpValidUntil_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; cbStatus.Focus(); } }
+        private void cbStatus_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; if (_selectedVoucher != null) btnEdit_Click(sender, e); else btnAdd_Click(sender, e); } }
+
+        #endregion
+
+        #region Toolbar Actions
+
+        private async void btnAdd_Click(object sender, EventArgs e) => await SaveVoucher(isEdit: false);
+        private async void btnEdit_Click(object sender, EventArgs e) { if (_selectedVoucher == null) { MessageBox.Show("Vui lòng chọn voucher cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; } await SaveVoucher(isEdit: true); }
+        private async void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (_selectedVoucher == null) { MessageBox.Show("Vui lòng chọn voucher cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            var result = MessageBox.Show($"Bạn có chắc muốn xóa Voucher '{_selectedVoucher.Code}'?\n\nHành động này không thể hoàn tác!", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result != DialogResult.Yes) return;
             try
             {
-                using (var context = new PostgresContext())
-                {
-
-                    var voucher = await context.Vouchers.FindAsync(idCanXoa);
-                    if (voucher != null)
-                    {
-                        context.Vouchers.Remove(voucher);
-                        await context.SaveChangesAsync();
-                    }
-                }
-
-                MessageBox.Show("✅ Xóa Voucher thành công!", "Thành công",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
-                LoadVouchersToGrid();
-                ResetForm();
+                using var context = new PostgresContext();
+                var voucher = await context.Vouchers.FindAsync(_selectedVoucher.Id);
+                if (voucher != null) { context.Vouchers.Remove(voucher); await context.SaveChangesAsync(); }
+                
+                // Log Audit
+                LogAudit("DELETE", _selectedVoucher.Id, $"Code: {_selectedVoucher.Code}");
+                
+                MessageBox.Show("Xóa Voucher thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadVoucherData(); ClearForm();
             }
-            catch (DbUpdateException dbEx)
-            {
-                string errorMsg = $"❌ Lỗi khi xóa (Lỗi DB):\n\n{dbEx.Message}";
-                if (dbEx.InnerException != null)
-                {
-                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{dbEx.InnerException.Message}";
-                }
-                MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                string errorMsg = $"❌ Lỗi hệ thống khi xóa:\n{ex.Message}";
-                if (ex.InnerException != null)
-                {
-                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{ex.InnerException.Message}";
-                }
-                MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch (DbUpdateException dbEx) { MessageBox.Show($"Lỗi khi xóa:\n\n{dbEx.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            catch (Exception ex) { MessageBox.Show($"Lỗi khi xóa:\n{ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
+        private void btnRefresh_Click(object sender, EventArgs e) 
+        { 
+            cbFilterStatus.SelectedIndex = 0; // Reset filter về "Tất cả"
+            LoadVoucherData(); 
+            ClearForm(); 
         }
+        private void btnFilter_Click(object sender, EventArgs e) => LoadVouchersToGrid();
+        private void cbFilterStatus_SelectedIndexChanged(object sender, EventArgs e) => LoadVouchersToGrid();
 
-        private void label7_Click(object sender, EventArgs e)
+        #endregion
+
+        #region Search Functionality
+
+        private void txtSearch_KeyPress(object sender, KeyPressEventArgs e) { if (e.KeyChar == (char)Keys.Enter) { e.Handled = true; LoadVouchersToGrid(); } }
+
+        #endregion
+
+        #region Database Operations
+
+        private void LogAudit(string action, Guid recordId, string details)
         {
-
-        }
-
-        private void label9_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        // Khi người dùng click vào một ô trong DataGridView, hiển thị chi tiết voucher lên form
-        private async void dgvVouchers_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0) return;
-
-            var row = dgvVouchers.Rows[e.RowIndex];
-
-            textBox1.Text = row.Cells["Code"].Value?.ToString();
-            textBox2.Text = row.Cells["Name"].Value?.ToString();
-            textBox3.Text = row.Cells["Description"].Value?.ToString();
-            cbxVoucherType.Text = row.Cells["Loai"].Value?.ToString();
-            var giamGiaStr = row.Cells["GiamGia"].Value?.ToString()
-                ?.Replace("%", "")
-                ?.Replace(",", "")
-                ?.Trim();
-            txtMinOrder.Text = row.Cells["MinOrder"].Value?.ToString();
-            txtMaxDiscount.Text = row.Cells["MaxDiscount"].Value?.ToString() == "Không giới hạn"
-                ? ""
-                : row.Cells["MaxDiscount"].Value?.ToString();
-
-            textBox4.Text = giamGiaStr;
-            textBox5.Text = row.Cells["ConLai"].Value?.ToString();
-            if (row.Cells["BatDau"].Value != null)
-            {
-                if (DateTime.TryParseExact(row.Cells["BatDau"].Value.ToString(),
-                    "dd/MM/yyyy", null,
-                    System.Globalization.DateTimeStyles.None, out DateTime bd))
-                {
-                    dtp_batdau.Value = bd;
-                }
-            }
-            if (row.Cells["HanDung"].Value != null &&
-                row.Cells["HanDung"].Value.ToString() != "Vô thời hạn")
-            {
-                if (DateTime.TryParseExact(row.Cells["HanDung"].Value.ToString(),
-                    "dd/MM/yyyy", null,
-                    System.Globalization.DateTimeStyles.None, out DateTime hd))
-                {
-                    dtp_handung.Value = hd;
-                }
-            }
-            cbx1_tatcama.Text = row.Cells["TrangThai"].Value?.ToString();
-            _selectedVoucher = new Voucher
-            {
-                Id = (Guid)row.Cells["Id"].Value
-            };
-        }
-
-        // Sửa voucher đã chọn
-        private async void btt_sua_Click(object sender, EventArgs e)
-        {
-            if (_selectedVoucher == null)
-            {
-                MessageBox.Show("Chọn voucher cần sửa!");
-                return;
-            }
-
             try
             {
-                using (var context = new PostgresContext())
+                using var context = new PostgresContext();
+                var userId = PostgresContext.CurrentUserId;
+                if (userId.HasValue)
                 {
-                    var voucher = await context.Vouchers.FindAsync(_selectedVoucher.Id);
-
-                    if (voucher == null)
+                    context.AuditLogs.Add(new AuditLog
                     {
-                        MessageBox.Show("Không tìm thấy voucher!");
-                        return;
-                    }
-
-                    // 🔹 Code + Name
-                    voucher.Code = textBox1.Text.Trim().ToUpper();
-                    voucher.Name = textBox2.Text.Trim();
-
-                    // 🔹 Description (NULL OK)
-                    voucher.Description = string.IsNullOrWhiteSpace(textBox3.Text)
-                        ? null
-                        : textBox3.Text.Trim();
-
-                    // 🔹 Type
-                    voucher.VoucherType = cbxVoucherType.Text;
-
-                    // 🔹 Discount
-                    if (!decimal.TryParse(textBox4.Text, out decimal discountVal) || discountVal < 0)
-                    {
-                        MessageBox.Show("Giá trị giảm không hợp lệ!");
-                        return;
-                    }
-                    voucher.DiscountValue = discountVal;
-
-                    // 🔹 Min Order
-                    if (decimal.TryParse(txtMinOrder.Text, out decimal min))
-                        voucher.MinOrderAmount = min;
-                    else
-                        voucher.MinOrderAmount = null;
-
-                    // 🔹 Max Discount
-                    if (decimal.TryParse(txtMaxDiscount.Text, out decimal max))
-                        voucher.MaxDiscountAmount = max;
-                    else
-                        voucher.MaxDiscountAmount = null;
-
-                    // 🔹 UsageLimit (không dùng ConLai)
-                    if (int.TryParse(textBox5.Text, out int limit) && limit > 0)
-                        voucher.UsageLimit = limit;
-                    else
-                        voucher.UsageLimit = null;
-
-                    // 🔹 Date
-                    if (dtp_handung.Value <= dtp_batdau.Value)
-                    {
-                        MessageBox.Show("Ngày hết hạn phải sau ngày bắt đầu!");
-                        return;
-                    }
-
-                    voucher.ValidFrom = dtp_batdau.Value.ToUniversalTime();
-                    voucher.ValidUntil = dtp_handung.Value.ToUniversalTime();
-
-                    // 🔹 Status
-                    voucher.status = cbx1_tatcama.Text;
-
-                    // 🔹 Update time
-                    voucher.UpdatedAt = DateTime.UtcNow;
-
-                    await context.SaveChangesAsync();
-
-                    MessageBox.Show("Cập nhật thành công!");
-
-                    LoadVouchersToGrid();
-                    ResetForm();
+                        Id = Guid.NewGuid(),
+                        UserId = userId.Value,
+                        Action = action,
+                        TableName = "vouchers",
+                        RecordId = recordId,
+                        NewValues = details,
+                        IpAddress = PostgresContext.CurrentUserIP,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    context.SaveChanges();
                 }
             }
-            catch (Exception ex)
-            {
-                string msg = $"Lỗi:\n{ex.Message}";
-                if (ex.InnerException != null)
-                    msg += $"\nChi tiết: {ex.InnerException.Message}";
-
-                MessageBox.Show(msg);
-            }
+            catch { /* Ignore audit errors */ }
         }
 
-        #region Hàm thêm mới voucher updata
-        private async Task SaveVoucher()
+        private async Task SaveVoucher(bool isEdit)
         {
-            var code = textBox1.Text.Trim().ToUpper();
-            var name = textBox2.Text.Trim();
-            var description = textBox3.Text.Trim();
+            if (!ValidateInputs(out string errorMessage)) { MessageBox.Show(errorMessage, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-            if (string.IsNullOrEmpty(code) || string.IsNullOrEmpty(name))
-            {
-                MessageBox.Show("Vui lòng nhập đầy đủ Mã và Tên Voucher!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            var code = txtCode.Text.Trim().ToUpper();
+            var name = txtName.Text.Trim();
+            var description = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
+            var voucherType = cbVoucherType.Text;
+            var status = cbStatus.Text;
 
-            if (!decimal.TryParse(textBox4.Text.Trim(), out decimal discountVal) || discountVal < 0)
-            {
-                MessageBox.Show("Giá trị giảm giá không hợp lệ!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (!decimal.TryParse(txtDiscountValue.Text.Trim(), out decimal discountVal) || discountVal < 0) { MessageBox.Show("Giá trị giảm giá không hợp lệ!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-            decimal? minOrderAmount = decimal.TryParse(txtMinOrder.Text.Trim(), out decimal mo) ? mo : null;
-            decimal? maxDiscount = decimal.TryParse(txtMaxDiscount.Text.Trim(), out decimal md) ? md : null;
-            int? usageLimit = int.TryParse(textBox5.Text.Trim(), out int ul) && ul > 0 ? ul : (int?)null;
+            decimal? minOrderAmount = decimal.TryParse(txtMinOrder.Text.Trim(), out decimal mo) && mo > 0 ? mo : null;
+            decimal? maxDiscount = decimal.TryParse(txtMaxDiscount.Text.Trim(), out decimal md) && md > 0 ? md : null;
+            int? usageLimit = int.TryParse(txtUsageLimit.Text.Trim(), out int ul) && ul > 0 ? ul : (int?)null;
 
-            var voucherType = cbxVoucherType.SelectedItem?.ToString() ?? "percentage";
-            var status = cbx1_tatcama.SelectedItem?.ToString() ?? "active";
+            DateTime validFrom = dtpValidFrom.Value.ToUniversalTime();
+            DateTime validUntil = dtpValidUntil.Value.ToUniversalTime();
 
-            DateTime validFrom = dtp_batdau.Value.ToUniversalTime();
-            DateTime validUntil = dtp_handung.Value.ToUniversalTime();
-
-            if (validUntil <= validFrom)
-            {
-                MessageBox.Show("Ngày hết hạn phải sau ngày bắt đầu!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (validUntil <= validFrom) { MessageBox.Show("Ngày hết hạn phải sau ngày bắt đầu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
             try
             {
                 using var context = new PostgresContext();
 
-                bool isExist = await context.Vouchers.AsNoTracking().AnyAsync(v => v.Code == code);
-                if (isExist)
+                if (!isEdit)
                 {
-                    MessageBox.Show($"Mã Voucher '{code}' đã tồn tại!", "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    bool isExist = await context.Vouchers.AsNoTracking().AnyAsync(v => v.Code == code);
+                    if (isExist) { MessageBox.Show($"Mã Voucher '{code}' đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+                    
+                    var id = Guid.NewGuid();
+                    var currentUserId = PostgresContext.CurrentUserId;
+
+                    await context.Database.ExecuteSqlInterpolatedAsync($@"
+                        INSERT INTO vouchers (id, code, name, description, voucher_type, discount_value,
+                            min_order_amount, max_discount_amount, usage_limit, usage_count,
+                            status, valid_from, valid_until, created_at, updated_at, created_by,
+                            applicable_products, applicable_categories)
+                        VALUES ({id}, {code}, {name}, {description}, {voucherType}::voucher_type, {discountVal},
+                            {minOrderAmount}, {maxDiscount}, {usageLimit}, 0,
+                            {status}::voucher_status, {validFrom}, {validUntil}, {DateTime.UtcNow}, {DateTime.UtcNow},
+                            {currentUserId}, NULL, NULL)");
+
+                    // Log Audit
+                    LogAudit("INSERT", id, $"Code: {code}, Name: {name}, Value: {discountVal}");
+                    
+                    MessageBox.Show("Thêm Voucher thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                var parameters = new[]
+                else
                 {
-            new NpgsqlParameter("id",           Guid.NewGuid()),
-            new NpgsqlParameter("code",          code),
-            new NpgsqlParameter("name",          name),
-            new NpgsqlParameter("description",   string.IsNullOrEmpty(description) ? DBNull.Value : description),
-            new NpgsqlParameter("voucher_type",  voucherType)  { DataTypeName = "voucher_type" },
-            new NpgsqlParameter("discount_value",discountVal),
-            new NpgsqlParameter("min_order",     minOrderAmount.HasValue ? minOrderAmount.Value : DBNull.Value),
-            new NpgsqlParameter("max_discount",  maxDiscount.HasValue    ? maxDiscount.Value    : DBNull.Value),
-            new NpgsqlParameter("usage_limit",   usageLimit.HasValue     ? usageLimit.Value     : DBNull.Value),
-            new NpgsqlParameter("status",        status)       { DataTypeName = "voucher_status" },
-            new NpgsqlParameter("valid_from",    validFrom),
-            new NpgsqlParameter("valid_until",   validUntil),
-            new NpgsqlParameter("created_at",    DateTime.UtcNow),
-            new NpgsqlParameter("updated_at",    DateTime.UtcNow),
-        };
-
-                await context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO vouchers 
-                (id, code, name, description, voucher_type, discount_value,
-                 min_order_amount, max_discount_amount, usage_limit, usage_count,
-                 status, valid_from, valid_until, created_at, updated_at)
-            VALUES
-                (@id, @code, @name, @description, @voucher_type::voucher_type, @discount_value,
-                 @min_order, @max_discount, @usage_limit, 0,
-                 @status::voucher_status, @valid_from, @valid_until, @created_at, @updated_at)
-        ", parameters);
-
-                MessageBox.Show("Thêm Voucher thành công!", "Thành công",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                LoadVouchersToGrid();
-                ResetForm();
+                    var existingVoucher = await context.Vouchers.AsNoTracking().FirstOrDefaultAsync(v => v.Id == _selectedVoucher.Id);
+                    if (existingVoucher == null) { MessageBox.Show("Không tìm thấy voucher!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+                    
+                    bool isExist = await context.Vouchers.AsNoTracking().AnyAsync(v => v.Code == code && v.Id != _selectedVoucher.Id);
+                    if (isExist) { MessageBox.Show($"Mã Voucher '{code}' đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+                    
+                    await context.Database.ExecuteSqlInterpolatedAsync($@"
+                        UPDATE vouchers SET 
+                            code = {code}, name = {name}, description = {description}, 
+                            voucher_type = {voucherType}::voucher_type,
+                            discount_value = {discountVal}, 
+                            min_order_amount = {minOrderAmount}, 
+                            max_discount_amount = {maxDiscount},
+                            usage_limit = {usageLimit}, 
+                            status = {status}::voucher_status,
+                            valid_from = {validFrom}, 
+                            valid_until = {validUntil}, 
+                            updated_at = {DateTime.UtcNow}
+                        WHERE id = {_selectedVoucher.Id}");
+                    
+                    // Log Audit
+                    LogAudit("UPDATE", _selectedVoucher.Id, $"Code: {code}, Name: {name}, Value: {discountVal}");
+                    
+                    MessageBox.Show("Sửa Voucher thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                LoadVoucherData(); ClearForm();
             }
-            catch (DbUpdateException dbEx)
-            {
-                var inner = dbEx.InnerException?.Message ?? dbEx.Message;
-                MessageBox.Show($"Lỗi database:\n{inner}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                var inner = ex.InnerException?.Message ?? ex.Message;
-                MessageBox.Show($"Lỗi:\n{inner}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch (Exception ex) { MessageBox.Show($"Lỗi:\n{ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
+
         #endregion
-        private async void btt_them_Click(object sender, EventArgs e)
+
+        #region Validation Helpers
+
+        private bool ValidateInputs(out string errorMessage)
         {
-            await SaveVoucher();
+            errorMessage = string.Empty;
+            var code = txtCode.Text.Trim(); var name = txtName.Text.Trim();
+            if (string.IsNullOrEmpty(code)) { errorMessage = "Vui lòng nhập mã voucher!"; txtCode.Focus(); return false; }
+            if (!Regex.IsMatch(code, @"^[A-Z0-9_]+$")) { errorMessage = "Mã voucher chỉ được chứa chữ HOA, số và dấu gạch dưới!"; txtCode.Focus(); return false; }
+            if (string.IsNullOrEmpty(name)) { errorMessage = "Vui lòng nhập tên voucher!"; txtName.Focus(); return false; }
+            if (string.IsNullOrEmpty(txtDiscountValue.Text.Trim())) { errorMessage = "Vui lòng nhập giá trị giảm giá!"; txtDiscountValue.Focus(); return false; }
+            if (!decimal.TryParse(txtDiscountValue.Text.Trim(), out decimal discountVal) || discountVal < 0) { errorMessage = "Giá trị giảm giá không hợp lệ!"; txtDiscountValue.Focus(); return false; }
+            if (cbVoucherType.Text == "percentage" && (discountVal < 0 || discountVal > 100)) { errorMessage = "Giá trị giảm giá phải từ 0-100 cho loại phần trăm!"; txtDiscountValue.Focus(); return false; }
+            return true;
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            PerformVoucherSearch();
+        #endregion
 
-        }
+        #region Display Helpers
 
-        private void txtSearch_TextChanged(object sender, EventArgs e)
-        {
+        private string GetVoucherTypeDisplay(string voucherType) => voucherType switch { "percentage" => "% Phần trăm", "fixed_amount" => "VNĐ Cố định", "free_item" => "Free item", "buy_one_get_one" => "Mua 1 tặng 1", _ => voucherType };
+        private string GetStatusDisplay(string status) => status switch { "active" => "Hoạt động", "inactive" => "Không hoạt động", "expired" => "Hết hạn", "used_up" => "Đã dùng hết", _ => status };
+        private string GetVoucherTypeKey(string displayType) => displayType switch { "% Phần trăm" => "percentage", "VNĐ Cố định" => "fixed_amount", "Free item" => "free_item", "Mua 1 tặng 1" => "buy_one_get_one", _ => "percentage" };
+        private string GetStatusKey(string displayStatus) => displayStatus switch { "Hoạt động" => "active", "Không hoạt động" => "inactive", "Hết hạn" => "expired", "Đã dùng hết" => "used_up", _ => "active" };
 
-        }
+        #endregion
 
-        private void txtSearch_KeyPress(object sender, KeyPressEventArgs e)
-        {
+        #region Loading Indicator
 
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                e.Handled = true;
-                PerformVoucherSearch();
-            }
-        }
+        private void ShowLoading(bool show) { if (show) { this.Cursor = Cursors.WaitCursor; pnlMain.Enabled = false; } else { this.Cursor = Cursors.Default; pnlMain.Enabled = true; } }
 
-        private void label13_Click(object sender, EventArgs e)
-        {
+        #endregion
 
-        }
+        #region Form Events
 
-        private void label15_Click(object sender, EventArgs e)
-        {
+        private void frmVouchers_Load(object sender, EventArgs e) => LoadVoucherData();
+        protected override void OnFormClosing(FormClosingEventArgs e) => base.OnFormClosing(e);
 
-        }
-
-        private void label8_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label16_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dtp_handung_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void groupBox2_Enter(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
     }
 }

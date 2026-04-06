@@ -50,17 +50,66 @@ dotnet run
 | Tables | 1 | Visual layout |
 | POS & Orders | 3 | Core business |
 | Customers | 2 | CRM + Membership |
-| Vouchers | 1 | Promotion |
+| Vouchers | 1 | Promotion ✅ |
 | Order History | 1 | Search, Filter |
 | Reports | 2 | Sales + Audit |
 | Users | 1 | Staff management |
 | **TỔNG** | **18** | |
 
-**Tiến độ:** 11/18 forms (61%) ✅ - All completed forms rated 10/10 ⭐
+**Tiến độ:** 12/18 forms (67%) ✅ - All completed forms rated 10/10 ⭐
 
 ---
 
-## ✅ FORMS ĐÃ HOÀN THÀNH (11/18)
+## ✅ FORMS ĐÃ HOÀN THÀNH (12/18)
+
+### 11. frmVouchers - Quản lý mã giảm giá ⭐ NEW
+
+**File:**
+- `frmVouchers.cs` (~522 dòng)
+- `frmVouchers.Designer.cs` (~940 dòng)
+
+**Trạng thái:** `HOÀN THÀNH 10/10` 🏆
+
+**Chức năng:**
+- ✅ CRUD đầy đủ (Thêm, Sửa, Xóa) với PostgreSQL ENUM types
+- ✅ Tìm kiếm theo mã, tên, mô tả
+- ✅ Filter theo trạng thái (Tất cả, Hoạt động, Hết hạn, Đã dùng hết, Không hoạt động)
+- ✅ 4 Stats cards (Tổng, Hoạt động, Hết hạn, Đã dùng hết) với color-coding
+- ✅ Validation: Mã UPPER_CASE, discount 0-100%, check trùng mã
+- ✅ Date validation: valid_until > valid_from
+- ✅ Color-coded Status column (Green/Yellow/Gray/Red backgrounds)
+- ✅ Highlight cảnh báo khi remaining ≤ 5
+- ✅ ExecuteSqlInterpolatedAsync với explicit ENUM casting
+- ✅ Audit Log cho INSERT/UPDATE/DELETE
+- ✅ Tracking created_by với CurrentUserId
+- ✅ Short-lived DbContext (using pattern)
+- ✅ Loading indicators
+- ✅ Keyboard navigation (Enter → next field → submit)
+- ✅ ComboBox reset về "Tất cả" khi refresh
+
+**Database:**
+- voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
+- voucher_status ENUM (active, inactive, expired, used_up)
+- uuid[] arrays (applicable_products, applicable_categories) mapped đúng kiểu
+- created_by FK to users (audit tracking)
+
+**UI/UX:**
+- Header xanh đậm "QUẢN LÝ VOUCHER"
+- Stats cards với icon và số liệu
+- Grid view (Left) + Form nhập liệu (Right)
+- Font Segoe UI 10F đồng nhất, không chữ to chữ nhỏ
+- Tiếng Việt hiển thị đầy đủ, không lỗi encoding
+- Button layout: Thêm | Sửa | Làm mới | Xóa
+
+**Security:**
+- ExecuteSqlInterpolatedAsync (SQL injection safe)
+- Explicit ENUM casting (::voucher_type, ::voucher_status)
+- Audit trail (ai làm gì, lúc nào)
+- Short-lived DbContext
+
+---
+
+## ✅ FORMS ĐÃ HOÀN THÀNH (12/18) - CONTINUED
 
 ### 9. frmSalesReport - Báo cáo doanh thu ⭐
 
@@ -590,7 +639,7 @@ Nếu có vấn đề, tạo issue hoặc liên hệ team lead.
 
 ---
 
-**Cập nhật cuối:** April 3, 2026 - 8/18 forms 10/10, real-time dashboard ⭐
+**Cập nhật cuối:** April 6, 2026 - 12/18 forms 10/10, frmVouchers production ready ⭐
 **Version:** 1.0.0
 **Status:** In Development 🚧
-**Progress:** 8/18 forms (44%) - Production Ready ⭐
+**Progress:** 12/18 forms (67%) - Production Ready ⭐

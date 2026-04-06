@@ -2,15 +2,8 @@
 {
     partial class frmVouchers
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,603 +15,925 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            pbx1 = new PictureBox();
-            lbl1 = new Label();
-            lbl2 = new Label();
-            lbl3 = new Label();
-            lbl4_hieuung = new Label();
-            lbl4 = new Label();
-            groupBox1 = new GroupBox();
-            label4 = new Label();
-            label3 = new Label();
-            label2 = new Label();
-            button2 = new Button();
-            txtSearch = new TextBox();
-            groupBox2 = new GroupBox();
-            cbx1_tatcama = new ComboBox();
-            groupBox3 = new GroupBox();
-            btt_xoa = new Button();
-            btt_sua = new Button();
-            btt_lammoi = new Button();
-            btt_them = new Button();
-            grpDanhSach = new GroupBox();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            pnlHeader = new Panel();
+            lblTitle = new Label();
+            pnlMain = new Panel();
+            pnlGrid = new Panel();
             dgvVouchers = new DataGridView();
-            grpNhapLieu = new GroupBox();
-            textBox3 = new TextBox();
-            label16 = new Label();
+            pnlRight = new Panel();
+            pnlFormContainer = new Panel();
+            lblFormTitle = new Label();
+            pnlFormFields = new Panel();
+            cbStatus = new ComboBox();
+            lblStatus = new Label();
+            dtpValidUntil = new DateTimePicker();
+            lblValidUntil = new Label();
+            dtpValidFrom = new DateTimePicker();
+            lblValidFrom = new Label();
             txtMaxDiscount = new TextBox();
-            label15 = new Label();
-            label14 = new Label();
-            cbxVoucherType = new ComboBox();
-            label13 = new Label();
-            dtp_batdau = new DateTimePicker();
-            dtp_handung = new DateTimePicker();
+            lblMaxDiscount = new Label();
+            txtUsageLimit = new TextBox();
+            lblUsageLimit = new Label();
             txtMinOrder = new TextBox();
-            textBox5 = new TextBox();
-            textBox4 = new TextBox();
-            textBox2 = new TextBox();
-            textBox1 = new TextBox();
-            label12 = new Label();
-            label11 = new Label();
-            label10 = new Label();
-            label9 = new Label();
-            label8 = new Label();
-            label7 = new Label();
-            label6 = new Label();
-            ((System.ComponentModel.ISupportInitialize)pbx1).BeginInit();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
-            groupBox3.SuspendLayout();
-            grpDanhSach.SuspendLayout();
+            lblMinOrder = new Label();
+            txtDiscountValue = new TextBox();
+            lblDiscountValue = new Label();
+            cbVoucherType = new ComboBox();
+            lblVoucherType = new Label();
+            txtDescription = new TextBox();
+            lblDescription = new Label();
+            txtName = new TextBox();
+            lblName = new Label();
+            txtCode = new TextBox();
+            lblCode = new Label();
+            pnlFormButtons = new Panel();
+            btnRefresh = new Button();
+            btnEdit = new Button();
+            btnAdd = new Button();
+            btnDelete = new Button();
+            pnlSearchFilter = new Panel();
+            btnFilter = new Button();
+            txtSearch = new TextBox();
+            cbFilterStatus = new ComboBox();
+            pnlStats = new Panel();
+            statTotal = new Panel();
+            lblTotalIcon = new Label();
+            lblTotalValue = new Label();
+            lblTotalLabel = new Label();
+            statActive = new Panel();
+            lblActiveIcon = new Label();
+            lblActiveValue = new Label();
+            lblActiveLabel = new Label();
+            statExpired = new Panel();
+            lblExpiredIcon = new Label();
+            lblExpiredValue = new Label();
+            lblExpiredLabel = new Label();
+            statUsedUp = new Panel();
+            lblUsedUpIcon = new Label();
+            lblUsedUpValue = new Label();
+            lblUsedUpLabel = new Label();
+            pnlHeader.SuspendLayout();
+            pnlMain.SuspendLayout();
+            pnlGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvVouchers).BeginInit();
-            grpNhapLieu.SuspendLayout();
+            pnlRight.SuspendLayout();
+            pnlFormContainer.SuspendLayout();
+            pnlFormFields.SuspendLayout();
+            pnlFormButtons.SuspendLayout();
+            pnlSearchFilter.SuspendLayout();
+            pnlStats.SuspendLayout();
+            statTotal.SuspendLayout();
+            statActive.SuspendLayout();
+            statExpired.SuspendLayout();
+            statUsedUp.SuspendLayout();
             SuspendLayout();
             // 
-            // pbx1
+            // pnlHeader
             // 
-            pbx1.Dock = DockStyle.Top;
-            pbx1.Image = Properties.Resources.la_ca_tra_sua_30k_1200x628;
-            pbx1.Location = new Point(0, 0);
-            pbx1.Name = "pbx1";
-            pbx1.Size = new Size(1491, 276);
-            pbx1.SizeMode = PictureBoxSizeMode.StretchImage;
-            pbx1.TabIndex = 0;
-            pbx1.TabStop = false;
+            pnlHeader.BackColor = Color.FromArgb(44, 62, 80);
+            pnlHeader.Controls.Add(lblTitle);
+            pnlHeader.Dock = DockStyle.Top;
+            pnlHeader.Location = new Point(0, 0);
+            pnlHeader.Name = "pnlHeader";
+            pnlHeader.Size = new Size(1600, 75);
+            pnlHeader.TabIndex = 0;
             // 
-            // lbl1
+            // lblTitle
             // 
-            lbl1.BackColor = SystemColors.ControlLight;
-            lbl1.Font = new Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lbl1.Location = new Point(97, 38);
-            lbl1.Name = "lbl1";
-            lbl1.Size = new Size(189, 107);
-            lbl1.TabIndex = 1;
-            lbl1.Text = "Tong Vouchers";
-            lbl1.TextAlign = ContentAlignment.TopCenter;
-            lbl1.Click += lbl1_Click;
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new Font("Segoe UI", 22F, FontStyle.Bold);
+            lblTitle.ForeColor = Color.White;
+            lblTitle.Location = new Point(25, 18);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new Size(299, 41);
+            lblTitle.TabIndex = 0;
+            lblTitle.Text = "QUẢN LÝ VOUCHER";
             // 
-            // lbl2
+            // pnlMain
             // 
-            lbl2.BackColor = SystemColors.ControlLight;
-            lbl2.Font = new Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lbl2.Location = new Point(440, 38);
-            lbl2.Name = "lbl2";
-            lbl2.Size = new Size(189, 107);
-            lbl2.TabIndex = 3;
-            lbl2.Text = "Đang Hoạt Động";
-            lbl2.TextAlign = ContentAlignment.TopCenter;
-            lbl2.Click += label2_Click;
+            pnlMain.BackColor = Color.FromArgb(246, 248, 250);
+            pnlMain.Controls.Add(pnlGrid);
+            pnlMain.Controls.Add(pnlRight);
+            pnlMain.Dock = DockStyle.Fill;
+            pnlMain.Location = new Point(0, 225);
+            pnlMain.Name = "pnlMain";
+            pnlMain.Padding = new Padding(15);
+            pnlMain.Size = new Size(1600, 675);
+            pnlMain.TabIndex = 3;
             // 
-            // lbl3
+            // pnlGrid
             // 
-            lbl3.BackColor = SystemColors.ControlLight;
-            lbl3.Font = new Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lbl3.Location = new Point(794, 38);
-            lbl3.Name = "lbl3";
-            lbl3.Size = new Size(189, 107);
-            lbl3.TabIndex = 5;
-            lbl3.Text = "Hết Hạn";
-            lbl3.TextAlign = ContentAlignment.TopCenter;
-            // 
-            // lbl4_hieuung
-            // 
-            lbl4_hieuung.BackColor = SystemColors.ActiveCaption;
-            lbl4_hieuung.Location = new Point(1117, 38);
-            lbl4_hieuung.Name = "lbl4_hieuung";
-            lbl4_hieuung.Size = new Size(15, 107);
-            lbl4_hieuung.TabIndex = 8;
-            // 
-            // lbl4
-            // 
-            lbl4.BackColor = SystemColors.ControlLight;
-            lbl4.Font = new Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lbl4.Location = new Point(1127, 38);
-            lbl4.Name = "lbl4";
-            lbl4.Size = new Size(189, 107);
-            lbl4.TabIndex = 7;
-            lbl4.Text = "Đã Dùng Hết Hạn";
-            lbl4.TextAlign = ContentAlignment.TopCenter;
-            lbl4.Click += lbl4_Click;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(label4);
-            groupBox1.Controls.Add(label3);
-            groupBox1.Controls.Add(label2);
-            groupBox1.Controls.Add(lbl2);
-            groupBox1.Controls.Add(lbl1);
-            groupBox1.Controls.Add(lbl4_hieuung);
-            groupBox1.Controls.Add(lbl3);
-            groupBox1.Controls.Add(lbl4);
-            groupBox1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            groupBox1.Location = new Point(18, 282);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(1358, 185);
-            groupBox1.TabIndex = 12;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Thống Kê Voucher";
-            // 
-            // label4
-            // 
-            label4.BackColor = SystemColors.ActiveCaption;
-            label4.Location = new Point(97, 38);
-            label4.Name = "label4";
-            label4.Size = new Size(15, 107);
-            label4.TabIndex = 11;
-            // 
-            // label3
-            // 
-            label3.BackColor = SystemColors.ActiveCaption;
-            label3.Location = new Point(426, 38);
-            label3.Name = "label3";
-            label3.Size = new Size(15, 107);
-            label3.TabIndex = 10;
-            // 
-            // label2
-            // 
-            label2.BackColor = SystemColors.ActiveCaption;
-            label2.Location = new Point(790, 38);
-            label2.Name = "label2";
-            label2.Size = new Size(15, 107);
-            label2.TabIndex = 9;
-            // 
-            // button2
-            // 
-            button2.BackColor = Color.DarkSalmon;
-            button2.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            button2.ForeColor = Color.White;
-            button2.Location = new Point(483, 42);
-            button2.Name = "button2";
-            button2.Size = new Size(138, 51);
-            button2.TabIndex = 17;
-            button2.Text = "Tìm";
-            button2.UseVisualStyleBackColor = false;
-            button2.Click += button2_Click;
-            // 
-            // txtSearch
-            // 
-            txtSearch.BorderStyle = BorderStyle.None;
-            txtSearch.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtSearch.Location = new Point(6, 42);
-            txtSearch.Multiline = true;
-            txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(441, 51);
-            txtSearch.TabIndex = 16;
-            txtSearch.Text = "Tìm theo mã...";
-            txtSearch.TextChanged += txtSearch_TextChanged;
-            txtSearch.KeyPress += txtSearch_KeyPress;
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(txtSearch);
-            groupBox2.Controls.Add(button2);
-            groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            groupBox2.Location = new Point(18, 473);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(1358, 125);
-            groupBox2.TabIndex = 19;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Tìm Kiếm";
-            groupBox2.Enter += groupBox2_Enter;
-            // 
-            // cbx1_tatcama
-            // 
-            cbx1_tatcama.FormattingEnabled = true;
-            cbx1_tatcama.Items.AddRange(new object[] { "active", "", "inactive", "", "expired", "", "used_up" });
-            cbx1_tatcama.Location = new Point(549, 172);
-            cbx1_tatcama.Name = "cbx1_tatcama";
-            cbx1_tatcama.Size = new Size(112, 36);
-            cbx1_tatcama.TabIndex = 20;
-            // 
-            // groupBox3
-            // 
-            groupBox3.Controls.Add(btt_xoa);
-            groupBox3.Controls.Add(btt_sua);
-            groupBox3.Controls.Add(btt_lammoi);
-            groupBox3.Controls.Add(btt_them);
-            groupBox3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            groupBox3.Location = new Point(24, 604);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(1365, 87);
-            groupBox3.TabIndex = 20;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "Thao Tác";
-            // 
-            // btt_xoa
-            // 
-            btt_xoa.BackColor = Color.Red;
-            btt_xoa.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btt_xoa.ForeColor = Color.White;
-            btt_xoa.Location = new Point(420, 32);
-            btt_xoa.Name = "btt_xoa";
-            btt_xoa.Size = new Size(94, 41);
-            btt_xoa.TabIndex = 4;
-            btt_xoa.Text = "Xóa";
-            btt_xoa.UseVisualStyleBackColor = false;
-            btt_xoa.Click += btt_xoa_Click;
-            // 
-            // btt_sua
-            // 
-            btt_sua.BackColor = Color.Gold;
-            btt_sua.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btt_sua.ForeColor = Color.White;
-            btt_sua.Location = new Point(280, 32);
-            btt_sua.Name = "btt_sua";
-            btt_sua.Size = new Size(94, 42);
-            btt_sua.TabIndex = 2;
-            btt_sua.Text = "Sửa";
-            btt_sua.UseVisualStyleBackColor = false;
-            btt_sua.Click += btt_sua_Click;
-            // 
-            // btt_lammoi
-            // 
-            btt_lammoi.BackColor = Color.FromArgb(0, 0, 192);
-            btt_lammoi.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btt_lammoi.ForeColor = Color.White;
-            btt_lammoi.Location = new Point(561, 33);
-            btt_lammoi.Name = "btt_lammoi";
-            btt_lammoi.Size = new Size(105, 41);
-            btt_lammoi.TabIndex = 3;
-            btt_lammoi.Text = "Làm Mới";
-            btt_lammoi.UseVisualStyleBackColor = false;
-            btt_lammoi.Click += btt_lammoi_Click;
-            // 
-            // btt_them
-            // 
-            btt_them.BackColor = Color.FromArgb(128, 255, 128);
-            btt_them.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btt_them.ForeColor = Color.White;
-            btt_them.Location = new Point(145, 33);
-            btt_them.Name = "btt_them";
-            btt_them.Size = new Size(94, 41);
-            btt_them.TabIndex = 1;
-            btt_them.Text = "Thêm";
-            btt_them.UseVisualStyleBackColor = false;
-            btt_them.Click += btt_them_Click;
-            // 
-            // grpDanhSach
-            // 
-            grpDanhSach.Controls.Add(dgvVouchers);
-            grpDanhSach.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            grpDanhSach.Location = new Point(24, 707);
-            grpDanhSach.Name = "grpDanhSach";
-            grpDanhSach.Size = new Size(1365, 309);
-            grpDanhSach.TabIndex = 21;
-            grpDanhSach.TabStop = false;
-            grpDanhSach.Text = "Danh Sách Vouchers";
+            pnlGrid.Controls.Add(dgvVouchers);
+            pnlGrid.Dock = DockStyle.Fill;
+            pnlGrid.Location = new Point(15, 15);
+            pnlGrid.Name = "pnlGrid";
+            pnlGrid.Size = new Size(1025, 645);
+            pnlGrid.TabIndex = 0;
             // 
             // dgvVouchers
             // 
-            dgvVouchers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvVouchers.Location = new Point(6, 33);
+            dgvVouchers.AllowUserToAddRows = false;
+            dgvVouchers.AllowUserToDeleteRows = false;
+            dgvVouchers.AllowUserToResizeRows = false;
+            dataGridViewCellStyle1.BackColor = Color.White;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F);
+            dataGridViewCellStyle1.ForeColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle1.Padding = new Padding(5, 8, 5, 8);
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(52, 152, 219);
+            dataGridViewCellStyle1.SelectionForeColor = Color.White;
+            dgvVouchers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dgvVouchers.BackgroundColor = Color.FromArgb(246, 248, 250);
+            dgvVouchers.BorderStyle = BorderStyle.None;
+            dgvVouchers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgvVouchers.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(52, 152, 219);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            dataGridViewCellStyle2.ForeColor = Color.White;
+            dataGridViewCellStyle2.Padding = new Padding(5, 10, 5, 10);
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(41, 128, 185);
+            dataGridViewCellStyle2.SelectionForeColor = Color.White;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvVouchers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dgvVouchers.ColumnHeadersHeight = 45;
+            dgvVouchers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.White;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 10F);
+            dataGridViewCellStyle3.ForeColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle3.Padding = new Padding(5, 8, 5, 8);
+            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(52, 152, 219);
+            dataGridViewCellStyle3.SelectionForeColor = Color.White;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            dgvVouchers.DefaultCellStyle = dataGridViewCellStyle3;
+            dgvVouchers.Dock = DockStyle.Fill;
+            dgvVouchers.EnableHeadersVisualStyles = false;
+            dgvVouchers.GridColor = Color.FromArgb(233, 236, 239);
+            dgvVouchers.Location = new Point(0, 0);
+            dgvVouchers.MultiSelect = false;
             dgvVouchers.Name = "dgvVouchers";
-            dgvVouchers.RowHeadersWidth = 51;
-            dgvVouchers.Size = new Size(1384, 266);
+            dgvVouchers.ReadOnly = true;
+            dgvVouchers.RowHeadersVisible = false;
+            dgvVouchers.RowHeadersWidth = 50;
+            dgvVouchers.RowTemplate.Height = 40;
+            dgvVouchers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvVouchers.Size = new Size(1025, 645);
+            dgvVouchers.StandardTab = true;
             dgvVouchers.TabIndex = 0;
             dgvVouchers.CellClick += dgvVouchers_CellClick;
-            dgvVouchers.CellContentClick += dgv_vouchers_CellContentClick;
             dgvVouchers.CellDoubleClick += dgvVouchers_CellDoubleClick;
+            dgvVouchers.CellFormatting += dgvVouchers_CellFormatting;
             // 
-            // grpNhapLieu
+            // pnlRight
             // 
-            grpNhapLieu.Controls.Add(textBox3);
-            grpNhapLieu.Controls.Add(label16);
-            grpNhapLieu.Controls.Add(txtMaxDiscount);
-            grpNhapLieu.Controls.Add(label15);
-            grpNhapLieu.Controls.Add(label14);
-            grpNhapLieu.Controls.Add(cbxVoucherType);
-            grpNhapLieu.Controls.Add(label13);
-            grpNhapLieu.Controls.Add(dtp_batdau);
-            grpNhapLieu.Controls.Add(cbx1_tatcama);
-            grpNhapLieu.Controls.Add(dtp_handung);
-            grpNhapLieu.Controls.Add(txtMinOrder);
-            grpNhapLieu.Controls.Add(textBox5);
-            grpNhapLieu.Controls.Add(textBox4);
-            grpNhapLieu.Controls.Add(textBox2);
-            grpNhapLieu.Controls.Add(textBox1);
-            grpNhapLieu.Controls.Add(label12);
-            grpNhapLieu.Controls.Add(label11);
-            grpNhapLieu.Controls.Add(label10);
-            grpNhapLieu.Controls.Add(label9);
-            grpNhapLieu.Controls.Add(label8);
-            grpNhapLieu.Controls.Add(label7);
-            grpNhapLieu.Controls.Add(label6);
-            grpNhapLieu.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            grpNhapLieu.Location = new Point(30, 1022);
-            grpNhapLieu.Name = "grpNhapLieu";
-            grpNhapLieu.Size = new Size(1423, 270);
-            grpNhapLieu.TabIndex = 22;
-            grpNhapLieu.TabStop = false;
-            grpNhapLieu.Text = "Form Nhập Liệu";
+            pnlRight.Controls.Add(pnlFormContainer);
+            pnlRight.Dock = DockStyle.Right;
+            pnlRight.Location = new Point(1040, 15);
+            pnlRight.Name = "pnlRight";
+            pnlRight.Padding = new Padding(0, 0, 0, 10);
+            pnlRight.Size = new Size(545, 645);
+            pnlRight.TabIndex = 1;
             // 
-            // textBox3
+            // pnlFormContainer
             // 
-            textBox3.Location = new Point(185, 230);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(323, 34);
-            textBox3.TabIndex = 28;
+            pnlFormContainer.BackColor = Color.White;
+            pnlFormContainer.Controls.Add(lblFormTitle);
+            pnlFormContainer.Controls.Add(pnlFormFields);
+            pnlFormContainer.Controls.Add(pnlFormButtons);
+            pnlFormContainer.Dock = DockStyle.Fill;
+            pnlFormContainer.Location = new Point(0, 0);
+            pnlFormContainer.Name = "pnlFormContainer";
+            pnlFormContainer.Size = new Size(545, 635);
+            pnlFormContainer.TabIndex = 0;
             // 
-            // label16
+            // lblFormTitle
             // 
-            label16.AutoSize = true;
-            label16.Location = new Point(6, 233);
-            label16.Name = "label16";
-            label16.Size = new Size(72, 28);
-            label16.TabIndex = 27;
-            label16.Text = "Mô Tả";
-            label16.Click += label16_Click;
+            lblFormTitle.BackColor = Color.FromArgb(52, 152, 219);
+            lblFormTitle.Dock = DockStyle.Top;
+            lblFormTitle.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblFormTitle.ForeColor = Color.White;
+            lblFormTitle.Location = new Point(0, 0);
+            lblFormTitle.Name = "lblFormTitle";
+            lblFormTitle.Padding = new Padding(20, 12, 20, 12);
+            lblFormTitle.Size = new Size(545, 45);
+            lblFormTitle.TabIndex = 0;
+            lblFormTitle.Text = "THÔNG TIN VOUCHER";
+            lblFormTitle.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // pnlFormFields
+            // 
+            pnlFormFields.AutoScroll = true;
+            pnlFormFields.Controls.Add(cbStatus);
+            pnlFormFields.Controls.Add(lblStatus);
+            pnlFormFields.Controls.Add(dtpValidUntil);
+            pnlFormFields.Controls.Add(lblValidUntil);
+            pnlFormFields.Controls.Add(dtpValidFrom);
+            pnlFormFields.Controls.Add(lblValidFrom);
+            pnlFormFields.Controls.Add(txtMaxDiscount);
+            pnlFormFields.Controls.Add(lblMaxDiscount);
+            pnlFormFields.Controls.Add(txtUsageLimit);
+            pnlFormFields.Controls.Add(lblUsageLimit);
+            pnlFormFields.Controls.Add(txtMinOrder);
+            pnlFormFields.Controls.Add(lblMinOrder);
+            pnlFormFields.Controls.Add(txtDiscountValue);
+            pnlFormFields.Controls.Add(lblDiscountValue);
+            pnlFormFields.Controls.Add(cbVoucherType);
+            pnlFormFields.Controls.Add(lblVoucherType);
+            pnlFormFields.Controls.Add(txtDescription);
+            pnlFormFields.Controls.Add(lblDescription);
+            pnlFormFields.Controls.Add(txtName);
+            pnlFormFields.Controls.Add(lblName);
+            pnlFormFields.Controls.Add(txtCode);
+            pnlFormFields.Controls.Add(lblCode);
+            pnlFormFields.Dock = DockStyle.Fill;
+            pnlFormFields.Location = new Point(0, 0);
+            pnlFormFields.Name = "pnlFormFields";
+            pnlFormFields.Padding = new Padding(35, 50, 35, 30);
+            pnlFormFields.Size = new Size(545, 570);
+            pnlFormFields.TabIndex = 1;
+            // 
+            // cbStatus
+            // 
+            cbStatus.Dock = DockStyle.Top;
+            cbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbStatus.Font = new Font("Segoe UI", 11F);
+            cbStatus.FormattingEnabled = true;
+            cbStatus.Location = new Point(35, 941);
+            cbStatus.Name = "cbStatus";
+            cbStatus.Size = new Size(458, 28);
+            cbStatus.TabIndex = 12;
+            cbStatus.KeyPress += cbStatus_KeyPress;
+            // 
+            // lblStatus
+            // 
+            lblStatus.Dock = DockStyle.Top;
+            lblStatus.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblStatus.ForeColor = Color.FromArgb(52, 73, 94);
+            lblStatus.Location = new Point(35, 893);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Padding = new Padding(0, 20, 0, 10);
+            lblStatus.Size = new Size(458, 48);
+            lblStatus.TabIndex = 22;
+            lblStatus.Text = "Trạng thái";
+            // 
+            // dtpValidUntil
+            // 
+            dtpValidUntil.CustomFormat = "dd/MM/yyyy HH:mm";
+            dtpValidUntil.Dock = DockStyle.Top;
+            dtpValidUntil.Font = new Font("Segoe UI", 11F);
+            dtpValidUntil.Format = DateTimePickerFormat.Custom;
+            dtpValidUntil.Location = new Point(35, 866);
+            dtpValidUntil.Name = "dtpValidUntil";
+            dtpValidUntil.Size = new Size(458, 27);
+            dtpValidUntil.TabIndex = 11;
+            dtpValidUntil.KeyPress += dtpValidUntil_KeyPress;
+            // 
+            // lblValidUntil
+            // 
+            lblValidUntil.Dock = DockStyle.Top;
+            lblValidUntil.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblValidUntil.ForeColor = Color.FromArgb(52, 73, 94);
+            lblValidUntil.Location = new Point(35, 817);
+            lblValidUntil.Name = "lblValidUntil";
+            lblValidUntil.Padding = new Padding(0, 20, 0, 10);
+            lblValidUntil.Size = new Size(458, 49);
+            lblValidUntil.TabIndex = 20;
+            lblValidUntil.Text = "Ngày hết hạn";
+            // 
+            // dtpValidFrom
+            // 
+            dtpValidFrom.CustomFormat = "dd/MM/yyyy HH:mm";
+            dtpValidFrom.Dock = DockStyle.Top;
+            dtpValidFrom.Font = new Font("Segoe UI", 11F);
+            dtpValidFrom.Format = DateTimePickerFormat.Custom;
+            dtpValidFrom.Location = new Point(35, 790);
+            dtpValidFrom.Name = "dtpValidFrom";
+            dtpValidFrom.Size = new Size(458, 27);
+            dtpValidFrom.TabIndex = 10;
+            dtpValidFrom.KeyPress += dtpValidFrom_KeyPress;
+            // 
+            // lblValidFrom
+            // 
+            lblValidFrom.Dock = DockStyle.Top;
+            lblValidFrom.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblValidFrom.ForeColor = Color.FromArgb(52, 73, 94);
+            lblValidFrom.Location = new Point(35, 738);
+            lblValidFrom.Name = "lblValidFrom";
+            lblValidFrom.Padding = new Padding(0, 20, 0, 10);
+            lblValidFrom.Size = new Size(458, 52);
+            lblValidFrom.TabIndex = 18;
+            lblValidFrom.Text = "Ngày bắt đầu";
             // 
             // txtMaxDiscount
             // 
-            txtMaxDiscount.Location = new Point(549, 127);
+            txtMaxDiscount.Dock = DockStyle.Top;
+            txtMaxDiscount.Font = new Font("Segoe UI", 11F);
+            txtMaxDiscount.Location = new Point(35, 711);
             txtMaxDiscount.Name = "txtMaxDiscount";
-            txtMaxDiscount.Size = new Size(171, 34);
-            txtMaxDiscount.TabIndex = 26;
+            txtMaxDiscount.PlaceholderText = "Để trống nếu không giới hạn";
+            txtMaxDiscount.Size = new Size(458, 27);
+            txtMaxDiscount.TabIndex = 8;
+            txtMaxDiscount.KeyPress += txtMaxDiscount_KeyPress;
             // 
-            // label15
+            // lblMaxDiscount
             // 
-            label15.AutoSize = true;
-            label15.Location = new Point(396, 127);
-            label15.Name = "label15";
-            label15.Size = new Size(129, 28);
-            label15.TabIndex = 25;
-            label15.Text = "Giảm Tối Đa";
-            label15.Click += label15_Click;
+            lblMaxDiscount.Dock = DockStyle.Top;
+            lblMaxDiscount.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblMaxDiscount.ForeColor = Color.FromArgb(52, 73, 94);
+            lblMaxDiscount.Location = new Point(35, 663);
+            lblMaxDiscount.Name = "lblMaxDiscount";
+            lblMaxDiscount.Padding = new Padding(0, 20, 0, 10);
+            lblMaxDiscount.Size = new Size(458, 48);
+            lblMaxDiscount.TabIndex = 14;
+            lblMaxDiscount.Text = "Giảm tối đa (VNĐ)";
             // 
-            // label14
+            // txtUsageLimit
             // 
-            label14.AutoSize = true;
-            label14.Location = new Point(396, 70);
-            label14.Name = "label14";
-            label14.Size = new Size(147, 28);
-            label14.TabIndex = 24;
-            label14.Text = "Đơn Tối Thiếu";
+            txtUsageLimit.Dock = DockStyle.Top;
+            txtUsageLimit.Font = new Font("Segoe UI", 11F);
+            txtUsageLimit.Location = new Point(35, 636);
+            txtUsageLimit.Name = "txtUsageLimit";
+            txtUsageLimit.PlaceholderText = "Để trống nếu không giới hạn";
+            txtUsageLimit.Size = new Size(458, 27);
+            txtUsageLimit.TabIndex = 7;
+            txtUsageLimit.KeyPress += txtUsageLimit_KeyPress;
             // 
-            // cbxVoucherType
+            // lblUsageLimit
             // 
-            cbxVoucherType.FormattingEnabled = true;
-            cbxVoucherType.Items.AddRange(new object[] { "percentage", "", "fixed_amount", "", "free_item", "", "buy_one_get_one" });
-            cbxVoucherType.Location = new Point(185, 172);
-            cbxVoucherType.Name = "cbxVoucherType";
-            cbxVoucherType.Size = new Size(183, 36);
-            cbxVoucherType.TabIndex = 23;
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Location = new Point(1105, 148);
-            label13.Name = "label13";
-            label13.Size = new Size(144, 28);
-            label13.TabIndex = 22;
-            label13.Text = "Ngày Bắt Đầu";
-            label13.Click += label13_Click;
-            // 
-            // dtp_batdau
-            // 
-            dtp_batdau.CalendarFont = new Font("Segoe UI", 11F);
-            dtp_batdau.CustomFormat = "dd/MM/yyyy";
-            dtp_batdau.Format = DateTimePickerFormat.Custom;
-            dtp_batdau.Location = new Point(1105, 190);
-            dtp_batdau.Margin = new Padding(3, 4, 3, 4);
-            dtp_batdau.Name = "dtp_batdau";
-            dtp_batdau.ShowCheckBox = true;
-            dtp_batdau.Size = new Size(183, 34);
-            dtp_batdau.TabIndex = 21;
-            dtp_batdau.Value = new DateTime(2026, 4, 4, 0, 0, 0, 0);
-            // 
-            // dtp_handung
-            // 
-            dtp_handung.CalendarFont = new Font("Segoe UI", 11F);
-            dtp_handung.CustomFormat = "dd/MM/yyyy";
-            dtp_handung.Format = DateTimePickerFormat.Custom;
-            dtp_handung.Location = new Point(1105, 96);
-            dtp_handung.Margin = new Padding(3, 4, 3, 4);
-            dtp_handung.Name = "dtp_handung";
-            dtp_handung.ShowCheckBox = true;
-            dtp_handung.Size = new Size(183, 34);
-            dtp_handung.TabIndex = 17;
-            dtp_handung.Value = new DateTime(2026, 4, 4, 0, 0, 0, 0);
-            dtp_handung.ValueChanged += dtp_handung_ValueChanged;
+            lblUsageLimit.Dock = DockStyle.Top;
+            lblUsageLimit.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblUsageLimit.ForeColor = Color.FromArgb(52, 73, 94);
+            lblUsageLimit.Location = new Point(35, 588);
+            lblUsageLimit.Name = "lblUsageLimit";
+            lblUsageLimit.Padding = new Padding(0, 20, 0, 10);
+            lblUsageLimit.Size = new Size(458, 48);
+            lblUsageLimit.TabIndex = 12;
+            lblUsageLimit.Text = "Giới hạn sử dụng";
             // 
             // txtMinOrder
             // 
-            txtMinOrder.Location = new Point(549, 67);
+            txtMinOrder.Dock = DockStyle.Top;
+            txtMinOrder.Font = new Font("Segoe UI", 11F);
+            txtMinOrder.Location = new Point(35, 561);
             txtMinOrder.Name = "txtMinOrder";
-            txtMinOrder.Size = new Size(171, 34);
-            txtMinOrder.TabIndex = 13;
+            txtMinOrder.PlaceholderText = "Để trống nếu không yêu cầu";
+            txtMinOrder.Size = new Size(458, 27);
+            txtMinOrder.TabIndex = 6;
+            txtMinOrder.KeyPress += txtMinOrder_KeyPress;
             // 
-            // textBox5
+            // lblMinOrder
             // 
-            textBox5.Location = new Point(894, 127);
-            textBox5.Name = "textBox5";
-            textBox5.Size = new Size(183, 34);
-            textBox5.TabIndex = 11;
+            lblMinOrder.Dock = DockStyle.Top;
+            lblMinOrder.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblMinOrder.ForeColor = Color.FromArgb(52, 73, 94);
+            lblMinOrder.Location = new Point(35, 513);
+            lblMinOrder.Name = "lblMinOrder";
+            lblMinOrder.Padding = new Padding(0, 20, 0, 10);
+            lblMinOrder.Size = new Size(458, 48);
+            lblMinOrder.TabIndex = 10;
+            lblMinOrder.Text = "Đơn tối thiểu (VNĐ)";
             // 
-            // textBox4
+            // txtDiscountValue
             // 
-            textBox4.Location = new Point(894, 67);
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(183, 34);
-            textBox4.TabIndex = 10;
+            txtDiscountValue.Dock = DockStyle.Top;
+            txtDiscountValue.Font = new Font("Segoe UI", 11F);
+            txtDiscountValue.Location = new Point(35, 486);
+            txtDiscountValue.Name = "txtDiscountValue";
+            txtDiscountValue.PlaceholderText = "VD: 10 (cho %) hoặc 10000 (cho VNĐ)";
+            txtDiscountValue.Size = new Size(458, 27);
+            txtDiscountValue.TabIndex = 5;
+            txtDiscountValue.KeyPress += txtDiscountValue_KeyPress;
             // 
-            // textBox2
+            // lblDiscountValue
             // 
-            textBox2.Location = new Point(185, 118);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(183, 34);
-            textBox2.TabIndex = 8;
+            lblDiscountValue.Dock = DockStyle.Top;
+            lblDiscountValue.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblDiscountValue.ForeColor = Color.FromArgb(52, 73, 94);
+            lblDiscountValue.Location = new Point(35, 435);
+            lblDiscountValue.Name = "lblDiscountValue";
+            lblDiscountValue.Padding = new Padding(0, 20, 0, 10);
+            lblDiscountValue.Size = new Size(458, 51);
+            lblDiscountValue.TabIndex = 8;
+            lblDiscountValue.Text = "Giá trị giảm";
             // 
-            // textBox1
+            // cbVoucherType
             // 
-            textBox1.Location = new Point(185, 64);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(183, 34);
-            textBox1.TabIndex = 7;
+            cbVoucherType.Dock = DockStyle.Top;
+            cbVoucherType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbVoucherType.Font = new Font("Segoe UI", 11F);
+            cbVoucherType.FormattingEnabled = true;
+            cbVoucherType.Location = new Point(35, 407);
+            cbVoucherType.Name = "cbVoucherType";
+            cbVoucherType.Size = new Size(458, 28);
+            cbVoucherType.TabIndex = 4;
+            cbVoucherType.KeyPress += cbVoucherType_KeyPress;
             // 
-            // label12
+            // lblVoucherType
             // 
-            label12.AutoSize = true;
-            label12.Location = new Point(396, 180);
-            label12.Name = "label12";
-            label12.Size = new Size(112, 28);
-            label12.TabIndex = 6;
-            label12.Text = "Trạng Thái";
+            lblVoucherType.Dock = DockStyle.Top;
+            lblVoucherType.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblVoucherType.ForeColor = Color.FromArgb(52, 73, 94);
+            lblVoucherType.Location = new Point(35, 359);
+            lblVoucherType.Name = "lblVoucherType";
+            lblVoucherType.Padding = new Padding(0, 20, 0, 10);
+            lblVoucherType.Size = new Size(458, 48);
+            lblVoucherType.TabIndex = 6;
+            lblVoucherType.Text = "Loại voucher";
             // 
-            // label11
+            // txtDescription
             // 
-            label11.AutoSize = true;
-            label11.Location = new Point(1105, 64);
-            label11.Name = "label11";
-            label11.Size = new Size(107, 28);
-            label11.TabIndex = 5;
-            label11.Text = "Hạn Dùng";
+            txtDescription.Dock = DockStyle.Top;
+            txtDescription.Font = new Font("Segoe UI", 11F);
+            txtDescription.Location = new Point(35, 259);
+            txtDescription.Multiline = true;
+            txtDescription.Name = "txtDescription";
+            txtDescription.PlaceholderText = "VD: Giảm giá cho khách mới đăng ký";
+            txtDescription.Size = new Size(458, 100);
+            txtDescription.TabIndex = 3;
+            txtDescription.KeyPress += txtDescription_KeyPress;
             // 
-            // label10
+            // lblDescription
             // 
-            label10.AutoSize = true;
-            label10.Location = new Point(760, 130);
-            label10.Name = "label10";
-            label10.Size = new Size(131, 28);
-            label10.TabIndex = 4;
-            label10.Text = "Lượt Còn Lại";
+            lblDescription.Dock = DockStyle.Top;
+            lblDescription.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblDescription.ForeColor = Color.FromArgb(52, 73, 94);
+            lblDescription.Location = new Point(35, 212);
+            lblDescription.Name = "lblDescription";
+            lblDescription.Padding = new Padding(0, 20, 0, 10);
+            lblDescription.Size = new Size(458, 47);
+            lblDescription.TabIndex = 4;
+            lblDescription.Text = "Mô tả";
             // 
-            // label9
+            // txtName
             // 
-            label9.AutoSize = true;
-            label9.Location = new Point(760, 70);
-            label9.Name = "label9";
-            label9.Size = new Size(128, 28);
-            label9.TabIndex = 3;
-            label9.Text = "Giá Trị Giảm";
-            label9.Click += label9_Click;
+            txtName.Dock = DockStyle.Top;
+            txtName.Font = new Font("Segoe UI", 11F);
+            txtName.Location = new Point(35, 185);
+            txtName.Name = "txtName";
+            txtName.PlaceholderText = "VD: Giảm 20% cho khách mới";
+            txtName.Size = new Size(458, 27);
+            txtName.TabIndex = 2;
+            txtName.KeyPress += txtName_KeyPress;
             // 
-            // label8
+            // lblName
             // 
-            label8.AutoSize = true;
-            label8.Location = new Point(6, 180);
-            label8.Name = "label8";
-            label8.Size = new Size(51, 28);
-            label8.TabIndex = 2;
-            label8.Text = "Loại";
-            label8.Click += label8_Click;
+            lblName.Dock = DockStyle.Top;
+            lblName.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblName.ForeColor = Color.FromArgb(52, 73, 94);
+            lblName.Location = new Point(35, 134);
+            lblName.Name = "lblName";
+            lblName.Padding = new Padding(0, 20, 0, 10);
+            lblName.Size = new Size(458, 51);
+            lblName.TabIndex = 2;
+            lblName.Text = "Tên voucher";
             // 
-            // label7
+            // txtCode
             // 
-            label7.AutoSize = true;
-            label7.Location = new Point(6, 127);
-            label7.Name = "label7";
-            label7.Size = new Size(179, 28);
-            label7.TabIndex = 1;
-            label7.Text = "Tên Chương Trình";
-            label7.Click += label7_Click;
+            txtCode.Dock = DockStyle.Top;
+            txtCode.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            txtCode.Location = new Point(35, 107);
+            txtCode.Name = "txtCode";
+            txtCode.PlaceholderText = "VD: WELCOME20, SUMMER_SALE";
+            txtCode.Size = new Size(458, 27);
+            txtCode.TabIndex = 1;
+            txtCode.KeyPress += txtCode_KeyPress;
             // 
-            // label6
+            // lblCode
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(6, 70);
-            label6.Name = "label6";
-            label6.Size = new Size(134, 28);
-            label6.TabIndex = 0;
-            label6.Text = "Mã Vouchers";
-            label6.Click += label6_Click;
+            lblCode.Dock = DockStyle.Top;
+            lblCode.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblCode.ForeColor = Color.FromArgb(52, 73, 94);
+            lblCode.Location = new Point(35, 50);
+            lblCode.Name = "lblCode";
+            lblCode.Padding = new Padding(0, 20, 0, 10);
+            lblCode.Size = new Size(458, 57);
+            lblCode.TabIndex = 0;
+            lblCode.Text = "Mã voucher";
+            // 
+            // pnlFormButtons
+            // 
+            pnlFormButtons.BackColor = Color.FromArgb(246, 248, 250);
+            pnlFormButtons.Controls.Add(btnRefresh);
+            pnlFormButtons.Controls.Add(btnEdit);
+            pnlFormButtons.Controls.Add(btnAdd);
+            pnlFormButtons.Controls.Add(btnDelete);
+            pnlFormButtons.Dock = DockStyle.Bottom;
+            pnlFormButtons.Location = new Point(0, 570);
+            pnlFormButtons.Name = "pnlFormButtons";
+            pnlFormButtons.Padding = new Padding(15);
+            pnlFormButtons.Size = new Size(545, 65);
+            pnlFormButtons.TabIndex = 2;
+            // 
+            // btnRefresh
+            // 
+            btnRefresh.BackColor = Color.FromArgb(149, 165, 166);
+            btnRefresh.Cursor = Cursors.Hand;
+            btnRefresh.Dock = DockStyle.Left;
+            btnRefresh.FlatAppearance.BorderSize = 0;
+            btnRefresh.FlatStyle = FlatStyle.Flat;
+            btnRefresh.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnRefresh.ForeColor = Color.White;
+            btnRefresh.Location = new Point(255, 15);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(120, 35);
+            btnRefresh.TabIndex = 15;
+            btnRefresh.Text = "Làm mới";
+            btnRefresh.UseVisualStyleBackColor = false;
+            btnRefresh.Click += btnRefresh_Click;
+            // 
+            // btnEdit
+            // 
+            btnEdit.BackColor = Color.FromArgb(243, 156, 18);
+            btnEdit.Cursor = Cursors.Hand;
+            btnEdit.Dock = DockStyle.Left;
+            btnEdit.FlatAppearance.BorderSize = 0;
+            btnEdit.FlatStyle = FlatStyle.Flat;
+            btnEdit.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnEdit.ForeColor = Color.White;
+            btnEdit.Location = new Point(135, 15);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(120, 35);
+            btnEdit.TabIndex = 14;
+            btnEdit.Text = "Sửa";
+            btnEdit.UseVisualStyleBackColor = false;
+            btnEdit.Click += btnEdit_Click;
+            // 
+            // btnAdd
+            // 
+            btnAdd.BackColor = Color.FromArgb(46, 204, 113);
+            btnAdd.Cursor = Cursors.Hand;
+            btnAdd.Dock = DockStyle.Left;
+            btnAdd.FlatAppearance.BorderSize = 0;
+            btnAdd.FlatStyle = FlatStyle.Flat;
+            btnAdd.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnAdd.ForeColor = Color.White;
+            btnAdd.Location = new Point(15, 15);
+            btnAdd.Name = "btnAdd";
+            btnAdd.Size = new Size(120, 35);
+            btnAdd.TabIndex = 13;
+            btnAdd.Text = "Thêm";
+            btnAdd.UseVisualStyleBackColor = false;
+            btnAdd.Click += btnAdd_Click;
+            // 
+            // btnDelete
+            // 
+            btnDelete.BackColor = Color.FromArgb(231, 76, 60);
+            btnDelete.Cursor = Cursors.Hand;
+            btnDelete.Dock = DockStyle.Right;
+            btnDelete.FlatAppearance.BorderSize = 0;
+            btnDelete.FlatStyle = FlatStyle.Flat;
+            btnDelete.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnDelete.ForeColor = Color.White;
+            btnDelete.Location = new Point(410, 15);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(120, 35);
+            btnDelete.TabIndex = 16;
+            btnDelete.Text = "Xóa";
+            btnDelete.UseVisualStyleBackColor = false;
+            btnDelete.Click += btnDelete_Click;
+            // 
+            // pnlSearchFilter
+            // 
+            pnlSearchFilter.BackColor = Color.White;
+            pnlSearchFilter.Controls.Add(btnFilter);
+            pnlSearchFilter.Controls.Add(txtSearch);
+            pnlSearchFilter.Controls.Add(cbFilterStatus);
+            pnlSearchFilter.Dock = DockStyle.Top;
+            pnlSearchFilter.Location = new Point(0, 75);
+            pnlSearchFilter.Name = "pnlSearchFilter";
+            pnlSearchFilter.Padding = new Padding(15, 12, 15, 12);
+            pnlSearchFilter.Size = new Size(1600, 60);
+            pnlSearchFilter.TabIndex = 1;
+            // 
+            // btnFilter
+            // 
+            btnFilter.BackColor = Color.FromArgb(52, 152, 219);
+            btnFilter.Cursor = Cursors.Hand;
+            btnFilter.FlatAppearance.BorderSize = 0;
+            btnFilter.FlatStyle = FlatStyle.Flat;
+            btnFilter.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnFilter.ForeColor = Color.White;
+            btnFilter.Location = new Point(1190, 13);
+            btnFilter.Name = "btnFilter";
+            btnFilter.Size = new Size(110, 35);
+            btnFilter.TabIndex = 17;
+            btnFilter.Text = "Tìm kiếm";
+            btnFilter.UseVisualStyleBackColor = false;
+            btnFilter.Click += btnFilter_Click;
+            // 
+            // txtSearch
+            // 
+            txtSearch.Font = new Font("Segoe UI", 11F);
+            txtSearch.Location = new Point(584, 18);
+            txtSearch.Name = "txtSearch";
+            txtSearch.PlaceholderText = "Tìm theo mã, tên, mô tả voucher...";
+            txtSearch.Size = new Size(600, 27);
+            txtSearch.TabIndex = 14;
+            txtSearch.KeyPress += txtSearch_KeyPress;
+            // 
+            // cbFilterStatus
+            // 
+            cbFilterStatus.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbFilterStatus.Font = new Font("Segoe UI", 11F);
+            cbFilterStatus.FormattingEnabled = true;
+            cbFilterStatus.Location = new Point(1313, 17);
+            cbFilterStatus.Name = "cbFilterStatus";
+            cbFilterStatus.Size = new Size(220, 28);
+            cbFilterStatus.TabIndex = 15;
+            cbFilterStatus.SelectedIndexChanged += cbFilterStatus_SelectedIndexChanged;
+            // 
+            // pnlStats
+            // 
+            pnlStats.BackColor = Color.White;
+            pnlStats.Controls.Add(statTotal);
+            pnlStats.Controls.Add(statActive);
+            pnlStats.Controls.Add(statExpired);
+            pnlStats.Controls.Add(statUsedUp);
+            pnlStats.Dock = DockStyle.Top;
+            pnlStats.Location = new Point(0, 135);
+            pnlStats.Name = "pnlStats";
+            pnlStats.Padding = new Padding(15);
+            pnlStats.Size = new Size(1600, 90);
+            pnlStats.TabIndex = 2;
+            // 
+            // statTotal
+            // 
+            statTotal.BackColor = Color.FromArgb(52, 152, 219);
+            statTotal.Controls.Add(lblTotalIcon);
+            statTotal.Controls.Add(lblTotalValue);
+            statTotal.Controls.Add(lblTotalLabel);
+            statTotal.Dock = DockStyle.Left;
+            statTotal.Location = new Point(675, 15);
+            statTotal.Name = "statTotal";
+            statTotal.Size = new Size(220, 60);
+            statTotal.TabIndex = 0;
+            // 
+            // lblTotalIcon
+            // 
+            lblTotalIcon.AutoSize = true;
+            lblTotalIcon.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblTotalIcon.ForeColor = Color.White;
+            lblTotalIcon.Location = new Point(10, 12);
+            lblTotalIcon.Name = "lblTotalIcon";
+            lblTotalIcon.Size = new Size(34, 25);
+            lblTotalIcon.TabIndex = 0;
+            lblTotalIcon.Text = "🎫";
+            // 
+            // lblTotalValue
+            // 
+            lblTotalValue.AutoSize = true;
+            lblTotalValue.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            lblTotalValue.ForeColor = Color.White;
+            lblTotalValue.Location = new Point(50, 0);
+            lblTotalValue.Name = "lblTotalValue";
+            lblTotalValue.Size = new Size(33, 37);
+            lblTotalValue.TabIndex = 1;
+            lblTotalValue.Text = "0";
+            // 
+            // lblTotalLabel
+            // 
+            lblTotalLabel.Font = new Font("Segoe UI", 9F);
+            lblTotalLabel.ForeColor = Color.White;
+            lblTotalLabel.Location = new Point(15, 40);
+            lblTotalLabel.Name = "lblTotalLabel";
+            lblTotalLabel.Size = new Size(180, 20);
+            lblTotalLabel.TabIndex = 2;
+            lblTotalLabel.Text = "Tổng";
+            // 
+            // statActive
+            // 
+            statActive.BackColor = Color.FromArgb(46, 204, 113);
+            statActive.Controls.Add(lblActiveIcon);
+            statActive.Controls.Add(lblActiveValue);
+            statActive.Controls.Add(lblActiveLabel);
+            statActive.Dock = DockStyle.Left;
+            statActive.Location = new Point(455, 15);
+            statActive.Name = "statActive";
+            statActive.Size = new Size(220, 60);
+            statActive.TabIndex = 1;
+            // 
+            // lblActiveIcon
+            // 
+            lblActiveIcon.AutoSize = true;
+            lblActiveIcon.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblActiveIcon.ForeColor = Color.White;
+            lblActiveIcon.Location = new Point(10, 12);
+            lblActiveIcon.Name = "lblActiveIcon";
+            lblActiveIcon.Size = new Size(34, 25);
+            lblActiveIcon.TabIndex = 0;
+            lblActiveIcon.Text = "✅";
+            // 
+            // lblActiveValue
+            // 
+            lblActiveValue.AutoSize = true;
+            lblActiveValue.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            lblActiveValue.ForeColor = Color.White;
+            lblActiveValue.Location = new Point(50, 3);
+            lblActiveValue.Name = "lblActiveValue";
+            lblActiveValue.Size = new Size(33, 37);
+            lblActiveValue.TabIndex = 1;
+            lblActiveValue.Text = "0";
+            // 
+            // lblActiveLabel
+            // 
+            lblActiveLabel.Font = new Font("Segoe UI", 9F);
+            lblActiveLabel.ForeColor = Color.White;
+            lblActiveLabel.Location = new Point(15, 40);
+            lblActiveLabel.Name = "lblActiveLabel";
+            lblActiveLabel.Size = new Size(180, 20);
+            lblActiveLabel.TabIndex = 2;
+            lblActiveLabel.Text = "Hoạt động";
+            // 
+            // statExpired
+            // 
+            statExpired.BackColor = Color.FromArgb(243, 156, 18);
+            statExpired.Controls.Add(lblExpiredIcon);
+            statExpired.Controls.Add(lblExpiredValue);
+            statExpired.Controls.Add(lblExpiredLabel);
+            statExpired.Dock = DockStyle.Left;
+            statExpired.Location = new Point(235, 15);
+            statExpired.Name = "statExpired";
+            statExpired.Size = new Size(220, 60);
+            statExpired.TabIndex = 2;
+            // 
+            // lblExpiredIcon
+            // 
+            lblExpiredIcon.AutoSize = true;
+            lblExpiredIcon.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblExpiredIcon.ForeColor = Color.White;
+            lblExpiredIcon.Location = new Point(10, 12);
+            lblExpiredIcon.Name = "lblExpiredIcon";
+            lblExpiredIcon.Size = new Size(34, 25);
+            lblExpiredIcon.TabIndex = 0;
+            lblExpiredIcon.Text = "⏰";
+            // 
+            // lblExpiredValue
+            // 
+            lblExpiredValue.AutoSize = true;
+            lblExpiredValue.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            lblExpiredValue.ForeColor = Color.White;
+            lblExpiredValue.Location = new Point(50, 0);
+            lblExpiredValue.Name = "lblExpiredValue";
+            lblExpiredValue.Size = new Size(33, 37);
+            lblExpiredValue.TabIndex = 1;
+            lblExpiredValue.Text = "0";
+            // 
+            // lblExpiredLabel
+            // 
+            lblExpiredLabel.Font = new Font("Segoe UI", 9F);
+            lblExpiredLabel.ForeColor = Color.White;
+            lblExpiredLabel.Location = new Point(15, 40);
+            lblExpiredLabel.Name = "lblExpiredLabel";
+            lblExpiredLabel.Size = new Size(180, 20);
+            lblExpiredLabel.TabIndex = 2;
+            lblExpiredLabel.Text = "Hết hạn";
+            // 
+            // statUsedUp
+            // 
+            statUsedUp.BackColor = Color.FromArgb(149, 165, 166);
+            statUsedUp.Controls.Add(lblUsedUpIcon);
+            statUsedUp.Controls.Add(lblUsedUpValue);
+            statUsedUp.Controls.Add(lblUsedUpLabel);
+            statUsedUp.Dock = DockStyle.Left;
+            statUsedUp.Location = new Point(15, 15);
+            statUsedUp.Name = "statUsedUp";
+            statUsedUp.Size = new Size(220, 60);
+            statUsedUp.TabIndex = 3;
+            // 
+            // lblUsedUpIcon
+            // 
+            lblUsedUpIcon.AutoSize = true;
+            lblUsedUpIcon.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblUsedUpIcon.ForeColor = Color.White;
+            lblUsedUpIcon.Location = new Point(10, 12);
+            lblUsedUpIcon.Name = "lblUsedUpIcon";
+            lblUsedUpIcon.Size = new Size(34, 25);
+            lblUsedUpIcon.TabIndex = 0;
+            lblUsedUpIcon.Text = "✔️";
+            // 
+            // lblUsedUpValue
+            // 
+            lblUsedUpValue.AutoSize = true;
+            lblUsedUpValue.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            lblUsedUpValue.ForeColor = Color.White;
+            lblUsedUpValue.Location = new Point(50, 0);
+            lblUsedUpValue.Name = "lblUsedUpValue";
+            lblUsedUpValue.Size = new Size(33, 37);
+            lblUsedUpValue.TabIndex = 1;
+            lblUsedUpValue.Text = "0";
+            // 
+            // lblUsedUpLabel
+            // 
+            lblUsedUpLabel.Font = new Font("Segoe UI", 9F);
+            lblUsedUpLabel.ForeColor = Color.White;
+            lblUsedUpLabel.Location = new Point(15, 40);
+            lblUsedUpLabel.Name = "lblUsedUpLabel";
+            lblUsedUpLabel.Size = new Size(180, 20);
+            lblUsedUpLabel.TabIndex = 2;
+            lblUsedUpLabel.Text = "Đã dùng hết";
             // 
             // frmVouchers
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            AutoScroll = true;
-            ClientSize = new Size(1491, 1325);
-            Controls.Add(grpNhapLieu);
-            Controls.Add(grpDanhSach);
-            Controls.Add(groupBox3);
-            Controls.Add(groupBox2);
-            Controls.Add(groupBox1);
-            Controls.Add(pbx1);
+            BackColor = Color.White;
+            ClientSize = new Size(1600, 900);
+            Controls.Add(pnlMain);
+            Controls.Add(pnlStats);
+            Controls.Add(pnlSearchFilter);
+            Controls.Add(pnlHeader);
             Name = "frmVouchers";
-            Text = "frmVouchers";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Quản lý Voucher - MilkTeaPOS";
+            WindowState = FormWindowState.Maximized;
             Load += frmVouchers_Load;
-            ((System.ComponentModel.ISupportInitialize)pbx1).EndInit();
-            groupBox1.ResumeLayout(false);
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
-            groupBox3.ResumeLayout(false);
-            grpDanhSach.ResumeLayout(false);
+            pnlHeader.ResumeLayout(false);
+            pnlHeader.PerformLayout();
+            pnlMain.ResumeLayout(false);
+            pnlGrid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvVouchers).EndInit();
-            grpNhapLieu.ResumeLayout(false);
-            grpNhapLieu.PerformLayout();
+            pnlRight.ResumeLayout(false);
+            pnlFormContainer.ResumeLayout(false);
+            pnlFormFields.ResumeLayout(false);
+            pnlFormFields.PerformLayout();
+            pnlFormButtons.ResumeLayout(false);
+            pnlSearchFilter.ResumeLayout(false);
+            pnlSearchFilter.PerformLayout();
+            pnlStats.ResumeLayout(false);
+            statTotal.ResumeLayout(false);
+            statTotal.PerformLayout();
+            statActive.ResumeLayout(false);
+            statActive.PerformLayout();
+            statExpired.ResumeLayout(false);
+            statExpired.PerformLayout();
+            statUsedUp.ResumeLayout(false);
+            statUsedUp.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private PictureBox pbx1;
-        private Label lbl1;
-        private Label lbl2;
-        private Label lbl3;
-        private Label lbl4_hieuung;
-        private Label lbl4;
-        private GroupBox groupBox1;
-        private Button button2;
+        private Panel pnlHeader;
+        private Label lblTitle;
+        private Panel pnlSearchFilter;
+        private Button btnFilter;
         private TextBox txtSearch;
-        private GroupBox groupBox2;
-        private Label label4;
-        private Label label3;
-        private Label label2;
-        private ComboBox cbx1_tatcama;
-        private GroupBox groupBox3;
-        private Button btt_xoa;
-        private Button btt_lammoi;
-        private Button btt_sua;
-        private Button btt_them;
-        private GroupBox grpDanhSach;
+        private ComboBox cbFilterStatus;
+        private Panel pnlStats;
+        private Panel statTotal;
+        private Label lblTotalIcon;
+        private Label lblTotalValue;
+        private Label lblTotalLabel;
+        private Panel statActive;
+        private Label lblActiveIcon;
+        private Label lblActiveValue;
+        private Label lblActiveLabel;
+        private Panel statExpired;
+        private Label lblExpiredIcon;
+        private Label lblExpiredValue;
+        private Label lblExpiredLabel;
+        private Panel statUsedUp;
+        private Label lblUsedUpIcon;
+        private Label lblUsedUpValue;
+        private Label lblUsedUpLabel;
+        private Panel pnlMain;
+        private Panel pnlGrid;
         private DataGridView dgvVouchers;
-        private GroupBox grpNhapLieu;
-        private Label label6;
-        private Label label7;
-        private Label label10;
-        private Label label9;
-        private Label label8;
-        private TextBox txtMinOrder;
-        private TextBox textBox5;
-        private TextBox textBox4;
-        private TextBox textBox2;
-        private TextBox textBox1;
-        private Label label12;
-        private Label label11;
-        private DateTimePicker dtp_handung;
-        private Label label13;
-        private DateTimePicker dtp_batdau;
-        private ComboBox cbxVoucherType;
-        private Label label15;
-        private Label label14;
+        private Panel pnlRight;
+        private Panel pnlFormContainer;
+        private Label lblFormTitle;
+        private Panel pnlFormFields;
+        private Label lblStatus;
+        private ComboBox cbStatus;
+        private DateTimePicker dtpValidUntil;
+        private Label lblValidUntil;
+        private DateTimePicker dtpValidFrom;
+        private Label lblValidFrom;
+        private Label lblMaxDiscount;
         private TextBox txtMaxDiscount;
-        private TextBox textBox3;
-        private Label label16;
+        private Label lblUsageLimit;
+        private TextBox txtUsageLimit;
+        private Label lblMinOrder;
+        private TextBox txtMinOrder;
+        private Label lblDiscountValue;
+        private TextBox txtDiscountValue;
+        private Label lblVoucherType;
+        private ComboBox cbVoucherType;
+        private Label lblDescription;
+        private TextBox txtDescription;
+        private Label lblName;
+        private TextBox txtName;
+        private Label lblCode;
+        private TextBox txtCode;
+        private Panel pnlFormButtons;
+        private Button btnRefresh;
+        private Button btnEdit;
+        private Button btnAdd;
+        private Button btnDelete;
     }
 }
