@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MilkTeaPOS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec34290b56cf1ba80b884bbf6290eabf2676a050")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8487a77ec3b6ea9009fe7e1078f733ab82763f14")]
 [assembly: System.Reflection.AssemblyProductAttribute("MilkTeaPOS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MilkTeaPOS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
