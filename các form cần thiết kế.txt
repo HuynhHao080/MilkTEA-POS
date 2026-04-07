@@ -28,10 +28,10 @@
 │ TỔNG           │   18     │                                │
 └────────────────┴──────────┴────────────────────────────────┘
 
-Tiến độ: 12/18 forms (67%) ✅
+Tiến độ: 13/18 forms (72%) ✅
 
 =====================================================
-✅ FORM ĐÃ HOÀN THÀNH (12/18)
+✅ FORM ĐÃ HOÀN THÀNH (13/18)
 =====================================================
 
 ✅ 1. frmCategories ⭐
@@ -293,7 +293,42 @@ Tiến độ: 12/18 forms (67%) ✅
 Ưu tiên thấp hơn:
 
 ⏳ 12. frmCustomers ✅ (ĐÃ HOÀN THÀNH)
-⏳ 13. frmMemberships
+✅ 13. frmMemberships ⭐
+   File: frmMemberships.cs (~720 dòng)
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - CRUD đầy đủ (Thêm, Sửa, Xóa) với PostgreSQL ENUM types
+   - Tìm kiếm theo tên khách hàng, SĐT
+   - Filter theo hạng thành viên (Tất cả, none, silver, gold, platinum, diamond)
+   - Auto-fill SĐT khi chọn khách hàng từ combobox
+   - Auto-select khách hàng khi nhập SĐT
+   - Validation: SĐT (9-11 số), Points ≥ 0, TotalSpent ≥ 0, TotalOrders ≥ 0
+   - Date validation: ExpiresAt > JoinedAt
+   - Color-coded Tier column (None=Gray, Silver=Silver, Gold=Gold, Platinum=Gray, Diamond=Red)
+   - ExecuteSqlInterpolatedAsync với explicit ENUM casting (::membership_tier)
+   - Short-lived DbContext (using pattern)
+   - Loading indicators
+   - Keyboard navigation (Enter → next field → submit)
+   - ComboBox reset về "Tất cả" khi refresh
+
+   Database:
+   - membership_tier ENUM (none, silver, gold, platinum, diamond)
+   - customer_id FK to customers (unique constraint)
+   - Auto-calculate tier based on total_spent (trigger)
+   - Auto-add points when order served (trigger)
+
+   UI/UX:
+   - Header xanh đậm "QUẢN LÝ THẺ HỘI VIÊN"
+   - Stats cards với icon và số liệu
+   - Grid view (Left) + Form nhập liệu (Right)
+   - Font Segoe UI 10F đồng nhất
+   - Tiếng Việt hiển thị đầy đủ, không lỗi encoding
+   - Button layout: Thêm | Sửa | Làm mới | Xóa
+
+   Security:
+   - ExecuteSqlInterpolatedAsync (SQL injection safe)
+   - Explicit ENUM casting (::membership_tier)
+   - Short-lived DbContext
 ✅ 11. frmVouchers ⭐
    File: frmVouchers.cs (522 dòng)
    Status: 10/10 - PRODUCTION READY
@@ -317,7 +352,7 @@ Tiến độ: 12/18 forms (67%) ✅
    Database:
    - voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
    - voucher_status ENUM (active, inactive, expired, used_up)
-   - uuid[] arrays (applicable_products, applicable_categories) mapped đúng kiểu
+   - applicable_tiers membership_tier[] (áp dụng theo hạng thành viên)
    - created_by FK to users (audit tracking)
 
    UI/UX:
@@ -473,7 +508,7 @@ Tiến độ: 12/18 forms (67%) ✅
    Database:
    - voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
    - voucher_status ENUM (active, inactive, expired, used_up)
-   - uuid[] arrays (applicable_products, applicable_categories) mapped đúng kiểu
+   - applicable_tiers membership_tier[] (áp dụng theo hạng thành viên)
    - created_by FK to users (audit tracking)
 
    UI/UX:

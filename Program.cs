@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using MilkTeaPOS.Models;
+using Npgsql;
 
 namespace MilkTeaPOS
 {

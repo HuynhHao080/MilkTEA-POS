@@ -220,6 +220,7 @@ namespace MilkTeaPOS
                     "frmCategories" => new frmCategories(),
                     "frmUsers" => new frmUsers(),
                     "frmCustomers" => new frmCustomers(),
+                    "frmMemberships" => new frmMemberships(),
                     "frmVouchers" => new frmVouchers(),
                     "frmSalesReport" => new frmSalesReport(),
                     "frmAuditLog" => new frmAuditLog(),

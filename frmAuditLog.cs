@@ -101,9 +101,20 @@ namespace MilkTeaPOS
                 cbUser.DisplayMember = "DisplayName";
                 cbUser.ValueMember = "Id";
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                // Log error for debugging
+                System.Diagnostics.Debug.WriteLine($"[AUDIT LOG] Failed to load filters: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[AUDIT LOG] Stack trace: {ex.StackTrace}");
+                
+                // Show user-friendly error
+                MessageBox.Show(
+                    "⚠️ Không thể tải bộ lọc!\n\n" +
+                    "💡 Ứng dụng sẽ tiếp tục hoạt động bình thường.\n" +
+                    "🔄 Nhấn 'Làm mới' để thử lại.",
+                    "Cảnh báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
             }
         }
 

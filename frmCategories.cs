@@ -172,9 +172,11 @@ namespace MilkTeaPOS
             var row = dgvCategories.Rows[e.RowIndex];
             if (row.Cells["Id"].Value == null) return;
 
+            if (!Guid.TryParse(row.Cells["Id"].Value.ToString(), out var categoryId)) return;
+
             _selectedCategory = new Category
             {
-                Id = Guid.Parse(row.Cells["Id"].Value.ToString()),
+                Id = categoryId,
                 Name = row.Cells["Name"].Value?.ToString() ?? string.Empty,
                 Description = row.Cells["Description"].Value?.ToString(),
                 ImageUrl = row.Cells["ImageUrl"]?.Value?.ToString(),
@@ -674,6 +676,27 @@ namespace MilkTeaPOS
                 return;
             }
 
+            // Validate tên danh mục không quá 100 ký tự (theo DB constraint)
+            if (categoryName.Length > 100)
+            {
+                MessageBox.Show($"⚠️ Tên danh mục quá dài!\n\nTối đa 100 ký tự, hiện tại: {categoryName.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtName.Focus();
+                txtName.Select(0, 100);
+                return;
+            }
+
+            // Validate Description không quá 1000 ký tự
+            var description = txtDescription.Text.Trim();
+            if (description.Length > 1000)
+            {
+                MessageBox.Show($"⚠️ Mô tả quá dài!\n\nTối đa 1000 ký tự, hiện tại: {description.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDescription.Focus();
+                txtDescription.Select(0, 1000);
+                return;
+            }
+
             // Check duplicate name
             bool exists;
             using (var context = new PostgresContext())
@@ -737,6 +760,27 @@ namespace MilkTeaPOS
                 MessageBox.Show("⚠️ Vui lòng nhập tên danh mục!", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtName.Focus();
+                return;
+            }
+
+            // Validate tên danh mục không quá 100 ký tự (theo DB constraint)
+            if (categoryName.Length > 100)
+            {
+                MessageBox.Show($"⚠️ Tên danh mục quá dài!\n\nTối đa 100 ký tự, hiện tại: {categoryName.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtName.Focus();
+                txtName.Select(0, 100);
+                return;
+            }
+
+            // Validate Description không quá 1000 ký tự
+            var description = txtDescription.Text.Trim();
+            if (description.Length > 1000)
+            {
+                MessageBox.Show($"⚠️ Mô tả quá dài!\n\nTối đa 1000 ký tự, hiện tại: {description.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDescription.Focus();
+                txtDescription.Select(0, 1000);
                 return;
             }
 

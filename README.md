@@ -56,11 +56,11 @@ dotnet run
 | Users | 1 | Staff management |
 | **TỔNG** | **18** | |
 
-**Tiến độ:** 12/18 forms (67%) ✅ - All completed forms rated 10/10 ⭐
+**Tiến độ:** 13/18 forms (72%) ✅ - All completed forms rated 10/10 ⭐
 
 ---
 
-## ✅ FORMS ĐÃ HOÀN THÀNH (12/18)
+## ✅ FORMS ĐÃ HOÀN THÀNH (13/18)
 
 ### 11. frmVouchers - Quản lý mã giảm giá ⭐ NEW
 
@@ -90,7 +90,7 @@ dotnet run
 **Database:**
 - voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
 - voucher_status ENUM (active, inactive, expired, used_up)
-- uuid[] arrays (applicable_products, applicable_categories) mapped đúng kiểu
+- applicable_tiers membership_tier[] (áp dụng theo hạng thành viên)
 - created_by FK to users (audit tracking)
 
 **UI/UX:**
@@ -109,7 +109,7 @@ dotnet run
 
 ---
 
-## ✅ FORMS ĐÃ HOÀN THÀNH (12/18) - CONTINUED
+## ✅ FORMS ĐÃ HOÀN THÀNH (13/18) - CONTINUED
 
 ### 9. frmSalesReport - Báo cáo doanh thu ⭐
 
@@ -486,7 +486,17 @@ dotnet run
 
 ### Ưu tiên thấp hơn:
 
-6. **frmMemberships** - Quản lý hội viên
+6. **frmMemberships** - Quản lý hội viên ✅ HOÀN THÀNH
+   - File: `frmMemberships.cs` (~720 dòng)
+   - Trạng thái: 10/10 - PRODUCTION READY
+   - Tính năng:
+     + CRUD đầy đủ với PostgreSQL ENUM (::membership_tier)
+     + Tìm kiếm theo tên, SĐT
+     + Filter theo hạng (Tất cả, none, silver, gold, platinum, diamond)
+     + Auto-fill SĐT khi chọn khách, auto-select khách khi nhập SĐT
+     + Validation: SĐT, số dương, ngày hợp lệ
+     + Color-coded Tier column
+     + ExecuteSqlInterpolatedAsync an toàn
 7. **frmVouchers** - Quản lý voucher
 8. **frmOrderHistory** - Lịch sử đơn hàng
 9. **frmOrderDetail** - Chi tiết đơn hàng
@@ -639,7 +649,7 @@ Nếu có vấn đề, tạo issue hoặc liên hệ team lead.
 
 ---
 
-**Cập nhật cuối:** April 6, 2026 - 12/18 forms 10/10, frmVouchers production ready ⭐
+**Cập nhật cuối:** April 7, 2026 - 13/18 forms 10/10, frmMemberships production ready ⭐
 **Version:** 1.0.0
 **Status:** In Development 🚧
-**Progress:** 12/18 forms (67%) - Production Ready ⭐
+**Progress:** 13/18 forms (72%) - Production Ready ⭐

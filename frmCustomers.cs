@@ -204,9 +204,11 @@ namespace MilkTeaPOS
             var row = dgvCustomers.Rows[e.RowIndex];
             if (row.Cells["Id"].Value == null) return;
 
+            if (!Guid.TryParse(row.Cells["Id"].Value.ToString(), out var customerId)) return;
+
             _selectedCustomer = new Customer
             {
-                Id = Guid.Parse(row.Cells["Id"].Value.ToString()),
+                Id = customerId,
                 Name = row.Cells["Name"].Value?.ToString() ?? string.Empty,
                 Phone = row.Cells["Phone"].Value?.ToString(),
                 Email = row.Cells["Email"].Value?.ToString(),
@@ -749,15 +751,29 @@ namespace MilkTeaPOS
                 return;
             }
 
+            // Validate tên khách hàng không quá 100 ký tự (theo DB constraint)
+            if (name.Length > 100)
+            {
+                MessageBox.Show($"⚠️ Tên khách hàng quá dài!\n\nTối đa 100 ký tự, hiện tại: {name.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtName.Focus();
+                txtName.Select(0, 100);
+                return;
+            }
+
             // Check duplicate phone
             var phone = txtPhone.Text.Trim();
             if (!string.IsNullOrEmpty(phone))
             {
+                // Remove common formatting characters before validation
+                phone = phone.Replace(" ", "").Replace("-", "").Replace(".", "");
+                txtPhone.Text = phone; // Update UI with cleaned version
+
                 // Validate phone format (Vietnamese: 9-11 digits)
-                if (!Regex.IsMatch(phone, @"^[0-9]{9,11}$"))
+                if (!IsValidPhone(phone))
                 {
-                    MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số.", "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số, bắt đầu bằng số 0 (VD: 0901234567).",
+                        "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtPhone.Focus();
                     txtPhone.SelectAll();
                     return;
@@ -785,10 +801,10 @@ namespace MilkTeaPOS
             var email = txtEmail.Text.Trim();
             if (!string.IsNullOrEmpty(email))
             {
-                // Validate email format
-                if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                // Validate email format with stricter regex
+                if (!IsValidEmail(email))
                 {
-                    MessageBox.Show("⚠️ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email.", "Lỗi",
+                    MessageBox.Show("⚠️ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email (VD: example@domain.com).", "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtEmail.Focus();
                     txtEmail.SelectAll();
@@ -813,6 +829,52 @@ namespace MilkTeaPOS
                 }
             }
 
+            // Validate DateOfBirth if provided
+            DateOnly? dob = null;
+            if (dtpDateOfBirth.Checked)
+            {
+                dob = DateOnly.FromDateTime(dtpDateOfBirth.Value);
+
+                // Check if date of birth is reasonable (not in future, not too old)
+                if (dob > DateOnly.FromDateTime(DateTime.Now))
+                {
+                    MessageBox.Show("⚠️ Ngày sinh không thể ở tương lai!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    dtpDateOfBirth.Focus();
+                    return;
+                }
+
+                if (dob < new DateOnly(1900, 1, 1))
+                {
+                    MessageBox.Show("⚠️ Ngày sinh không hợp lệ!\n\nNăm sinh phải từ 1900 trở về sau.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    dtpDateOfBirth.Focus();
+                    return;
+                }
+            }
+
+            // Validate Address length
+            var address = txtAddress.Text.Trim();
+            if (address.Length > 500)
+            {
+                MessageBox.Show($"⚠️ Địa chỉ quá dài!\n\nTối đa 500 ký tự, hiện tại: {address.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtAddress.Focus();
+                txtAddress.Select(0, 500);
+                return;
+            }
+
+            // Validate Notes length
+            var notes = txtNotes.Text.Trim();
+            if (notes.Length > 1000)
+            {
+                MessageBox.Show($"⚠️ Ghi chú quá dài!\n\nTối đa 1000 ký tự, hiện tại: {notes.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNotes.Focus();
+                txtNotes.Select(0, 1000);
+                return;
+            }
+
             try
             {
                 var genderDb = cbGender.Text switch
@@ -822,12 +884,6 @@ namespace MilkTeaPOS
                     "Khác" => "other",
                     _ => null
                 };
-
-                DateOnly? dob = null;
-                if (dtpDateOfBirth.Checked)
-                {
-                    dob = DateOnly.FromDateTime(dtpDateOfBirth.Value);
-                }
 
                 using (var context = new PostgresContext())
                 {
@@ -842,8 +898,8 @@ namespace MilkTeaPOS
                         Address = txtAddress.Text,
                         Notes = txtNotes.Text,
                         AvatarUrl = txtAvatarUrl.Text,
-                        CreatedAt = dtpCreatedAt.Value.ToUniversalTime(),
-                        UpdatedAt = dtpUpdatedAt.Value.ToUniversalTime()
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     };
 
                     context.Customers.Add(customer);
@@ -878,15 +934,29 @@ namespace MilkTeaPOS
                 return;
             }
 
+            // Validate tên khách hàng không quá 100 ký tự
+            if (name.Length > 100)
+            {
+                MessageBox.Show($"⚠️ Tên khách hàng quá dài!\n\nTối đa 100 ký tự, hiện tại: {name.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtName.Focus();
+                txtName.Select(0, 100);
+                return;
+            }
+
             // Check duplicate phone (excluding current)
             var phone = txtPhone.Text.Trim();
             if (!string.IsNullOrEmpty(phone))
             {
+                // Remove common formatting characters before validation
+                phone = phone.Replace(" ", "").Replace("-", "").Replace(".", "");
+                txtPhone.Text = phone;
+
                 // Validate phone format (Vietnamese: 9-11 digits)
-                if (!Regex.IsMatch(phone, @"^[0-9]{9,11}$"))
+                if (!IsValidPhone(phone))
                 {
-                    MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số.", "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số, bắt đầu bằng số 0 (VD: 0901234567).",
+                        "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtPhone.Focus();
                     txtPhone.SelectAll();
                     return;
@@ -914,10 +984,10 @@ namespace MilkTeaPOS
             var email = txtEmail.Text.Trim();
             if (!string.IsNullOrEmpty(email))
             {
-                // Validate email format
-                if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                // Validate email format with stricter regex
+                if (!IsValidEmail(email))
                 {
-                    MessageBox.Show("⚠️ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email.", "Lỗi",
+                    MessageBox.Show("⚠️ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email (VD: example@domain.com).", "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtEmail.Focus();
                     txtEmail.SelectAll();
@@ -942,6 +1012,52 @@ namespace MilkTeaPOS
                 }
             }
 
+            // Validate DateOfBirth if provided
+            DateOnly? dob = null;
+            if (dtpDateOfBirth.Checked)
+            {
+                dob = DateOnly.FromDateTime(dtpDateOfBirth.Value);
+
+                // Check if date of birth is reasonable
+                if (dob > DateOnly.FromDateTime(DateTime.Now))
+                {
+                    MessageBox.Show("⚠️ Ngày sinh không thể ở tương lai!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    dtpDateOfBirth.Focus();
+                    return;
+                }
+
+                if (dob < new DateOnly(1900, 1, 1))
+                {
+                    MessageBox.Show("⚠️ Ngày sinh không hợp lệ!\n\nNăm sinh phải từ 1900 trở về sau.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    dtpDateOfBirth.Focus();
+                    return;
+                }
+            }
+
+            // Validate Address length
+            var address = txtAddress.Text.Trim();
+            if (address.Length > 500)
+            {
+                MessageBox.Show($"⚠️ Địa chỉ quá dài!\n\nTối đa 500 ký tự, hiện tại: {address.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtAddress.Focus();
+                txtAddress.Select(0, 500);
+                return;
+            }
+
+            // Validate Notes length
+            var notes = txtNotes.Text.Trim();
+            if (notes.Length > 1000)
+            {
+                MessageBox.Show($"⚠️ Ghi chú quá dài!\n\nTối đa 1000 ký tự, hiện tại: {notes.Length} ký tự.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNotes.Focus();
+                txtNotes.Select(0, 1000);
+                return;
+            }
+
             try
             {
                 var genderDb = cbGender.Text switch
@@ -951,12 +1067,6 @@ namespace MilkTeaPOS
                     "Khác" => "other",
                     _ => null
                 };
-
-                DateOnly? dob = null;
-                if (dtpDateOfBirth.Checked)
-                {
-                    dob = DateOnly.FromDateTime(dtpDateOfBirth.Value);
-                }
 
                 using (var context = new PostgresContext())
                 {
@@ -977,8 +1087,7 @@ namespace MilkTeaPOS
                         customer.Address = txtAddress.Text;
                         customer.Notes = txtNotes.Text;
                         customer.AvatarUrl = txtAvatarUrl.Text;
-                        customer.CreatedAt = dtpCreatedAt.Value.ToUniversalTime();
-                        customer.UpdatedAt = dtpUpdatedAt.Value.ToUniversalTime();
+                        customer.UpdatedAt = DateTime.UtcNow;
 
                         await context.SaveChangesAsync();
                     }
@@ -1003,6 +1112,56 @@ namespace MilkTeaPOS
         #endregion
 
         #region Helper Methods
+
+        /// <summary>
+        /// Validate email format with stricter rules
+        /// </summary>
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            // Check length first (practical limit)
+            if (email.Length > 254)
+                return false;
+
+            // Stricter email regex:
+            // - Local part: 1-64 chars, alphanumeric + ._%+-
+            // - @ symbol
+            // - Domain: 1-255 chars, alphanumeric + hyphens
+            // - Must have valid TLD (at least 2 chars)
+            var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+            
+            if (!emailRegex.IsMatch(email))
+                return false;
+
+            // Additional checks
+            if (email.StartsWith(".") || email.EndsWith("."))
+                return false;
+
+            if (email.Contains(".."))
+                return false;
+
+            if (email.Contains("@@") || email.StartsWith("@") || email.EndsWith("@"))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validate phone number format (Vietnamese)
+        /// </summary>
+        private bool IsValidPhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            // Remove common formatting
+            phone = phone.Replace(" ", "").Replace("-", "").Replace(".", "");
+
+            // Vietnamese phone: 9-11 digits, starting with 0
+            return Regex.IsMatch(phone, @"^0[0-9]{8,10}$");
+        }
 
         private void ShowLoading(bool isLoading)
         {

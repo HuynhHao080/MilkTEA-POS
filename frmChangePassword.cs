@@ -101,10 +101,13 @@ namespace MilkTeaPOS
                 return;
             }
 
-            if (newPassword.Length < 6)
+            if (newPassword.Length < 8)
             {
                 MessageBox.Show(
-                    "⚠️ Mật khẩu mới phải có ít nhất 6 ký tự!",
+                    "⚠️ Mật khẩu mới phải có ít nhất 8 ký tự!\n\n" +
+                    "💡 Khuyến nghị:\n" +
+                    "   • Sử dụng ít nhất 12 ký tự để bảo mật tốt hơn\n" +
+                    "   • Kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt",
                     "Thông báo",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
@@ -113,10 +116,10 @@ namespace MilkTeaPOS
                 return;
             }
 
-            // Password complexity validation
+            // Password complexity validation (max score = 7)
             int complexityScore = 0;
-            if (newPassword.Length >= 6) complexityScore++;
             if (newPassword.Length >= 8) complexityScore++;
+            if (newPassword.Length >= 10) complexityScore++;
             if (newPassword.Length >= 12) complexityScore++;
             if (newPassword.Any(char.IsUpper)) complexityScore++;
             if (newPassword.Any(char.IsLower)) complexityScore++;
@@ -126,7 +129,13 @@ namespace MilkTeaPOS
             if (complexityScore < 4)
             {
                 MessageBox.Show(
-                    "⚠️ Mật khẩu mới quá yếu!\n\nVui lòng sử dụng mật khẩu phức tạp hơn:\n- Ít nhất 8 ký tự\n- Chữ hoa, chữ thường\n- Số\n- Ký tự đặc biệt (!@#$%^&*)",
+                    "⚠️ Mật khẩu mới quá yếu!\n\n" +
+                    "💡 Yêu cầu tối thiểu:\n" +
+                    "   • Ít nhất 8 ký tự (khuyến nghị 12+)\n" +
+                    "   • Có chữ hoa (A-Z)\n" +
+                    "   • Có chữ thường (a-z)\n" +
+                    "   • Có số (0-9)\n" +
+                    "   • Có ký tự đặc biệt (!@#$%^&*)",
                     "Lỗi",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
@@ -179,9 +188,9 @@ namespace MilkTeaPOS
                     // Hash new password with BCrypt (work factor = 12)
                     string newHash = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: 12);
 
-                    // Update password hash
+                    // Update password hash - ONLY store hashed password, never plain text
                     user.PasswordHash = newHash;
-                    user.Password = newPassword; // Temporary: satisfy NOT NULL constraint
+                    user.Password = Guid.NewGuid().ToString(); // Placeholder to satisfy NOT NULL constraint
                     user.UpdatedAt = DateTime.UtcNow;
 
                     await context.SaveChangesAsync();
@@ -246,15 +255,15 @@ namespace MilkTeaPOS
             }
 
             int score = 0;
-            if (password.Length >= 6) score++;
             if (password.Length >= 8) score++;
+            if (password.Length >= 10) score++;
             if (password.Length >= 12) score++;
             if (password.Any(char.IsUpper)) score++;
             if (password.Any(char.IsLower)) score++;
             if (password.Any(char.IsDigit)) score++;
             if (password.Any(c => !char.IsLetterOrDigit(c))) score++;
 
-            if (score <= 2)
+            if (score <= 3)
             {
                 lblPasswordStrength.Text = "Độ mạnh mật khẩu: 🔴 Yếu";
                 lblPasswordStrength.ForeColor = Color.FromArgb(220, 53, 69);

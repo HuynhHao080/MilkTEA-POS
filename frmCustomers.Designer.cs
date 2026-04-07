@@ -65,6 +65,8 @@ namespace MilkTeaPOS
         private void InitializeComponent()
         {
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlHeader = new Panel();
             lblTitle = new Label();
             pnlToolbar = new Panel();
@@ -261,30 +263,29 @@ namespace MilkTeaPOS
             dgvCustomers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvCustomers.BackgroundColor = Color.White;
             dgvCustomers.BorderStyle = BorderStyle.None;
-            dgvCustomers.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
-            {
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                BackColor = Color.FromArgb(45, 55, 72),
-                ForeColor = Color.White,
-                Alignment = DataGridViewContentAlignment.MiddleCenter
-            };
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle1.SelectionForeColor = Color.White;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvCustomers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvCustomers.ColumnHeadersHeight = 45;
-            dgvCustomers.DefaultCellStyle = new DataGridViewCellStyle
-            {
-                Font = new Font("Segoe UI", 11F),
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(45, 55, 72),
-                SelectionBackColor = Color.FromArgb(255, 107, 107),
-                SelectionForeColor = Color.White
-            };
-            dgvCustomers.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = Color.FromArgb(247, 249, 252)
-            };
             dgvCustomers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvCustomers.Dock = DockStyle.Top;
-            dgvCustomers.EnableHeadersVisualStyles = false;
             dgvCustomers.GridColor = Color.FromArgb(226, 232, 240);
+            dgvCustomers.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.White;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 11F);
+            dataGridViewCellStyle2.ForeColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(255, 107, 107);
+            dataGridViewCellStyle2.SelectionForeColor = Color.White;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dgvCustomers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(247, 249, 252);
+            dgvCustomers.Dock = DockStyle.Fill;
+            dgvCustomers.EnableHeadersVisualStyles = false;
             dgvCustomers.Location = new Point(20, 20);
             dgvCustomers.MultiSelect = false;
             dgvCustomers.Name = "dgvCustomers";
@@ -516,8 +517,7 @@ namespace MilkTeaPOS
             // 
             // picAvatar
             // 
-            picAvatar.BackColor = Color.FromArgb(247, 249, 252);
-            picAvatar.BorderStyle = BorderStyle.FixedSingle;
+            picAvatar.BackColor = Color.White;
             picAvatar.Location = new Point(1071, 33);
             picAvatar.Name = "picAvatar";
             picAvatar.Size = new Size(186, 186);

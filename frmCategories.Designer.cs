@@ -271,7 +271,7 @@
                 BackColor = Color.FromArgb(247, 249, 252)
             };
             dgvCategories.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvCategories.Dock = DockStyle.Top;
+            dgvCategories.Dock = DockStyle.Fill;
             dgvCategories.EnableHeadersVisualStyles = false;
             dgvCategories.GridColor = Color.FromArgb(226, 232, 240);
             dgvCategories.Location = new Point(20, 20);

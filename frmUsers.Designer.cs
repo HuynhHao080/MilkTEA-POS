@@ -57,6 +57,9 @@ namespace MilkTeaPOS
 
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlHeader = new Panel();
             lblTitle = new Label();
             pnlToolbar = new Panel();
@@ -240,38 +243,37 @@ namespace MilkTeaPOS
             pnlMain.Padding = new Padding(20);
             pnlMain.Size = new Size(1198, 698);
             pnlMain.TabIndex = 0;
-            // 
+            //
             // dgvUsers
-            // 
+            //
             dgvUsers.AllowUserToAddRows = false;
             dgvUsers.AllowUserToDeleteRows = false;
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvUsers.BackgroundColor = Color.White;
             dgvUsers.BorderStyle = BorderStyle.None;
-            dgvUsers.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
-            {
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                BackColor = Color.FromArgb(45, 55, 72),
-                ForeColor = Color.White,
-                Alignment = DataGridViewContentAlignment.MiddleCenter
-            };
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle1.SelectionForeColor = Color.White;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvUsers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvUsers.ColumnHeadersHeight = 45;
-            dgvUsers.DefaultCellStyle = new DataGridViewCellStyle
-            {
-                Font = new Font("Segoe UI", 11F),
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(45, 55, 72),
-                SelectionBackColor = Color.FromArgb(255, 107, 107),
-                SelectionForeColor = Color.White
-            };
-            dgvUsers.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = Color.FromArgb(247, 249, 252)
-            };
             dgvUsers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvUsers.Dock = DockStyle.Top;
-            dgvUsers.EnableHeadersVisualStyles = false;
             dgvUsers.GridColor = Color.FromArgb(226, 232, 240);
+            dgvUsers.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.White;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 11F);
+            dataGridViewCellStyle2.ForeColor = Color.FromArgb(45, 55, 72);
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(255, 107, 107);
+            dataGridViewCellStyle2.SelectionForeColor = Color.White;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dgvUsers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(247, 249, 252);
+            dgvUsers.Dock = DockStyle.Fill;
+            dgvUsers.EnableHeadersVisualStyles = false;
             dgvUsers.Location = new Point(20, 20);
             dgvUsers.MultiSelect = false;
             dgvUsers.Name = "dgvUsers";
@@ -485,8 +487,7 @@ namespace MilkTeaPOS
             // 
             // picAvatar
             // 
-            picAvatar.BackColor = Color.FromArgb(247, 249, 252);
-            picAvatar.BorderStyle = BorderStyle.FixedSingle;
+            picAvatar.BackColor = Color.White;
             picAvatar.Location = new Point(617, 124);
             picAvatar.Name = "picAvatar";
             picAvatar.Size = new Size(113, 112);

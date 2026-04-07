@@ -19,9 +19,11 @@ namespace MilkTeaPOS
 
         private void setupDefaults()
         {
-            // Default credentials for demo
+            // Default username for convenience (password must be entered manually for security)
             txtUsername.Text = "admin";
-            txtPassword.Text = "admin123";
+            txtPassword.Text = string.Empty;
+            txtPassword.PlaceholderText = "Mật khẩu";
+            txtUsername.Focus();
         }
 
         private void txtPassword_KeyPress(object? sender, KeyPressEventArgs e)
@@ -203,18 +205,22 @@ namespace MilkTeaPOS
             }
             catch (Exception ex)
             {
+                // Log error internally for debugging
+                System.Diagnostics.Debug.WriteLine($"[LOGIN ERROR] {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[LOGIN STACK] {ex.StackTrace}");
+
                 if (!this.IsDisposed && this.IsHandleCreated)
                 {
                     this.Invoke(() =>
                     {
+                        // Show generic error message to user (don't leak DB info)
                         string errorMessage = $"❌ Không thể kết nối cơ sở dữ liệu!\n\n";
-                        errorMessage += $"🔍 Chi tiết lỗi:\n";
-                        errorMessage += $"   {ex.Message}\n\n";
-                        errorMessage += $"📋 Hướng khắc phục:\n";
-                        errorMessage += $"   • Kiểm tra kết nối Internet\n";
-                        errorMessage += $"   • Xác nhận cấu hình database\n";
-                        errorMessage += $"   • Liên hệ bộ phận kỹ thuật nếu lỗi tiếp diễn.\n\n";
-                        errorMessage += $"💡 Mã lỗi: DB_CONNECTION_FAILED";
+                        errorMessage += $"📋 Vui lòng kiểm tra:\n";
+                        errorMessage += $"   • Kết nối Internet ổn định\n";
+                        errorMessage += $"   • Ứng dụng đang chạy bình thường\n\n";
+                        errorMessage += $"💡 Liên hệ bộ phận kỹ thuật nếu lỗi tiếp diễn.\n";
+                        errorMessage += $"   • Email: support@milkteapos.com\n";
+                        errorMessage += $"   • Hotline: 1900 xxxx";
 
                         MessageBox.Show(
                             errorMessage,

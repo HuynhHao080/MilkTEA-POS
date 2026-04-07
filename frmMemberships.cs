@@ -1,318 +1,293 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MilkTeaPOS.Models;
-using Npgsql;
-using System;
+﻿using System;
+using System.Data;
+using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
+using MilkTeaPOS.Models;
 
 namespace MilkTeaPOS
 {
     public partial class frmMemberships : Form
     {
-        private Guid selectedId = Guid.Empty;
+        private Membership? _selectedMembership;
+
+        #region Constants
+
+        private static readonly string[] TIERS = { "none", "silver", "gold", "platinum", "diamond" };
+
+        // Cached fonts to avoid GDI leaks
+        private readonly Font _fontTierNone = new Font("Segoe UI", 10F);
+        private readonly Font _fontTierSilver = new Font("Segoe UI", 10F, FontStyle.Bold);
+        private readonly Font _fontTierGold = new Font("Segoe UI", 10F, FontStyle.Bold);
+        private readonly Font _fontTierPlatinum = new Font("Segoe UI", 10F, FontStyle.Bold);
+        private readonly Font _fontTierDiamond = new Font("Segoe UI", 10F, FontStyle.Bold);
+
+        #endregion
 
         #region Constructor & Initialization
 
         public frmMemberships()
         {
             InitializeComponent();
+            InitializeForm();
         }
 
-        private async void Memberships_Load(object sender, EventArgs e)
+        private void InitializeForm()
         {
-            try
-            {
+            InitializeTierCombo();
+            InitializeTierFilterCombo();
+            LoadCustomers();
+            LoadMemberships();
+        }
 
-                await LoadMembershipsAsync();
-                dtpJoinedAt.Enabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("❌ Lỗi khi load form: " + ex.Message);
-            }
+        private void InitializeTierCombo()
+        {
+            cbTier.Items.Clear();
+            cbTier.Items.AddRange(TIERS);
+            cbTier.SelectedIndex = 0;
+            cbTier.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+
+        private void InitializeTierFilterCombo()
+        {
+            cbTierFilter.Items.Clear();
+            cbTierFilter.Items.Add("Tất cả");
+            cbTierFilter.Items.AddRange(TIERS);
+            cbTierFilter.SelectedIndex = 0;
+            cbTierFilter.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         #endregion
 
-        private async void PerformMembershipSearch()
-        {
-            var searchText = txtSearch.Text.Trim().ToLower();
+        #region Data Loading & Display
 
+        private async void LoadMemberships()
+        {
             try
             {
-                using (var context = new PostgresContext())
-                {
-                    // 1. Truy vấn LINQ với Join để lấy dữ liệu thô
-                    var query = from m in context.Memberships
-                                join c in context.Customers on m.CustomerId equals c.Id
-                                where string.IsNullOrEmpty(searchText) ||
-                                      c.Name.ToLower().Contains(searchText) ||
-                                      c.Phone.Contains(searchText) ||
-                                      ((string)(object)m.Tier).ToLower().Contains(searchText)
-                                orderby m.JoinedAt descending
-                                select new { m, c };
+                ShowLoading(true);
 
-                    var results = await query.AsNoTracking().ToListAsync();
+                using var context = new PostgresContext();
 
-                    // 2. Format dữ liệu ĐỒNG BỘ với hàm LoadMembershipsAsync
-                    dgvMemberships.DataSource = results.Select(x => new
-                    {
-                        x.m.Id,
-                        CustomerName = x.c.Name, // Giữ nguyên tên để CustomersMemberships_Column nhận ra
-                        Tier = x.m.Tier,
-                        Points = x.m.Points,
-                        TotalSpent = x.m.TotalSpent, // Để số nguyên để định dạng N0 ở hàm Column
-                        TotalOrders = x.m.TotalOrders,
-                        JoinedAt = x.m.JoinedAt,
-                        // Tính ngày hết hạn nếu null giống hàm Load
-                        ExpiresAt = x.m.ExpiresAt ?? (x.m.JoinedAt.HasValue ? x.m.JoinedAt.Value.AddMonths(6) : (DateTime?)null),
-                        LastOrder = x.m.LastOrderAt,
-                        UpdatedAt = x.m.UpdatedAt
-                    }).ToList();
-                }
-
-                // 3. Gọi hàm định dạng lại tiêu đề và ẩn ID
-                CustomersMemberships_Column();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi tìm kiếm: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        #region Data Loading & Display customers bỏ
-
-
-
-        public void CustomersMemberships_Column()
-        {
-            if (dgvMemberships.Columns.Count == 0) return;
-            if (dgvMemberships.Columns.Contains("Id")) dgvMemberships.Columns["Id"].Visible = false;
-            if (dgvMemberships.Columns.Contains("CustomerId")) dgvMemberships.Columns["CustomerId"].Visible = false;
-            dgvMemberships.Columns["CustomerName"].HeaderText = "Tên Khách Hàng";
-            dgvMemberships.Columns["Tier"].HeaderText = "Hạng";
-            dgvMemberships.Columns["Points"].HeaderText = "Điểm";
-            dgvMemberships.Columns["TotalSpent"].HeaderText = "Tổng Chi Tiêu";
-            dgvMemberships.Columns["TotalOrders"].HeaderText = "Tổng Đơn";
-            dgvMemberships.Columns["JoinedAt"].HeaderText = "Ngày Tham Gia";
-            dgvMemberships.Columns["ExpiresAt"].HeaderText = "Ngày Hết Hạn";
-            if (dgvMemberships.Columns.Contains("JoinedAt"))
-                dgvMemberships.Columns["JoinedAt"].DefaultCellStyle.Format = "dd/MM/yyyy";
-            if (dgvMemberships.Columns.Contains("ExpiresAt"))
-                dgvMemberships.Columns["ExpiresAt"].DefaultCellStyle.Format = "dd/MM/yyyy";
-            if (dgvMemberships.Columns.Contains("TotalSpent"))
-            {
-                dgvMemberships.Columns["TotalSpent"].DefaultCellStyle.Format = "N0";
-                dgvMemberships.Columns["TotalSpent"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            }
-        }
-        private async Task LoadMembershipsAsync()
-        {
-            using (var context = new PostgresContext())
-            {
-                var data = await context.Memberships
+                var memberships = await context.Memberships
                     .AsNoTracking()
                     .Include(m => m.Customer)
-                    .Select(m => new
-                    {
-                        m.Id,
-                        CustomerName = m.Customer != null ? m.Customer.Name : "N/A",
-                        m.Tier,
-                        m.Points,
-                        m.TotalSpent,
-                        m.TotalOrders,
-                        m.JoinedAt,
-                        // TÍNH TOÁN TẠI ĐÂY: Nếu DB có ExpiresAt thì lấy lấy ở đây phải có ngàythang, 
-                        // nếu không thì tự tính bằng cách lấy JoinedAt + 6 tháng
-                        ExpiresAt = m.ExpiresAt ?? (m.JoinedAt.HasValue ? m.JoinedAt.Value.AddMonths(6) : (DateTime?)null),
-                        LastOrder = m.LastOrderAt,
-                        m.UpdatedAt
-                    })
+                    .OrderByDescending(m => m.TotalSpent)
                     .ToListAsync();
 
-                dgvMemberships.DataSource = data;
+                dgvMemberships.DataSource = memberships.Select(m => new
+                {
+                    m.Id,
+                    CustomerName = m.Customer?.Name ?? "N/A",
+                    CustomerPhone = m.Customer?.Phone ?? "-",
+                    Tier = m.Tier.ToString(),
+                    m.Points,
+                    m.TotalSpent,
+                    m.TotalOrders,
+                    m.JoinedAt,
+                    ExpiresAt = m.ExpiresAt ?? (m.JoinedAt.HasValue ? m.JoinedAt.Value.AddMonths(6) : (DateTime?)null),
+                    m.LastOrderAt,
+                    m.UpdatedAt
+                }).ToList();
+
+                CustomizeColumns();
             }
-            CustomersMemberships_Column();
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Lỗi tải dữ liệu:\n{ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ShowLoading(false);
+            }
+        }
+
+        private void CustomizeColumns()
+        {
+            if (dgvMemberships.Columns.Count == 0) return;
+
+            var columns = dgvMemberships.Columns;
+
+            if (columns["Id"] != null) columns["Id"].Visible = false;
+            if (columns["CustomerName"] != null) { columns["CustomerName"].HeaderText = "Khách hàng"; columns["CustomerName"].Width = 180; }
+            if (columns["CustomerPhone"] != null) { columns["CustomerPhone"].HeaderText = "SĐT"; columns["CustomerPhone"].Width = 120; }
+            if (columns["Tier"] != null) { columns["Tier"].HeaderText = "Hạng"; columns["Tier"].Width = 120; columns["Tier"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter; }
+            if (columns["Points"] != null) { columns["Points"].HeaderText = "Điểm"; columns["Points"].Width = 80; columns["Points"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter; }
+            if (columns["TotalSpent"] != null) { columns["TotalSpent"].HeaderText = "Tổng chi tiêu"; columns["TotalSpent"].Width = 140; columns["TotalSpent"].DefaultCellStyle.Format = "N0"; columns["TotalSpent"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight; }
+            if (columns["TotalOrders"] != null) { columns["TotalOrders"].HeaderText = "Tổng đơn"; columns["TotalOrders"].Width = 90; columns["TotalOrders"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter; }
+            if (columns["JoinedAt"] != null) { columns["JoinedAt"].HeaderText = "Ngày tham gia"; columns["JoinedAt"].Width = 130; columns["JoinedAt"].DefaultCellStyle.Format = "dd/MM/yyyy"; }
+            if (columns["ExpiresAt"] != null) { columns["ExpiresAt"].HeaderText = "Ngày hết hạn"; columns["ExpiresAt"].Width = 130; columns["ExpiresAt"].DefaultCellStyle.Format = "dd/MM/yyyy"; }
+            if (columns["LastOrderAt"] != null) { columns["LastOrderAt"].HeaderText = "Đơn cuối"; columns["LastOrderAt"].Width = 130; columns["LastOrderAt"].DefaultCellStyle.Format = "dd/MM/yyyy"; }
+            if (columns["UpdatedAt"] != null) columns["UpdatedAt"].Visible = false;
+        }
+
+        private void dgvMemberships_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dgvMemberships.Columns["Tier"] == null || e.ColumnIndex != dgvMemberships.Columns["Tier"].Index || e.Value == null)
+                return;
+
+            var tier = e.Value.ToString().ToLower();
+            e.CellStyle.ForeColor = tier switch
+            {
+                "none" => Color.Gray,
+                "silver" => Color.FromArgb(192, 192, 192),
+                "gold" => Color.FromArgb(255, 193, 7),
+                "platinum" => Color.FromArgb(108, 117, 125),
+                "diamond" => Color.FromArgb(255, 107, 107),
+                _ => Color.Gray
+            };
+
+            e.CellStyle.Font = tier switch
+            {
+                "none" => _fontTierNone,
+                "silver" => _fontTierSilver,
+                "gold" => _fontTierGold,
+                "platinum" => _fontTierPlatinum,
+                "diamond" => _fontTierDiamond,
+                _ => _fontTierNone
+            };
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _fontTierNone?.Dispose();
+            _fontTierSilver?.Dispose();
+            _fontTierGold?.Dispose();
+            _fontTierPlatinum?.Dispose();
+            _fontTierDiamond?.Dispose();
+            base.OnFormClosing(e);
         }
 
         #endregion
 
-        #region Event Handlers
+        #region Event Handlers - DataGridView
 
         private void dgvMemberships_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
             var row = dgvMemberships.Rows[e.RowIndex];
-            if (row.Cells["Id"].Value != null)
-                selectedId = (Guid)row.Cells["Id"].Value;
-            cbCustomer.Text = row.Cells["CustomerName"].Value?.ToString() ?? "";
-            if (dgvMemberships.Columns.Contains("Tier"))
-                cbTier.Text = row.Cells["Tier"].Value?.ToString() ?? "none";
-            txtPoints.Text = row.Cells["Points"].Value?.ToString() ?? "0";
-            txtTotalSpent.Text = row.Cells["TotalSpent"].Value?.ToString() ?? "0";
-            txtTotalOrders.Text = row.Cells["TotalOrders"].Value?.ToString() ?? "0";
-            if (row.Cells["JoinedAt"].Value != null && row.Cells["JoinedAt"].Value != DBNull.Value)
-                dtpJoinedAt.Value = Convert.ToDateTime(row.Cells["JoinedAt"].Value);
-            else
-                dtpJoinedAt.Value = DateTime.Now;
-            if (row.Cells["ExpiresAt"].Value != null && row.Cells["ExpiresAt"].Value != DBNull.Value)
-                dtpExpiresAt.Value = Convert.ToDateTime(row.Cells["ExpiresAt"].Value);
-            else
-                dtpExpiresAt.Value = DateTime.Now;
-            if (dgvMemberships.Columns.Contains("LastOrder") &&
-                row.Cells["LastOrder"].Value != null && row.Cells["LastOrder"].Value != DBNull.Value)
-            {
-                dtpLastOrder.Value = Convert.ToDateTime(row.Cells["LastOrder"].Value);
-            }
+            if (row.Cells["Id"].Value == null) return;
+
+            if (!Guid.TryParse(row.Cells["Id"].Value.ToString(), out var membershipId)) return;
+
+            // Load membership from DB to get correct CustomerId & Tier
+            using var context = new PostgresContext();
+            _selectedMembership = context.Memberships
+                .AsNoTracking()
+                .FirstOrDefault(m => m.Id == membershipId);
+
+            if (_selectedMembership != null)
+                FillFormData();
         }
 
         #endregion
-        private void ResetMembershipForm()
-        {
-            txtPoints.Clear();
-
-        }
 
         #region Form Data Management
 
-        private bool ValidateForm()
+        private void FillFormData()
         {
-            if (cbCustomer.SelectedValue == null)
+            if (_selectedMembership == null) return;
+
+            // Load customer info
+            using var context = new PostgresContext();
+            var customer = context.Customers.Find(_selectedMembership.CustomerId);
+            if (customer != null)
             {
-                MessageBox.Show("⚠️ Vui lòng chọn khách hàng");
-                return false;
+                txtPhone.Text = customer.Phone;
+                cbCustomer.SelectedValue = customer.Id;
             }
 
-            if (!int.TryParse(txtPoints.Text, out _))
-            {
-                MessageBox.Show("⚠️ Điểm không hợp lệ");
-                return false;
-            }
+            cbTier.Text = _selectedMembership.Tier ?? "none";
+            txtPoints.Text = _selectedMembership.Points.ToString();
+            txtTotalSpent.Text = _selectedMembership.TotalSpent.HasValue ? _selectedMembership.TotalSpent.Value.ToString("#,##0") : "0";
+            txtTotalOrders.Text = _selectedMembership.TotalOrders.ToString();
 
-            if (!decimal.TryParse(txtTotalSpent.Text, out _))
-            {
-                MessageBox.Show("⚠️ Tổng chi tiêu không hợp lệ");
-                return false;
-            }
+            if (_selectedMembership.JoinedAt.HasValue)
+                dtpJoinedAt.Value = _selectedMembership.JoinedAt.Value.ToLocalTime();
 
-            if (!int.TryParse(txtTotalOrders.Text, out _))
-            {
-                MessageBox.Show("⚠️ Số đơn không hợp lệ");
-                return false;
-            }
+            if (_selectedMembership.ExpiresAt.HasValue)
+                dtpExpiresAt.Value = _selectedMembership.ExpiresAt.Value.ToLocalTime();
+            else
+                dtpExpiresAt.Checked = false;
 
-            return true;
+            if (_selectedMembership.LastOrderAt.HasValue)
+            {
+                dtpLastOrder.Checked = true;
+                dtpLastOrder.Value = _selectedMembership.LastOrderAt.Value.ToLocalTime();
+            }
+            else
+            {
+                dtpLastOrder.Checked = false;
+            }
         }
 
         private void ClearForm()
         {
-            selectedId = Guid.Empty;
+            _selectedMembership = null;
+            txtPhone.Clear();
             cbCustomer.SelectedIndex = -1;
+            cbTier.SelectedIndex = 0;
             txtPoints.Clear();
             txtTotalSpent.Clear();
             txtTotalOrders.Clear();
             dtpJoinedAt.Value = DateTime.Now;
-            dtpExpiresAt.Value = DateTime.Now;
+            dtpExpiresAt.Value = DateTime.Now.AddMonths(6);
+            dtpLastOrder.Checked = false;
+            cbTierFilter.SelectedIndex = 0; // Reset filter về "Tất cả"
         }
 
         #endregion
 
-        #region Database Operations
+        #region Customer Loading
 
-        private async Task AddMembershipAsync()
+        private async void LoadCustomers()
         {
-            if (!ValidateForm()) return;
-
             try
             {
-                using (var context = new PostgresContext())
-                {
-                    var membership = new Membership
-                    {
-                        Id = Guid.NewGuid(),
-                        CustomerId = (Guid)cbCustomer.SelectedValue,
-                        Points = int.Parse(txtPoints.Text),
-                        TotalSpent = decimal.Parse(txtTotalSpent.Text),
-                        TotalOrders = int.Parse(txtTotalOrders.Text),
-                        JoinedAt = DateTime.Now,
-                        ExpiresAt = dtpExpiresAt.Value,
-                        UpdatedAt = DateTime.Now
-                    };
+                using var context = new PostgresContext();
 
-                    context.Memberships.Add(membership);
-                    await context.SaveChangesAsync();
-                }
+                var customers = await context.Customers
+                    .AsNoTracking()
+                    .Where(c => c.Phone != null) // Chỉ lấy khách có SĐT
+                    .OrderBy(c => c.Name)
+                    .ToListAsync();
 
-                MessageBox.Show("✅ Thêm thành công");
-                await LoadMembershipsAsync();
-                ClearForm();
+                cbCustomer.DataSource = null;
+                cbCustomer.Items.Clear();
+                cbCustomer.DataSource = customers;
+                cbCustomer.DisplayMember = "Name";
+                cbCustomer.ValueMember = "Id";
+                cbCustomer.SelectedIndex = -1;
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show("❌ Lỗi thêm: " + ex.Message);
+                // Silently fail
             }
         }
 
-        private async Task UpdateMembershipAsync()
+        private Guid? GetCustomerIdFromPhone(string phone)
         {
-            if (!ValidateForm()) return;
+            if (string.IsNullOrEmpty(phone)) return null;
 
-            try
-            {
-                using (var context = new PostgresContext())
-                {
-                    var membership = await context.Memberships.FindAsync(selectedId);
-                    if (membership == null) return;
+            using var context = new PostgresContext();
+            var customer = context.Customers
+                .AsNoTracking()
+                .FirstOrDefault(c => c.Phone == phone);
 
-                    membership.Points = int.Parse(txtPoints.Text);
-                    membership.TotalSpent = decimal.Parse(txtTotalSpent.Text);
-                    membership.TotalOrders = int.Parse(txtTotalOrders.Text);
-                    membership.ExpiresAt = dtpExpiresAt.Value;
-                    membership.UpdatedAt = DateTime.Now;
-
-                    await context.SaveChangesAsync();
-                }
-
-                MessageBox.Show("✅ Cập nhật thành công");
-                await LoadMembershipsAsync();
-                ClearForm();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("❌ Lỗi cập nhật: " + ex.Message);
-            }
+            return customer?.Id;
         }
 
-        private async Task DeleteMembershipAsync()
+        private void cbCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (selectedId == Guid.Empty) return;
-
-            var confirm = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận",
-                MessageBoxButtons.YesNo);
-
-            if (confirm != DialogResult.Yes) return;
-
-            try
+            // Tự động điền SĐT khi chọn khách hàng
+            if (cbCustomer.SelectedItem is Customer selectedCustomer)
             {
-                using (var context = new PostgresContext())
-                {
-                    var membership = await context.Memberships.FindAsync(selectedId);
-                    if (membership != null)
-                    {
-                        context.Memberships.Remove(membership);
-                        await context.SaveChangesAsync();
-                    }
-                }
-
-                MessageBox.Show("✅ Xóa thành công");
-                await LoadMembershipsAsync();
-                ClearForm();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("❌ Lỗi xóa: " + ex.Message);
+                txtPhone.Text = selectedCustomer.Phone ?? string.Empty;
             }
         }
 
@@ -320,27 +295,87 @@ namespace MilkTeaPOS
 
         #region Search Functionality
 
-        private async Task SearchAsync()
+        private void txtSearch_KeyPress(object sender, KeyPressEventArgs e)
         {
-            var keyword = txtSearch.Text.Trim();
-
-            using (var context = new PostgresContext())
+            if (e.KeyChar == (char)Keys.Enter)
             {
-                var data = await context.Memberships
-                    .Where(m => m.Customer.Name.Contains(keyword))
-                    .Select(m => new
-                    {
-                        m.Id,
-                        CustomerName = m.Customer.Name,
-                        m.Points,
-                        m.TotalSpent,
-                        m.TotalOrders,
-                        m.JoinedAt,
-                        m.ExpiresAt
-                    })
-                    .ToListAsync();
+                e.Handled = true;
+                PerformSearch();
+            }
+        }
 
-                dgvMemberships.DataSource = data;
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            PerformSearch();
+        }
+
+        private void cbTierFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PerformSearch();
+        }
+
+        private async void PerformSearch()
+        {
+            var searchText = txtSearch.Text.Trim().ToLower();
+            var tierFilter = cbTierFilter.SelectedItem?.ToString();
+
+            try
+            {
+                ShowLoading(true);
+
+                using var context = new PostgresContext();
+
+                // 1. Load data từ DB (không filter tier ở đây để tránh lỗi PG enum)
+                var query = context.Memberships
+                    .AsNoTracking()
+                    .Include(m => m.Customer);
+
+                var memberships = await query.ToListAsync();
+
+                // 2. Filter Tier ở bộ nhớ (C# string vs string - an toàn)
+                if (tierFilter != "Tất cả")
+                {
+                    var tier = tierFilter?.ToLower();
+                    memberships = memberships.Where(m => m.Tier?.ToLower() == tier).ToList();
+                }
+
+                // 3. Filter Search Text
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    memberships = memberships.Where(m =>
+                        (m.Customer?.Name?.ToLower().Contains(searchText) ?? false) ||
+                        (m.Customer?.Phone?.Contains(searchText) ?? false) ||
+                        (m.Tier?.ToLower().Contains(searchText) ?? false)).ToList();
+                }
+
+                // 4. Sắp xếp
+                memberships = memberships.OrderByDescending(m => m.TotalSpent).ToList();
+
+                dgvMemberships.DataSource = memberships.Select(m => new
+                {
+                    m.Id,
+                    CustomerName = m.Customer?.Name ?? "N/A",
+                    CustomerPhone = m.Customer?.Phone ?? "-",
+                    Tier = m.Tier ?? "none",
+                    m.Points,
+                    m.TotalSpent,
+                    m.TotalOrders,
+                    m.JoinedAt,
+                    ExpiresAt = m.ExpiresAt ?? (m.JoinedAt.HasValue ? m.JoinedAt.Value.AddMonths(6) : (DateTime?)null),
+                    m.LastOrderAt,
+                    m.UpdatedAt
+                }).ToList();
+
+                CustomizeColumns();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Lỗi tìm kiếm:\n{ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ShowLoading(false);
             }
         }
 
@@ -350,332 +385,343 @@ namespace MilkTeaPOS
 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
-            await AddMembershipAsync();
+            await SaveMembership();
         }
 
         private async void btnEdit_Click(object sender, EventArgs e)
         {
-            await UpdateMembershipAsync();
+            if (_selectedMembership == null)
+            {
+                MessageBox.Show("⚠️ Vui lòng chọn hội viên cần sửa!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            await UpdateMembership();
         }
 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
-            await DeleteMembershipAsync();
-        }
-
-        private async void btnSearch_Click(object sender, EventArgs e)
-        {
-            await SearchAsync();
-        }
-
-        private async void btnRefresh_Click(object sender, EventArgs e)
-        {
-            await LoadMembershipsAsync();
-            ClearForm();
-        }
-
-        #endregion
-
-        private async void dgvMemberships_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private async void btnEdit_Click_1(object sender, EventArgs e)
-        {
-            if (selectedId == Guid.Empty)
+            if (_selectedMembership == null)
             {
-                MessageBox.Show("Vui lòng chọn thành viên cần sửa từ danh sách!");
-                return;
-            }
-
-            try
-            {
-                using (var context = new PostgresContext())
-                {
-                    var membership = await context.Memberships.FindAsync(selectedId);
-
-                    if (membership == null)
-                    {
-                        MessageBox.Show("Không tìm thấy thông tin thành viên trong hệ thống!");
-                        return;
-                    }
-                    membership.Tier = cbTier.Text;
-                    if (int.TryParse(txtPoints.Text, out int points))
-                        membership.Points = points;
-                    else
-                        membership.Points = 0;
-                    if (decimal.TryParse(txtTotalSpent.Text, out decimal totalSpent))
-                        membership.TotalSpent = totalSpent;
-                    if (int.TryParse(txtTotalOrders.Text, out int totalOrders))
-                        membership.TotalOrders = totalOrders;
-
-                    membership.JoinedAt = dtpJoinedAt.Value.ToUniversalTime();
-                    membership.ExpiresAt = dtpExpiresAt.Value.ToUniversalTime();
-                    await context.SaveChangesAsync();
-
-                    MessageBox.Show("Cập nhật thông tin thành viên thành công!");
-                    LoadMembershipsAsync();
-                    ResetMembershipForm();
-                }
-            }
-            catch (Exception ex)
-            {
-                string msg = $"Lỗi khi cập nhật:\n{ex.Message}";
-                if (ex.InnerException != null)
-                    msg += $"\nChi tiết: {ex.InnerException.Message}";
-
-                MessageBox.Show(msg);
-            }
-
-        }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            ResetMembershipForm();
-        }
-
-        private async void btnDelete_Click_1(object sender, EventArgs e)
-        {
-            if (dgvMemberships.CurrentRow == null)
-            {
-                MessageBox.Show("⚠️ Vui lòng chọn Hội viên cần xóa!", "Thông báo",
+                MessageBox.Show("⚠️ Vui lòng chọn hội viên cần xóa!", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            // 2. Lấy ID và Tên khách hàng từ dòng đang chọn để hiển thị thông báo xác nhận
-            var row = dgvMemberships.CurrentRow;
-            Guid idCanXoa = (Guid)row.Cells["Id"].Value;
-            string tenKhachHang = row.Cells["CustomerName"].Value?.ToString() ?? "Không rõ tên";
 
+            var customerName = cbCustomer.Text;
             var result = MessageBox.Show(
-                $" Bạn có chắc muốn xóa thẻ Hội viên của khách hàng '{tenKhachHang}'?\n\n⚠️ Hành động này không thể hoàn tác!",
+                $"🗑️ Bạn có chắc muốn xóa thẻ hội viên của '{customerName}'?\n\n⚠️ Hành động này không thể hoàn tác!",
                 "Xác nhận xóa",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
             if (result != DialogResult.Yes) return;
+
             try
             {
-                using (var context = new PostgresContext())
+                using var context = new PostgresContext();
+                var membership = await context.Memberships.FindAsync(_selectedMembership.Id);
+                if (membership != null)
                 {
-                    var membership = await context.Memberships.FindAsync(idCanXoa);
-                    if (membership != null)
-                    {
-                        context.Memberships.Remove(membership);
-                        await context.SaveChangesAsync();
-
-                        MessageBox.Show("Xóa thẻ Hội viên thành công!", "Thành công",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
-                        LoadMembershipsAsync();
-                        ResetMembershipForm();
-                    }
-                    else
-                    {
-                        MessageBox.Show("❌ Không tìm thấy dữ liệu hội viên này trong hệ thống!", "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    context.Memberships.Remove(membership);
+                    await context.SaveChangesAsync();
                 }
+
+                MessageBox.Show("✅ Xóa thẻ hội viên thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                LoadMemberships();
+                ClearForm();
             }
             catch (DbUpdateException dbEx)
             {
-
-                string errorMsg = $"Lỗi khi xóa (Ràng buộc dữ liệu):\n\n{dbEx.Message}";
+                string errorMsg = $"❌ Lỗi khi xóa (ràng buộc dữ liệu):\n\n{dbEx.Message}";
                 if (dbEx.InnerException != null)
                 {
-                    errorMsg += $"\n\nChi tiết lỗi:\n{dbEx.InnerException.Message}";
+                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{dbEx.InnerException.Message}";
                 }
                 MessageBox.Show(errorMsg, "Lỗi Database", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                string errorMsg = $"Lỗi hệ thống khi xóa:\n{ex.Message}";
+                string errorMsg = $"❌ Lỗi khi xóa:\n{ex.Message}";
                 if (ex.InnerException != null)
                 {
-                    errorMsg += $"\n\nChi tiết lỗi:\n{ex.InnerException.Message}";
+                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{ex.InnerException.Message}";
                 }
                 MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            LoadMemberships();
+            ClearForm();
+        }
+
+        #endregion
+
+        #region Database Operations
+
         private async Task SaveMembership()
         {
-            var phoneInput = txtPhone.Text.Trim(); // Lấy từ ô SĐT
-            var customerName = cbCustomer.Text.Trim(); // Tên đã được tự điền
-            var tier = cbTier.Text.Trim();
+            var phone = txtPhone.Text.Trim();
+            var tier = cbTier.Text.Trim().ToLower();
 
-            // Kiểm tra xem đã có tên khách hàng (đã tìm thấy) chưa
-            if (string.IsNullOrEmpty(customerName))
+            // Validate phone
+            if (string.IsNullOrEmpty(phone))
             {
-                MessageBox.Show("Vui lòng nhập SĐT hợp lệ để xác định khách hàng!", "Thông báo");
+                MessageBox.Show("⚠️ Vui lòng nhập số điện thoại khách hàng!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPhone.Focus();
                 return;
             }
 
-            // Các phần parse số và ngày giữ nguyên như cũ...
-            int.TryParse(txtPoints.Text.Trim(), out int points);
-            decimal.TryParse(txtTotalSpent.Text.Trim(), out decimal totalSpent);
-            int.TryParse(txtTotalOrders.Text.Trim(), out int totalOrders);
-            DateTime joinedAt = dtpJoinedAt.Value.ToUniversalTime();
-            DateTime expiresAt = dtpExpiresAt.Value.ToUniversalTime();
-            DateTime? lastOrder = dtpLastOrder.Checked ? dtpLastOrder.Value.ToUniversalTime() : (DateTime?)null;
+            // Validate phone format
+            if (!Regex.IsMatch(phone, @"^[0-9]{9,11}$"))
+            {
+                MessageBox.Show("⚠️ Số điện thoại không hợp lệ!\n\nChỉ chấp nhận 9-11 chữ số.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPhone.Focus();
+                txtPhone.SelectAll();
+                return;
+            }
+
+            // Check if customer exists
+            var customerId = GetCustomerIdFromPhone(phone);
+            if (!customerId.HasValue)
+            {
+                MessageBox.Show($"⚠️ Không tìm thấy khách hàng với SĐT '{phone}'!\n\nVui lòng tạo khách hàng trước.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPhone.Focus();
+                txtPhone.SelectAll();
+                return;
+            }
+
+            // Check if membership already exists
+            using (var context = new PostgresContext())
+            {
+                bool exists = await context.Memberships
+                    .AsNoTracking()
+                    .AnyAsync(m => m.CustomerId == customerId.Value);
+
+                if (exists)
+                {
+                    MessageBox.Show($"⚠️ Khách hàng này đã có thẻ hội viên!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
+            // Validate numeric fields
+            if (!int.TryParse(txtPoints.Text.Trim(), out int points) || points < 0)
+            {
+                MessageBox.Show("⚠️ Điểm phải là số dương!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPoints.Focus();
+                txtPoints.SelectAll();
+                return;
+            }
+
+            if (!decimal.TryParse(txtTotalSpent.Text.Trim(), out decimal totalSpent) || totalSpent < 0)
+            {
+                MessageBox.Show("⚠️ Tổng chi tiêu phải là số dương!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTotalSpent.Focus();
+                txtTotalSpent.SelectAll();
+                return;
+            }
+
+            if (!int.TryParse(txtTotalOrders.Text.Trim(), out int totalOrders) || totalOrders < 0)
+            {
+                MessageBox.Show("⚠️ Số đơn phải là số dương!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTotalOrders.Focus();
+                txtTotalOrders.SelectAll();
+                return;
+            }
+
+            // Validate dates
+            var joinedAt = dtpJoinedAt.Value.ToUniversalTime();
+            var expiresAt = dtpExpiresAt.Checked ? dtpExpiresAt.Value.ToUniversalTime() : (DateTime?)null;
+
+            if (expiresAt.HasValue && expiresAt.Value <= joinedAt)
+            {
+                MessageBox.Show("⚠️ Ngày hết hạn phải sau ngày tham gia!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dtpExpiresAt.Focus();
+                return;
+            }
 
             try
             {
                 using var context = new PostgresContext();
 
-                var parameters = new[]
-                {
-            new NpgsqlParameter("phone",        phoneInput),
-            new NpgsqlParameter("tier",         tier),
-            new NpgsqlParameter("points",       points),
-            new NpgsqlParameter("total_spent",  totalSpent),
-            new NpgsqlParameter("total_orders", totalOrders),
-            new NpgsqlParameter("joined_at",    joinedAt),
-            new NpgsqlParameter("expires_at",   expiresAt),
-            new NpgsqlParameter("last_order_at",   (object)lastOrder ?? DBNull.Value),
-            new NpgsqlParameter("updated_at",   DateTime.UtcNow)
-        };
+                var id = Guid.NewGuid();
+                var currentUserId = PostgresContext.CurrentUserId;
 
-                // Sử dụng INSERT với Subquery dựa trên SĐT để lấy ID
-                await context.Database.ExecuteSqlRawAsync(@"
-                    INSERT INTO memberships 
-                        (id, customer_id, tier, points, total_spent, total_orders, 
+                await context.Database.ExecuteSqlInterpolatedAsync($@"
+                    INSERT INTO memberships (id, customer_id, tier, points, total_spent, total_orders,
                          joined_at, expires_at, last_order_at, updated_at)
-                    VALUES
-                        (gen_random_uuid(), 
-                         (SELECT id FROM customers WHERE phone = @phone LIMIT 1), 
-                         @tier::membership_tier, -- THÊM ÉP KIỂU Ở ĐÂY
-                         @points, @total_spent, @total_orders, 
-                         @joined_at, @expires_at, @last_order_at, @updated_at)
-                ", parameters);
+                    VALUES ({id}, {customerId.Value}, {tier}::membership_tier, {points}, {totalSpent}, {totalOrders},
+                         {joinedAt}, {expiresAt}, {(dtpLastOrder.Checked ? dtpLastOrder.Value.ToUniversalTime() : (DateTime?)null)}, {DateTime.UtcNow})");
 
-                MessageBox.Show($"Thêm Hội viên cho khách hàng '{customerName}' thành công!", "Thành công");
+                MessageBox.Show("✅ Thêm thẻ hội viên thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                LoadMembershipsAsync();
-                ResetMembershipForm();
+                LoadMemberships();
+                ClearForm();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                string errorMsg = $"❌ Lỗi khi lưu vào database:\n\n{dbEx.Message}";
+                if (dbEx.InnerException != null)
+                {
+                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{dbEx.InnerException.Message}";
+                }
+                MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi: {ex.Message}");
+                string errorMsg = $"❌ Lỗi khi lưu:\n{ex.Message}";
+                if (ex.InnerException != null)
+                {
+                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{ex.InnerException.Message}";
+                }
+                MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        //        private async Task SaveMembership()
-        //        {      
-        //            var customerName = cbCustomer.Text.Trim(); 
-        //            var tier = cbTier.Text.Trim();             
-        //            if (string.IsNullOrEmpty(customerName))
-        //            {
-        //                MessageBox.Show("Vui lòng chọn hoặc nhập tên khách hàng!", "Thông báo",
-        //                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //                return;
-        //            }
-        //            int.TryParse(txtPoints.Text.Trim(), out int points);
-        //            decimal.TryParse(txtTotalSpent.Text.Trim(), out decimal totalSpent);
-        //            int.TryParse(txtTotalOrders.Text.Trim(), out int totalOrders);
-        //            DateTime joinedAt = dtpJoinedAt.Value.ToUniversalTime();
-        //            DateTime expiresAt = dtpExpiresAt.Value.ToUniversalTime();
-        ////cái này lỗi cẩn thận
-        //            // Xử lý LastOrder (Order gần nhất) - Có thể nhập hoặc không
-        //            // Nếu checkbox bên cạnh dtpLastOrder được tích thì lấy giá trị, ngược lại để null
-        //            DateTime? lastOrder = dtpLastOrder.Checked ? dtpLastOrder.Value.ToUniversalTime() : (DateTime?)null;
-        //            if (expiresAt <= joinedAt)
-        //            {
-        //                MessageBox.Show("Ngày hết hạn phải sau ngày tham gia!", "Thông báo",
-        //                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //                return;
-        //            }
-        //            try
-        //            {
-        //                using var context = new PostgresContext();
-        //                var parameters = new[]
-        //                {
-        //            new NpgsqlParameter("id",           Guid.NewGuid()),
-        //            new NpgsqlParameter("customer_name", customerName),
-        //            new NpgsqlParameter("tier",          tier),
-        //            new NpgsqlParameter("points",        points),
-        //            new NpgsqlParameter("total_spent",   totalSpent),
-        //            new NpgsqlParameter("total_orders",  totalOrders),
-        //            new NpgsqlParameter("joined_at",     joinedAt),
-        //            new NpgsqlParameter("expires_at",    expiresAt),
-        //            new NpgsqlParameter("last_order",    (object)lastOrder ?? DBNull.Value), // CÓ THỂ NULL
-        //            new NpgsqlParameter("updated_at",    DateTime.UtcNow)
-        //        };
-        //                await context.Database.ExecuteSqlRawAsync(@"
-        //            INSERT INTO memberships 
-        //                (id, customer_name, tier, points, total_spent, total_orders, 
-        //                 joined_at, expires_at, last_order, updated_at)
-        //            VALUES
-        //                (@id, @customer_name, @tier, @points, @total_spent, @total_orders, 
-        //                 @joined_at, @expires_at, @last_order, @updated_at)
-        //        ", parameters);
 
-        //                MessageBox.Show("Thêm Hội viên thành công!", "Thành công",
-        //                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //                LoadMembershipsAsync();
-        //                ResetMembershipForm();
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                var inner = ex.InnerException?.Message ?? ex.Message;
-        //                MessageBox.Show($"Lỗi khi thêm hội viên:\n{inner}", "Lỗi",
-        //                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //            }
-        //        }
-        private void btnAdd_Click_1(object sender, EventArgs e)
+        private async Task UpdateMembership()
         {
-            SaveMembership();
+            if (_selectedMembership == null) return;
+
+            var tier = cbTier.Text.Trim().ToLower();
+
+            // Validate numeric fields
+            if (!int.TryParse(txtPoints.Text.Trim(), out int points) || points < 0)
+            {
+                MessageBox.Show("⚠️ Điểm phải là số dương!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPoints.Focus();
+                txtPoints.SelectAll();
+                return;
+            }
+
+            if (!decimal.TryParse(txtTotalSpent.Text.Trim(), out decimal totalSpent) || totalSpent < 0)
+            {
+                MessageBox.Show("⚠️ Tổng chi tiêu phải là số dương!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTotalSpent.Focus();
+                txtTotalSpent.SelectAll();
+                return;
+            }
+
+            if (!int.TryParse(txtTotalOrders.Text.Trim(), out int totalOrders) || totalOrders < 0)
+            {
+                MessageBox.Show("⚠️ Số đơn phải là số dương!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTotalOrders.Focus();
+                txtTotalOrders.SelectAll();
+                return;
+            }
+
+            // Validate dates
+            var joinedAt = dtpJoinedAt.Value.ToUniversalTime();
+            var expiresAt = dtpExpiresAt.Checked ? dtpExpiresAt.Value.ToUniversalTime() : (DateTime?)null;
+
+            if (expiresAt.HasValue && expiresAt.Value <= joinedAt)
+            {
+                MessageBox.Show("⚠️ Ngày hết hạn phải sau ngày tham gia!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dtpExpiresAt.Focus();
+                return;
+            }
+
+            try
+            {
+                using var context = new PostgresContext();
+
+                await context.Database.ExecuteSqlInterpolatedAsync($@"
+                    UPDATE memberships SET
+                         tier = {tier}::membership_tier,
+                         points = {points},
+                         total_spent = {totalSpent},
+                         total_orders = {totalOrders},
+                         joined_at = {joinedAt},
+                         expires_at = {expiresAt},
+                         last_order_at = {(dtpLastOrder.Checked ? dtpLastOrder.Value.ToUniversalTime() : (DateTime?)null)},
+                         updated_at = {DateTime.UtcNow}
+                    WHERE id = {_selectedMembership.Id}");
+
+                MessageBox.Show("✅ Cập nhật thẻ hội viên thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                LoadMemberships();
+                ClearForm();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                string errorMsg = $"❌ Lỗi khi cập nhật database:\n\n{dbEx.Message}";
+                if (dbEx.InnerException != null)
+                {
+                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{dbEx.InnerException.Message}";
+                }
+                MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = $"❌ Lỗi khi cập nhật:\n{ex.Message}";
+                if (ex.InnerException != null)
+                {
+                    errorMsg += $"\n\n📋 Chi tiết lỗi:\n{ex.InnerException.Message}";
+                }
+                MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+        #endregion
+
+        #region Phone Search Helper
 
         private async void txtPhone_TextChanged(object sender, EventArgs e)
         {
+            var phone = txtPhone.Text.Trim();
 
-        }
-
-        private async void txtPhone_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
+            if (string.IsNullOrEmpty(phone) || phone.Length < 9)
             {
-                e.SuppressKeyPress = true;
+                cbCustomer.SelectedIndex = -1;
+                return;
+            }
 
-                string phone = txtPhone.Text.Trim();
-                if (string.IsNullOrEmpty(phone)) return;
+            // Auto-find customer by phone
+            try
+            {
+                using var context = new PostgresContext();
+                var customer = await context.Customers
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Phone == phone);
 
-                try
+                if (customer != null)
                 {
-                    using var context = new PostgresContext();
-                    var customer = await context.Customers
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.Phone == phone);
-
-                    if (customer != null)
-                    {
-                        cbCustomer.Text = customer.Name;
-                        cbCustomer.ForeColor = Color.Blue;
-                        txtPoints.Focus();
-                    }
-                    else
-                    {
-                        cbCustomer.Text = "";
-                        MessageBox.Show($"Không tìm thấy khách hàng với SĐT: {phone}\nVui lòng kiểm tra lại hoặc thêm mới khách hàng!",
-                            "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    cbCustomer.SelectedValue = customer.Id;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi truy vấn dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch
+            {
+                // Silently fail
             }
         }
 
-        private void txtSearch_TextChanged(object sender, EventArgs e)
+        #endregion
+
+        #region Helper Methods
+
+        private void ShowLoading(bool isLoading)
         {
-            PerformMembershipSearch();
+            this.Cursor = isLoading ? Cursors.WaitCursor : Cursors.Default;
         }
 
-        private void txtTotalOrders_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
     }
 }

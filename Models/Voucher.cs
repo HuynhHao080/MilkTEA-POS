@@ -27,10 +27,6 @@ public partial class Voucher
 
     public DateTime? ValidUntil { get; set; }
 
-    public List<Guid>? ApplicableProducts { get; set; }
-
-    public List<Guid>? ApplicableCategories { get; set; }
-
     public Guid? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }

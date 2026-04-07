@@ -417,9 +417,9 @@ namespace MilkTeaPOS
 
             int score = 0;
 
-            // Length check
-            if (password.Length >= 6) score++;
+            // Length check (aligned with 8 char minimum)
             if (password.Length >= 8) score++;
+            if (password.Length >= 10) score++;
             if (password.Length >= 12) score++;
 
             // Character variety checks
@@ -429,7 +429,7 @@ namespace MilkTeaPOS
             if (password.Any(c => !char.IsLetterOrDigit(c))) score++;
 
             // Update UI based on score (0-7)
-            if (score <= 2)
+            if (score <= 3)
             {
                 lblPasswordStrength.Text = "Độ mạnh mật khẩu: 🔴 Yếu";
                 lblPasswordStrength.ForeColor = Color.FromArgb(220, 53, 69);
@@ -735,12 +735,45 @@ namespace MilkTeaPOS
                 return;
             }
 
-            if (password.Length < 6)
+            if (password.Length < 8)
             {
-                MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi",
+                MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 8 ký tự!", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPassword.Focus();
                 txtPassword.SelectAll();
+                return;
+            }
+
+            // Password complexity validation
+            if (!password.Any(char.IsUpper))
+            {
+                MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 chữ HOA (A-Z)!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPassword.Focus();
+                return;
+            }
+
+            if (!password.Any(char.IsLower))
+            {
+                MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 chữ THƯỜNG (a-z)!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPassword.Focus();
+                return;
+            }
+
+            if (!password.Any(char.IsDigit))
+            {
+                MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 số (0-9)!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPassword.Focus();
+                return;
+            }
+
+            if (!password.Any(c => !char.IsLetterOrDigit(c)))
+            {
+                MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&*)!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPassword.Focus();
                 return;
             }
 
@@ -782,7 +815,7 @@ namespace MilkTeaPOS
                         Id = Guid.NewGuid(),
                         Username = username,
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12),
-                        Password = password, // Temporary: satisfy NOT NULL constraint
+                        Password = Guid.NewGuid().ToString(), // Placeholder to satisfy NOT NULL constraint (never store plain text!)
                         RoleId = selectedRole?.Id,
                         AvatarUrl = txtAvatarUrl.Text,
                         IsActive = chkIsActive.Checked,
@@ -845,12 +878,45 @@ namespace MilkTeaPOS
             // Validate password if changing
             if (!string.IsNullOrEmpty(password))
             {
-                if (password.Length < 6)
+                if (password.Length < 8)
                 {
-                    MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi",
+                    MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 8 ký tự!", "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtPassword.Focus();
                     txtPassword.SelectAll();
+                    return;
+                }
+
+                // Password complexity validation
+                if (!password.Any(char.IsUpper))
+                {
+                    MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 chữ HOA (A-Z)!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtPassword.Focus();
+                    return;
+                }
+
+                if (!password.Any(char.IsLower))
+                {
+                    MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 chữ THƯỜNG (a-z)!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtPassword.Focus();
+                    return;
+                }
+
+                if (!password.Any(char.IsDigit))
+                {
+                    MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 số (0-9)!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtPassword.Focus();
+                    return;
+                }
+
+                if (!password.Any(c => !char.IsLetterOrDigit(c)))
+                {
+                    MessageBox.Show("⚠️ Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&*)!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtPassword.Focus();
                     return;
                 }
 
@@ -889,7 +955,7 @@ namespace MilkTeaPOS
                         if (!string.IsNullOrEmpty(password))
                         {
                             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
-                            user.Password = password; // Temporary: satisfy NOT NULL constraint
+                            user.Password = Guid.NewGuid().ToString(); // Placeholder (never store plain text!)
                         }
 
                         await context.SaveChangesAsync();

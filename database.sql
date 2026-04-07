@@ -210,8 +210,6 @@ CREATE TABLE vouchers (
     status voucher_status DEFAULT 'active',
     valid_from TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     valid_until TIMESTAMP WITH TIME ZONE,
-    applicable_products UUID[],
-    applicable_categories UUID[],
     applicable_tiers membership_tier[] DEFAULT ARRAY['none', 'silver', 'gold', 'platinum', 'diamond']::membership_tier[],
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

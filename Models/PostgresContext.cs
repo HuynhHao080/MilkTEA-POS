@@ -349,6 +349,10 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.Points)
                 .HasDefaultValue(0)
                 .HasColumnName("points");
+            entity.Property(e => e.Tier)
+                .HasColumnType("membership_tier")
+                .HasColumnName("tier")
+                .HasConversion<string>();
             entity.Property(e => e.TotalOrders)
                 .HasDefaultValue(0)
                 .HasColumnName("total_orders");
@@ -848,12 +852,6 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
-            entity.Property(e => e.ApplicableCategories)
-                .HasColumnName("applicable_categories")
-                .HasColumnType("uuid[]");
-            entity.Property(e => e.ApplicableProducts)
-                .HasColumnName("applicable_products")
-                .HasColumnType("uuid[]");
             entity.Property(e => e.Code)
                 .HasMaxLength(50)
                 .HasColumnName("code");

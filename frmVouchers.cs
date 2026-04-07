@@ -427,12 +427,11 @@ namespace MilkTeaPOS
                     await context.Database.ExecuteSqlInterpolatedAsync($@"
                         INSERT INTO vouchers (id, code, name, description, voucher_type, discount_value,
                             min_order_amount, max_discount_amount, usage_limit, usage_count,
-                            status, valid_from, valid_until, created_at, updated_at, created_by,
-                            applicable_products, applicable_categories)
+                            status, valid_from, valid_until, created_at, updated_at, created_by)
                         VALUES ({id}, {code}, {name}, {description}, {voucherType}::voucher_type, {discountVal},
                             {minOrderAmount}, {maxDiscount}, {usageLimit}, 0,
                             {status}::voucher_status, {validFrom}, {validUntil}, {DateTime.UtcNow}, {DateTime.UtcNow},
-                            {currentUserId}, NULL, NULL)");
+                            {currentUserId})");
 
                     // Log Audit
                     LogAudit("INSERT", id, $"Code: {code}, Name: {name}, Value: {discountVal}");
