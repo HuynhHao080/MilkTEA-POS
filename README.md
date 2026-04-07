@@ -203,7 +203,7 @@ Dự án nội bộ - Không public.
 
 ## 📞 Liên hệ
 
-- **Developer**: Huỳnh Văn Hạo
+- **Developer**: Huỳnh Nhựt Hào
 - **GitHub**: https://github.com/HuynhHao080/MilkTEA-POS
 
 ---
