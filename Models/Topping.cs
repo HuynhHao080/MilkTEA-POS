@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MilkTeaPOS.Models;
+﻿namespace MilkTeaPOS.Models;
 
 /// <summary>
 /// Add-on toppings with individual pricing
@@ -15,6 +12,8 @@ public partial class Topping
     public string? Description { get; set; }
 
     public decimal Price { get; set; }
+
+    public string? ImageUrl { get; set; }
 
     public bool? IsAvailable { get; set; }
 

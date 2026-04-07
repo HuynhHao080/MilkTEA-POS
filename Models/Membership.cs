@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MilkTeaPOS.Models;
+﻿namespace MilkTeaPOS.Models;
 
 public partial class Membership
 {

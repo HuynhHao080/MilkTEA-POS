@@ -224,6 +224,9 @@ namespace MilkTeaPOS
                     "frmVouchers" => new frmVouchers(),
                     "frmSalesReport" => new frmSalesReport(),
                     "frmAuditLog" => new frmAuditLog(),
+                    "frmProducts" => new frmProducts(),
+                    "frmToppings" => new frmToppings(),
+                    "frmTables" => new frmTables(),
                     _ => createPlaceholderForm(formName)
                 };
 

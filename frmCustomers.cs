@@ -703,6 +703,8 @@ namespace MilkTeaPOS
                     }
                 }
 
+                LogAudit("DELETE", _selectedCustomer.Id, $"Name: {_selectedCustomer.Name}");
+
                 MessageBox.Show("✅ Xóa khách hàng thành công!", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -904,6 +906,8 @@ namespace MilkTeaPOS
 
                     context.Customers.Add(customer);
                     await context.SaveChangesAsync();
+
+                    LogAudit("INSERT", customer.Id, $"Name: {customer.Name}, Phone: {customer.Phone ?? "N/A"}");
                 }
 
                 MessageBox.Show("✅ Thêm khách hàng thành công!", "Thành công",
@@ -1093,6 +1097,8 @@ namespace MilkTeaPOS
                     }
                 }
 
+                LogAudit("UPDATE", _selectedCustomer.Id, $"Name: {_selectedCustomer.Name}, Phone: {_selectedCustomer.Phone ?? "N/A"}");
+
                 MessageBox.Show("✅ Cập nhật khách hàng thành công!", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -1196,6 +1202,42 @@ namespace MilkTeaPOS
                 errorMsg += $"\n\n📋 Chi tiết lỗi:\n{ex.InnerException.Message}";
             }
             MessageBox.Show(errorMsg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private DateTime _lastAuditTime = DateTime.MinValue;
+        private readonly object _auditLock = new object();
+
+        private void LogAudit(string action, Guid recordId, string details)
+        {
+            lock (_auditLock)
+            {
+                if ((DateTime.UtcNow - _lastAuditTime).TotalMilliseconds < 500) return;
+                _lastAuditTime = DateTime.UtcNow;
+            }
+
+            try
+            {
+                var userId = PostgresContext.CurrentUserId;
+                if (!userId.HasValue) return;
+
+                var escapedDetails = details.Replace("\"", "\\\"");
+                var jsonContent = $"{{\"details\": \"{escapedDetails}\"}}";
+
+                using var context = new PostgresContext();
+                context.AuditLogs.Add(new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId.Value,
+                    Action = action,
+                    TableName = "customers",
+                    RecordId = recordId,
+                    NewValues = jsonContent,
+                    IpAddress = PostgresContext.CurrentUserIP,
+                    CreatedAt = DateTime.UtcNow
+                });
+                context.SaveChanges();
+            }
+            catch { }
         }
 
         #endregion

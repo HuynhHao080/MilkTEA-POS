@@ -425,6 +425,8 @@ namespace MilkTeaPOS
                 {
                     context.Memberships.Remove(membership);
                     await context.SaveChangesAsync();
+
+                    LogAudit("DELETE", _selectedMembership.Id, $"CustomerId: {_selectedMembership.CustomerId}");
                 }
 
                 MessageBox.Show("✅ Xóa thẻ hội viên thành công!", "Thành công",
@@ -566,6 +568,8 @@ namespace MilkTeaPOS
                     VALUES ({id}, {customerId.Value}, {tier}::membership_tier, {points}, {totalSpent}, {totalOrders},
                          {joinedAt}, {expiresAt}, {(dtpLastOrder.Checked ? dtpLastOrder.Value.ToUniversalTime() : (DateTime?)null)}, {DateTime.UtcNow})");
 
+                LogAudit("INSERT", id, $"CustomerId: {customerId.Value}, Tier: {tier}, Points: {points}");
+
                 MessageBox.Show("✅ Thêm thẻ hội viên thành công!", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -654,6 +658,8 @@ namespace MilkTeaPOS
                          updated_at = {DateTime.UtcNow}
                     WHERE id = {_selectedMembership.Id}");
 
+                LogAudit("UPDATE", _selectedMembership.Id, $"CustomerId: {_selectedMembership.CustomerId}, Tier: {tier}, Points: {points}");
+
                 MessageBox.Show("✅ Cập nhật thẻ hội viên thành công!", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -720,6 +726,42 @@ namespace MilkTeaPOS
         private void ShowLoading(bool isLoading)
         {
             this.Cursor = isLoading ? Cursors.WaitCursor : Cursors.Default;
+        }
+
+        private DateTime _lastAuditTime = DateTime.MinValue;
+        private readonly object _auditLock = new object();
+
+        private void LogAudit(string action, Guid recordId, string details)
+        {
+            lock (_auditLock)
+            {
+                if ((DateTime.UtcNow - _lastAuditTime).TotalMilliseconds < 500) return;
+                _lastAuditTime = DateTime.UtcNow;
+            }
+
+            try
+            {
+                var userId = PostgresContext.CurrentUserId;
+                if (!userId.HasValue) return;
+
+                var escapedDetails = details.Replace("\"", "\\\"");
+                var jsonContent = $"{{\"details\": \"{escapedDetails}\"}}";
+
+                using var context = new PostgresContext();
+                context.AuditLogs.Add(new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId.Value,
+                    Action = action,
+                    TableName = "memberships",
+                    RecordId = recordId,
+                    NewValues = jsonContent,
+                    IpAddress = PostgresContext.CurrentUserIP,
+                    CreatedAt = DateTime.UtcNow
+                });
+                context.SaveChanges();
+            }
+            catch { }
         }
 
         #endregion

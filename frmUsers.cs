@@ -673,6 +673,8 @@ namespace MilkTeaPOS
                     {
                         context.Users.Remove(user);
                         await context.SaveChangesAsync();
+
+                        LogAudit("DELETE", _selectedUser.Id, $"Username: {_selectedUser.Username}");
                     }
                 }
 
@@ -825,6 +827,8 @@ namespace MilkTeaPOS
 
                     context.Users.Add(user);
                     await context.SaveChangesAsync();
+
+                    LogAudit("INSERT", user.Id, $"Username: {user.Username}, RoleId: {user.RoleId}");
                 }
 
                 MessageBox.Show("✅ Thêm người dùng thành công!", "Thành công",
@@ -962,6 +966,8 @@ namespace MilkTeaPOS
                     }
                 }
 
+                LogAudit("UPDATE", _selectedUser.Id, $"Username: {_selectedUser.Username}, RoleId: {_selectedUser.RoleId}");
+
                 MessageBox.Show("✅ Cập nhật người dùng thành công!", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -976,6 +982,46 @@ namespace MilkTeaPOS
             {
                 ShowError("cập nhật", ex);
             }
+        }
+
+        #endregion
+
+        #region Audit Logging
+
+        private DateTime _lastAuditTime = DateTime.MinValue;
+        private readonly object _auditLock = new object();
+
+        private void LogAudit(string action, Guid recordId, string details)
+        {
+            lock (_auditLock)
+            {
+                if ((DateTime.UtcNow - _lastAuditTime).TotalMilliseconds < 500) return;
+                _lastAuditTime = DateTime.UtcNow;
+            }
+
+            try
+            {
+                var userId = PostgresContext.CurrentUserId;
+                if (!userId.HasValue) return;
+
+                var escapedDetails = details.Replace("\"", "\\\"");
+                var jsonContent = $"{{\"details\": \"{escapedDetails}\"}}";
+
+                using var context = new PostgresContext();
+                context.AuditLogs.Add(new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId.Value,
+                    Action = action,
+                    TableName = "users",
+                    RecordId = recordId,
+                    NewValues = jsonContent,
+                    IpAddress = PostgresContext.CurrentUserIP,
+                    CreatedAt = DateTime.UtcNow
+                });
+                context.SaveChanges();
+            }
+            catch { }
         }
 
         #endregion

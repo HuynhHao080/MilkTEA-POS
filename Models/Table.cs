@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MilkTeaPOS.Models;
+﻿namespace MilkTeaPOS.Models;
 
 /// <summary>
 /// Physical tables in the shop with location and capacity
@@ -15,6 +12,8 @@ public partial class Table
     public int? Capacity { get; set; }
 
     public string? Location { get; set; }
+
+    public string? ImageUrl { get; set; }
 
     public string? Status { get; set; }
 

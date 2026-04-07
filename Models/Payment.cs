@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MilkTeaPOS.Models;
+﻿namespace MilkTeaPOS.Models;
 
 /// <summary>
 /// Payment records with split amount tracking (received/paid/change) and status enforcement

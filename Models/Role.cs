@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MilkTeaPOS.Models;
+﻿namespace MilkTeaPOS.Models;
 
 /// <summary>
 /// User roles: Admin, Staff, Cashier
