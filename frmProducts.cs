@@ -2,6 +2,11 @@ using MilkTeaPOS.Models;
 using MilkTeaPOS.Services;
 using MilkTeaPOS.ViewModels;
 using MilkTeaPOS.Helpers;
+using ZXing;
+using ZXing.Common;
+using System.Drawing.Printing;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace MilkTeaPOS
 {
@@ -243,6 +248,10 @@ namespace MilkTeaPOS
             // Reset guard nếu vẫn là product này
             if (_loadingProductId == _selectedProduct.Id)
                 _loadingProductId = null;
+
+            // Generate barcode preview
+            string barcodeToUse = $"PRD{_selectedProduct.Id.ToString("N").Substring(0, 8).ToUpper()}";
+            GenerateBarcodePreview(barcodeToUse);
 
             if (!string.IsNullOrEmpty(_selectedProduct.ImageUrl))
             {
@@ -737,6 +746,139 @@ namespace MilkTeaPOS
 
         #endregion
 
+        #region Barcode
+
+        private void GenerateBarcodePreview(string barcodeText)
+        {
+            if (string.IsNullOrWhiteSpace(barcodeText))
+            {
+                picBarcode.Image = null;
+                return;
+            }
+
+            try
+            {
+                var writer = new BarcodeWriterPixelData
+                {
+                    Format = BarcodeFormat.CODE_128,
+                    Options = new EncodingOptions
+                    {
+                        Width = 250,
+                        Height = 80,
+                        Margin = 10
+                    }
+                };
+
+                var pixelData = writer.Write(barcodeText);
+                
+                // Convert pixel data to bitmap
+                var bitmap = new Bitmap(pixelData.Width, pixelData.Height);
+                for (int y = 0; y < pixelData.Height; y++)
+                {
+                    for (int x = 0; x < pixelData.Width; x++)
+                    {
+                        var index = (y * pixelData.Width + x) * 4;
+                        var r = pixelData.Pixels[index];
+                        var g = pixelData.Pixels[index + 1];
+                        var b = pixelData.Pixels[index + 2];
+                        bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
+                    }
+                }
+                
+                picBarcode.Image = bitmap;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Lỗi tạo barcode:\n{ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                picBarcode.Image = null;
+            }
+        }
+
+        private void btnPrintBarcode_Click(object? sender, EventArgs e)
+        {
+            if (_selectedProduct == null)
+            {
+                MessageBox.Show("⚠️ Vui lòng chọn sản phẩm trước khi in barcode!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string barcodeToPrint = $"PRD{_selectedProduct.Id.ToString("N").Substring(0, 8).ToUpper()}";
+
+            if (picBarcode.Image == null)
+            {
+                GenerateBarcodePreview(barcodeToPrint);
+            }
+
+            ShowPrintDialog(barcodeToPrint);
+        }
+
+        private void ShowPrintDialog(string barcodeText)
+        {
+            using var printDialog = new PrintDialog();
+            printDialog.Document = CreatePrintDocument(barcodeText);
+            printDialog.AllowSomePages = false;
+            printDialog.UseEXDialog = true;
+
+            if (printDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    printDialog.Document.Print();
+                    MessageBox.Show("✅ In barcode thành công!", "Thành công",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"❌ Lỗi in barcode:\n{ex.Message}", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private PrintDocument CreatePrintDocument(string barcodeText)
+        {
+            var printDoc = new PrintDocument();
+            printDoc.PrintPage += (sender, e) =>
+            {
+                if (picBarcode.Image == null) return;
+
+                // Label size: 50mm x 30mm (common barcode label)
+                int labelWidth = 500; // in hundredths of inch
+                int labelHeight = 300;
+
+                // Calculate position to center barcode
+                int x = (e.PageBounds.Width - labelWidth) / 2;
+                int y = (e.PageBounds.Height - labelHeight) / 2;
+
+                // Draw barcode
+                e.Graphics.DrawImage(picBarcode.Image, x, y, labelWidth, labelHeight - 40);
+
+                // Draw product name below barcode
+                var font = new Font("Arial", 10, FontStyle.Bold);
+                var brush = new SolidBrush(Color.Black);
+                var productName = _selectedProduct?.Name ?? string.Empty;
+                var textSize = e.Graphics.MeasureString(productName, font);
+                var textX = x + (labelWidth - textSize.Width) / 2;
+                var textY = y + labelHeight - 40;
+
+                e.Graphics.DrawString(productName, font, brush, textX, textY);
+
+                // Draw barcode number
+                var smallFont = new Font("Arial", 8, FontStyle.Regular);
+                var barcodeTextSize = e.Graphics.MeasureString(barcodeText, smallFont);
+                var barcodeTextX = x + (labelWidth - barcodeTextSize.Width) / 2;
+                var barcodeTextY = textY + 20;
+
+                e.Graphics.DrawString(barcodeText, smallFont, brush, barcodeTextX, barcodeTextY);
+            };
+
+            return printDoc;
+        }
+
+        #endregion
+
         #region Helpers
 
         private async Task LoadProductSizesAsync()
@@ -792,6 +934,7 @@ namespace MilkTeaPOS
             chkIsFeatured.Checked = false;
             numPreparationTime.Value = 5;
             picPreview.Image = null;
+            picBarcode.Image = null;
             _selectedProduct = null;
         }
 

@@ -57,6 +57,10 @@ namespace MilkTeaPOS
         private System.Windows.Forms.Label lblPreparationTime;
         private System.Windows.Forms.NumericUpDown numPreparationTime;
         private System.Windows.Forms.PictureBox picPreview;
+        
+        // Barcode controls
+        private System.Windows.Forms.Button btnPrintBarcode;
+        private System.Windows.Forms.PictureBox picBarcode;
 
         protected override void Dispose(bool disposing)
         {
@@ -69,6 +73,7 @@ namespace MilkTeaPOS
 
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             pnlHeader = new Panel();
             lblTitle = new Label();
             pnlToolbar = new Panel();
@@ -110,6 +115,19 @@ namespace MilkTeaPOS
             lblPreparationTime = new Label();
             numPreparationTime = new NumericUpDown();
             picPreview = new PictureBox();
+            btnPrintBarcode = new Button();
+            picBarcode = new PictureBox();
+            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn4 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn7 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn8 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn9 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn10 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn11 = new DataGridViewTextBoxColumn();
             pnlHeader.SuspendLayout();
             pnlToolbar.SuspendLayout();
             pnlSearch.SuspendLayout();
@@ -122,6 +140,7 @@ namespace MilkTeaPOS
             ((System.ComponentModel.ISupportInitialize)numSizeL).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numPreparationTime).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picPreview).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picBarcode).BeginInit();
             SuspendLayout();
             // 
             // pnlHeader
@@ -248,7 +267,7 @@ namespace MilkTeaPOS
             lblSearchLabel.TabIndex = 0;
             lblSearchLabel.Text = "🔍 Tìm kiếm:";
             lblSearchLabel.Click += lblSearchLabel_Click;
-            //
+            // 
             // txtSearch
             // 
             txtSearch.BackColor = Color.FromArgb(247, 249, 252);
@@ -288,7 +307,7 @@ namespace MilkTeaPOS
             lblFilterStatus.ForeColor = Color.FromArgb(45, 55, 72);
             lblFilterStatus.Location = new Point(680, 20);
             lblFilterStatus.Name = "lblFilterStatus";
-            lblFilterStatus.Size = new Size(80, 21);
+            lblFilterStatus.Size = new Size(114, 21);
             lblFilterStatus.TabIndex = 4;
             lblFilterStatus.Text = "Trạng thái:";
             lblFilterStatus.TextAlign = ContentAlignment.MiddleRight;
@@ -299,7 +318,7 @@ namespace MilkTeaPOS
             cboFilterStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cboFilterStatus.FlatStyle = FlatStyle.Flat;
             cboFilterStatus.Font = new Font("Segoe UI", 12F);
-            cboFilterStatus.Location = new Point(765, 15);
+            cboFilterStatus.Location = new Point(800, 14);
             cboFilterStatus.Name = "cboFilterStatus";
             cboFilterStatus.Size = new Size(180, 29);
             cboFilterStatus.TabIndex = 5;
@@ -320,7 +339,6 @@ namespace MilkTeaPOS
             //
             dgvProducts.AllowUserToAddRows = false;
             dgvProducts.AllowUserToDeleteRows = false;
-            dgvProducts.AutoGenerateColumns = false;
             dgvProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvProducts.BackgroundColor = Color.White;
             dgvProducts.BorderStyle = BorderStyle.None;
@@ -345,20 +363,6 @@ namespace MilkTeaPOS
             {
                 BackColor = Color.FromArgb(247, 249, 252)
             };
-            dgvProducts.Columns.AddRange(new DataGridViewTextBoxColumn[]
-            {
-                new DataGridViewTextBoxColumn { Name = "Id", DataPropertyName = "Id", Visible = false },
-                new DataGridViewTextBoxColumn { Name = "CategoryId", DataPropertyName = "CategoryId", Visible = false },
-                new DataGridViewTextBoxColumn { Name = "ImageUrl", DataPropertyName = "ImageUrl", Visible = false },
-                new DataGridViewTextBoxColumn { Name = "Name", DataPropertyName = "Name", HeaderText = "Tên sản phẩm", FillWeight = 18 },
-                new DataGridViewTextBoxColumn { Name = "CategoryName", DataPropertyName = "CategoryName", HeaderText = "Danh mục", FillWeight = 13 },
-                new DataGridViewTextBoxColumn { Name = "BasePrice", DataPropertyName = "BasePrice", HeaderText = "Base", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Format = "#,##0", Alignment = DataGridViewContentAlignment.MiddleRight } },
-                new DataGridViewTextBoxColumn { Name = "Description", DataPropertyName = "Description", HeaderText = "Mô tả", FillWeight = 20 },
-                new DataGridViewTextBoxColumn { Name = "IsAvailable", DataPropertyName = "IsAvailable", HeaderText = "Đang bán", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter } },
-                new DataGridViewTextBoxColumn { Name = "IsFeatured", DataPropertyName = "IsFeatured", HeaderText = "Nổi bật", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter } },
-                new DataGridViewTextBoxColumn { Name = "PreparationTime", DataPropertyName = "PreparationTime", HeaderText = "TG (phút)", FillWeight = 7, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter } },
-                new DataGridViewTextBoxColumn { Name = "CreatedAt", DataPropertyName = "CreatedAt", HeaderText = "Ngày tạo", FillWeight = 10, DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy HH:mm" } }
-            });
             dgvProducts.Dock = DockStyle.Fill;
             dgvProducts.EnableHeadersVisualStyles = false;
             dgvProducts.GridColor = Color.FromArgb(226, 232, 240);
@@ -369,11 +373,25 @@ namespace MilkTeaPOS
             dgvProducts.RowHeadersVisible = false;
             dgvProducts.RowTemplate.Height = 50;
             dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvProducts.Size = new Size(1158, 358);
+            dgvProducts.Size = new Size(1158, 359);
             dgvProducts.TabIndex = 0;
             dgvProducts.CellClick += dgvProducts_CellClick;
             dgvProducts.CellFormatting += dgvProducts_CellFormatting;
             dgvProducts.DataError += dgvProducts_DataError;
+            dgvProducts.Columns.AddRange(new DataGridViewTextBoxColumn[]
+            {
+                new DataGridViewTextBoxColumn { Name = "Id", DataPropertyName = "Id", Visible = false, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "CategoryId", DataPropertyName = "CategoryId", Visible = false, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "ImageUrl", DataPropertyName = "ImageUrl", Visible = false, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "Name", DataPropertyName = "Name", HeaderText = "Tên sản phẩm", FillWeight = 18, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "CategoryName", DataPropertyName = "CategoryName", HeaderText = "Danh mục", FillWeight = 13, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "BasePrice", DataPropertyName = "BasePrice", HeaderText = "Base", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Format = "#,##0", Alignment = DataGridViewContentAlignment.MiddleRight }, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "Description", DataPropertyName = "Description", HeaderText = "Mô tả", FillWeight = 20, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "IsAvailable", DataPropertyName = "IsAvailable", HeaderText = "Đang bán", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter }, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "IsFeatured", DataPropertyName = "IsFeatured", HeaderText = "Nổi bật", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter }, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "PreparationTime", DataPropertyName = "PreparationTime", HeaderText = "TG (phút)", FillWeight = 7, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter }, ReadOnly = true },
+                new DataGridViewTextBoxColumn { Name = "CreatedAt", DataPropertyName = "CreatedAt", HeaderText = "Ngày tạo", FillWeight = 10, DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy HH:mm" }, ReadOnly = true }
+            });
             // 
             // pnlForm
             // 
@@ -385,7 +403,6 @@ namespace MilkTeaPOS
             pnlForm.Controls.Add(lblBasePrice);
             pnlForm.Controls.Add(numBasePrice);
             pnlForm.Controls.Add(lblSizes);
-            pnlForm.Controls.Add(lblSizeS);
             pnlForm.Controls.Add(numSizeS);
             pnlForm.Controls.Add(lblSizeM);
             pnlForm.Controls.Add(numSizeM);
@@ -403,11 +420,13 @@ namespace MilkTeaPOS
             pnlForm.Controls.Add(lblPreparationTime);
             pnlForm.Controls.Add(numPreparationTime);
             pnlForm.Controls.Add(picPreview);
+            pnlForm.Controls.Add(btnPrintBarcode);
+            pnlForm.Controls.Add(picBarcode);
             pnlForm.Dock = DockStyle.Bottom;
-            pnlForm.Location = new Point(20, 378);
+            pnlForm.Location = new Point(20, 379);
             pnlForm.Name = "pnlForm";
             pnlForm.Padding = new Padding(30);
-            pnlForm.Size = new Size(1158, 300);
+            pnlForm.Size = new Size(1158, 299);
             pnlForm.TabIndex = 1;
             // 
             // lblName
@@ -666,13 +685,93 @@ namespace MilkTeaPOS
             // picPreview
             // 
             picPreview.BackColor = Color.FromArgb(247, 249, 252);
-            picPreview.BorderStyle = BorderStyle.FixedSingle;
             picPreview.Location = new Point(647, 140);
             picPreview.Name = "picPreview";
             picPreview.Size = new Size(200, 140);
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 17;
             picPreview.TabStop = false;
+            // 
+            // btnPrintBarcode
+            // 
+            btnPrintBarcode.BackColor = Color.FromArgb(46, 204, 113);
+            btnPrintBarcode.Cursor = Cursors.Hand;
+            btnPrintBarcode.FlatAppearance.BorderSize = 0;
+            btnPrintBarcode.FlatStyle = FlatStyle.Flat;
+            btnPrintBarcode.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnPrintBarcode.ForeColor = Color.White;
+            btnPrintBarcode.Location = new Point(888, 24);
+            btnPrintBarcode.Name = "btnPrintBarcode";
+            btnPrintBarcode.Size = new Size(250, 35);
+            btnPrintBarcode.TabIndex = 25;
+            btnPrintBarcode.Text = "🖨️ In mã barcode";
+            btnPrintBarcode.UseVisualStyleBackColor = false;
+            btnPrintBarcode.Click += btnPrintBarcode_Click;
+            // 
+            // picBarcode
+            // 
+            picBarcode.BackColor = Color.White;
+            picBarcode.Location = new Point(888, 64);
+            picBarcode.Name = "picBarcode";
+            picBarcode.Size = new Size(250, 120);
+            picBarcode.SizeMode = PictureBoxSizeMode.Zoom;
+            picBarcode.TabIndex = 26;
+            picBarcode.TabStop = false;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            dataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            dataGridViewTextBoxColumn2.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            dataGridViewTextBoxColumn3.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            dataGridViewTextBoxColumn4.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn5
+            // 
+            dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
+            dataGridViewTextBoxColumn5.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            dataGridViewTextBoxColumn6.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn7
+            // 
+            dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
+            dataGridViewTextBoxColumn7.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn8
+            // 
+            dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
+            dataGridViewTextBoxColumn8.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn9
+            // 
+            dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
+            dataGridViewTextBoxColumn9.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn10
+            // 
+            dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
+            dataGridViewTextBoxColumn10.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn11
+            // 
+            dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
+            dataGridViewTextBoxColumn11.ReadOnly = true;
             // 
             // frmProducts
             // 
@@ -702,7 +801,20 @@ namespace MilkTeaPOS
             ((System.ComponentModel.ISupportInitialize)numSizeL).EndInit();
             ((System.ComponentModel.ISupportInitialize)numPreparationTime).EndInit();
             ((System.ComponentModel.ISupportInitialize)picPreview).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picBarcode).EndInit();
             ResumeLayout(false);
         }
+
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
     }
 }
