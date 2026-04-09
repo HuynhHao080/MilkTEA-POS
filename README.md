@@ -2,13 +2,13 @@
 
 Ứng dụng POS (Point of Sale) desktop cho quán trà sữa, xây dựng trên **.NET 10 Windows Forms** với cơ sở dữ liệu **PostgreSQL** (Supabase).
 
-## 📊 Tiến độ dự án: 18/18 forms (100%) 🎉
+## 📊 Tiến độ dự án: 17/17 forms (100%) 🎉
 
 ---
 
 ## 🚀 Tính năng chính
 
-### ✅ Đã hoàn thành (18/18 forms)
+### ✅ Đã hoàn thành (17/17 forms)
 
 | Nhóm | Forms | Trạng thái |
 |------|-------|------------|
@@ -95,9 +95,11 @@ MilkTEA-POS/
 
 ## 🔐 Thông tin đăng nhập
 
-| Username | Password | Role |
-|----------|----------|------|
-| admin | admin123 | Admin |
+| Username | Password     | Role     |
+|----------|--------------|----------|
+| admin    | admin1234@A  | Admin    |
+| tranvi   | tranvi123@A  | Cashier  |
+| cong     | cong123@A    | Staff    |
 
 ---
 
@@ -122,7 +124,6 @@ MilkTEA-POS/
 15. **frmPayment** - Thanh toán, multiple payment methods
 16. **frmSalesReport** - Revenue reports, CSV export, timezone fix
 17. **frmAuditLog** - Audit trail viewer, JSON details
-18. **frmPOS** - Point of Sale interface
 
 ---
 
@@ -207,4 +208,4 @@ Dự án nội bộ - Không public.
 
 ---
 
-*Cập nhật cuối: April 9, 2026 - HOÀN THÀNH 18/18 FORMS 🎉*
+*Cập nhật cuối: April 9, 2026 - HOÀN THÀNH 17/17 FORMS 🎉*

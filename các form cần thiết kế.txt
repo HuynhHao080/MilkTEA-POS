@@ -1,5 +1,5 @@
 =====================================================
-    DANH SÁCH 18 FORMS - MilkTeaPOS
+    DANH SÁCH 17 FORMS - MilkTeaPOS
 =====================================================
 
 ✅ = HOÀN THÀNH
@@ -7,7 +7,7 @@
 ⏳ = CHƯA LÀM
 
 =====================================================
-📊 TỔNG KẾT: 18 FORMS - HOÀN THÀNH 100% 🎉
+📊 TỔNG KẾT: 17 FORMS - HOÀN THÀNH 100% 🎉
 =====================================================
 
 ┌────────────────┬──────────┬────────────────────────────────┐
@@ -24,13 +24,13 @@
 │ Reports        │    2     │ Sales + Audit                  │
 │ Users          │    1     │ Staff management               │
 ├────────────────┼──────────┼────────────────────────────────┤
-│ TỔNG           │   18     │ HOÀN THÀNH 18/18 (100%) ✅     │
+│ TỔNG           │   17     │ HOÀN THÀNH 17/17 (100%) ✅     │
 └────────────────┴──────────┴────────────────────────────────┘
 
-Tiến độ: 18/18 forms (100%) ✅🎉
+Tiến độ: 17/17 forms (100%) ✅🎉
 
 =====================================================
-✅ FORM ĐÃ HOÀN THÀNH (18/18)
+✅ FORM ĐÃ HOÀN THÀNH (17/17)
 =====================================================
 
 ✅ 1. frmLogin ⭐
@@ -207,14 +207,6 @@ Tiến độ: 18/18 forms (100%) ✅🎉
    - Double-click xem chi tiết JSON
    - Export audit log ra CSV
 
-✅ 18. frmPOS ⭐
-   File: frmPOS.cs
-   Status: 10/10 - PRODUCTION READY
-   Features:
-   - Point of Sale interface
-   - Tạo đơn hàng nhanh
-   - Custom: size, đường, đá, toppings
-
 =====================================================
 🔐 PASSWORD SECURITY (BCrypt) - PRODUCTION READY
 =====================================================
@@ -258,6 +250,6 @@ Security checklist:
 - ✅ Transaction wrapping cho order save
 
 =====================================================
-CẬP NHẬT CUỐI: April 9, 2026 - 18/18 forms (100%) 🎉
+CẬP NHẬT CUỐI: April 9, 2026 - 17/17 forms (100%) 🎉
 HOÀN THÀNH TOÀN BỘ DỰ ÁN ✅
 =====================================================
