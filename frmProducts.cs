@@ -1,6 +1,7 @@
 using MilkTeaPOS.Models;
 using MilkTeaPOS.Services;
 using MilkTeaPOS.ViewModels;
+using MilkTeaPOS.Helpers;
 
 namespace MilkTeaPOS
 {
@@ -472,6 +473,18 @@ namespace MilkTeaPOS
 
         private async void btnAdd_Click(object? sender, EventArgs e)
         {
+            // Check permission
+            if (!PermissionChecker.CanCreate("frmProducts"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền thêm sản phẩm mới!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Vui lòng liên hệ quản trị viên.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (!ValidateForm()) return;
 
             try
@@ -529,6 +542,18 @@ namespace MilkTeaPOS
 
         private async void btnEdit_Click(object? sender, EventArgs e)
         {
+            // Check permission
+            if (!PermissionChecker.CanUpdate("frmProducts"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền sửa sản phẩm!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Vui lòng liên hệ quản trị viên.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_selectedProduct == null)
             {
                 MessageBox.Show("⚠️ Vui lòng chọn sản phẩm cần sửa!", "Thông báo",
@@ -605,6 +630,18 @@ namespace MilkTeaPOS
 
         private async void btnDelete_Click(object? sender, EventArgs e)
         {
+            // Check permission
+            if (!PermissionChecker.CanDelete("frmProducts"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền xóa sản phẩm!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Vui lòng liên hệ quản trị viên.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_selectedProduct == null)
             {
                 MessageBox.Show("⚠️ Vui lòng chọn sản phẩm cần xóa!", "Thông báo",

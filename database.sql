@@ -1,4 +1,4 @@
--- ============================================
+﻿-- ============================================
 -- MilkTeaPOS Database Schema
 -- PostgreSQL for Supabase
 -- COMPLETE with Full Indexes, FKs, Triggers, Functions
@@ -37,7 +37,6 @@ DROP TYPE IF EXISTS membership_tier CASCADE;
 
 -- Drop new tables
 DROP TABLE IF EXISTS audit_logs CASCADE;
-DROP TABLE IF EXISTS voucher_usages CASCADE;
 DROP TABLE IF EXISTS vouchers CASCADE;
 DROP TABLE IF EXISTS memberships CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
@@ -75,9 +74,11 @@ CREATE TABLE roles (
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255),
+    password_hash VARCHAR(255) NOT NULL,
     role_id UUID REFERENCES roles(id) ON DELETE SET NULL,  -- Allow NULL when role deleted
     is_active BOOLEAN DEFAULT TRUE,
+    avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -133,6 +134,7 @@ CREATE TABLE toppings (
     description TEXT,
     price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
     is_available BOOLEAN DEFAULT TRUE,
+    image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -144,6 +146,7 @@ CREATE TABLE tables (
     status table_status DEFAULT 'available',
     capacity INT DEFAULT 2 CHECK (capacity > 0),
     location VARCHAR(50) DEFAULT 'main',
+    image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -162,6 +165,7 @@ CREATE TABLE customers (
     gender VARCHAR(10) CHECK (gender IN ('male', 'female', 'other')),
     address TEXT,
     notes TEXT,
+    avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -220,25 +224,6 @@ CREATE INDEX idx_vouchers_code ON vouchers(code);
 CREATE INDEX idx_vouchers_status ON vouchers(status);
 CREATE INDEX idx_vouchers_valid_until ON vouchers(valid_until);
 CREATE INDEX idx_vouchers_type ON vouchers(voucher_type);
-
--- Voucher Usages (lịch sử sử dụng voucher)
-CREATE TABLE voucher_usages (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    voucher_id UUID NOT NULL REFERENCES vouchers(id) ON DELETE CASCADE,
-    customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
-    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-    discount_amount NUMERIC(12, 2) NOT NULL CHECK (discount_amount >= 0),
-    used_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    used_by UUID REFERENCES users(id) ON DELETE SET NULL
-);
-
-CREATE INDEX idx_voucher_usages_voucher_id ON voucher_usages(voucher_id);
-CREATE INDEX idx_voucher_usages_customer_id ON voucher_usages(customer_id);
-CREATE INDEX idx_voucher_usages_order_id ON voucher_usages(order_id);
-CREATE INDEX idx_voucher_usages_used_at ON voucher_usages(used_at);
-
--- Voucher Usages: NEW INDEX FOR USAGE LIMIT CHECK
-CREATE INDEX idx_voucher_usages_voucher_customer ON voucher_usages(voucher_id, customer_id);
 
 -- ============================================
 -- AUDIT LOG TABLE
@@ -860,10 +845,6 @@ BEGIN
     SET voucher_discount = v_discount_amount,
         total_amount = GREATEST(0, subtotal - discount - v_discount_amount)
     WHERE id = p_order_id;
-
-    -- Record voucher usage
-    INSERT INTO voucher_usages (voucher_id, customer_id, order_id, discount_amount, used_by)
-    VALUES (v_voucher_id, v_customer_id, p_order_id, v_discount_amount, current_setting('app.current_user_id', TRUE)::UUID);
 
     -- Increment usage count
     UPDATE vouchers SET usage_count = usage_count + 1 WHERE id = v_voucher_id;

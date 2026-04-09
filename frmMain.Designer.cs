@@ -140,9 +140,9 @@
             pnlSidebar.Name = "pnlSidebar";
             pnlSidebar.Size = new Size(280, 900);
             pnlSidebar.TabIndex = 2;
-            //
+            // 
             // btnLogout
-            //
+            // 
             btnLogout.BackColor = Color.FromArgb(220, 53, 69);
             btnLogout.Cursor = Cursors.Hand;
             btnLogout.Dock = DockStyle.Bottom;
@@ -160,9 +160,9 @@
             btnLogout.Text = "🚪  Đăng xuất";
             btnLogout.UseVisualStyleBackColor = false;
             btnLogout.Click += btnMenu_Click;
-            //
+            // 
             // btnChangePassword
-            //
+            // 
             btnChangePassword.BackColor = Color.FromArgb(108, 117, 125);
             btnChangePassword.Cursor = Cursors.Hand;
             btnChangePassword.Dock = DockStyle.Bottom;
@@ -172,14 +172,14 @@
             btnChangePassword.FlatStyle = FlatStyle.Flat;
             btnChangePassword.Font = new Font("Segoe UI", 11.5F);
             btnChangePassword.ForeColor = Color.White;
-            btnChangePassword.Location = new Point(0, 756);
+            btnChangePassword.Location = new Point(0, 852);
             btnChangePassword.Name = "btnChangePassword";
             btnChangePassword.Size = new Size(280, 48);
             btnChangePassword.TabIndex = 13;
             btnChangePassword.Text = "🔐  Đổi mật khẩu";
             btnChangePassword.UseVisualStyleBackColor = false;
             btnChangePassword.Click += btnChangePassword_Click;
-            //
+            // 
             // btnAuditLog
             // 
             btnAuditLog.BackColor = Color.FromArgb(30, 40, 50);
@@ -321,7 +321,7 @@
             btnOrderHistory.Click += btnMenu_Click;
             // 
             // btnPOS
-            //
+            // 
             btnPOS.BackColor = Color.FromArgb(30, 40, 50);
             btnPOS.Cursor = Cursors.Hand;
             btnPOS.Dock = DockStyle.Top;
@@ -335,7 +335,7 @@
             btnPOS.Name = "btnPOS";
             btnPOS.Size = new Size(280, 48);
             btnPOS.TabIndex = 8;
-            btnPOS.Tag = "frmPOS";
+            btnPOS.Tag = "frmOrders";
             btnPOS.Text = "\U0001f6d2  Order (POS)";
             btnPOS.UseVisualStyleBackColor = false;
             btnPOS.Click += btnMenu_Click;
@@ -419,9 +419,9 @@
             btnCategories.Text = "\U0001f9cb  Danh mục";
             btnCategories.UseVisualStyleBackColor = false;
             btnCategories.Click += btnMenu_Click;
-            //
+            // 
             // btnDashboard
-            //
+            // 
             btnDashboard.BackColor = Color.FromArgb(30, 40, 50);
             btnDashboard.Cursor = Cursors.Hand;
             btnDashboard.Dock = DockStyle.Top;
@@ -439,9 +439,9 @@
             btnDashboard.Text = "📊  Dashboard";
             btnDashboard.UseVisualStyleBackColor = false;
             btnDashboard.Click += btnMenu_Click;
-            //
+            // 
             // lblLogo
-            //
+            // 
             lblLogo.BackColor = Color.FromArgb(255, 107, 107);
             lblLogo.Dock = DockStyle.Top;
             lblLogo.Font = new Font("Segoe UI", 22F, FontStyle.Bold);
@@ -505,16 +505,16 @@
             pnlWelcome.Controls.Add(pnlStatsContainer);
             pnlWelcome.Location = new Point(20, 20);
             pnlWelcome.Name = "pnlWelcome";
-            pnlWelcome.Size = new Size(1000, 256);
+            pnlWelcome.Size = new Size(1000, 389);
             pnlWelcome.TabIndex = 0;
             // 
             // lblWelcomeTitle
             // 
             lblWelcomeTitle.Font = new Font("Segoe UI", 30F, FontStyle.Bold);
             lblWelcomeTitle.ForeColor = Color.FromArgb(44, 62, 80);
-            lblWelcomeTitle.Location = new Point(30, 25);
+            lblWelcomeTitle.Location = new Point(25, 25);
             lblWelcomeTitle.Name = "lblWelcomeTitle";
-            lblWelcomeTitle.Size = new Size(940, 50);
+            lblWelcomeTitle.Size = new Size(950, 50);
             lblWelcomeTitle.TabIndex = 0;
             lblWelcomeTitle.Text = "Xin chào! 👋";
             lblWelcomeTitle.TextAlign = ContentAlignment.MiddleLeft;
@@ -523,9 +523,9 @@
             // 
             lblWelcomeSubtitle.Font = new Font("Segoe UI", 13F);
             lblWelcomeSubtitle.ForeColor = Color.FromArgb(127, 140, 141);
-            lblWelcomeSubtitle.Location = new Point(30, 80);
+            lblWelcomeSubtitle.Location = new Point(25, 80);
             lblWelcomeSubtitle.Name = "lblWelcomeSubtitle";
-            lblWelcomeSubtitle.Size = new Size(940, 35);
+            lblWelcomeSubtitle.Size = new Size(950, 35);
             lblWelcomeSubtitle.TabIndex = 1;
             lblWelcomeSubtitle.Text = "Chúc bạn một ngày làm việc hiệu quả! Chọn chức năng ở menu bên trái để bắt đầu.";
             lblWelcomeSubtitle.TextAlign = ContentAlignment.MiddleLeft;
@@ -537,9 +537,9 @@
             pnlStatsContainer.Controls.Add(pnlStats2);
             pnlStatsContainer.Controls.Add(pnlStats3);
             pnlStatsContainer.Controls.Add(pnlStats4);
-            pnlStatsContainer.Location = new Point(30, 130);
+            pnlStatsContainer.Location = new Point(25, 135);
             pnlStatsContainer.Name = "pnlStatsContainer";
-            pnlStatsContainer.Size = new Size(940, 100);
+            pnlStatsContainer.Size = new Size(972, 208);
             pnlStatsContainer.TabIndex = 2;
             // 
             // pnlStats1
@@ -687,7 +687,7 @@
             pnlStats4.Controls.Add(lblStats4Label);
             pnlStats4.Controls.Add(lblStats4Value);
             pnlStats4.Cursor = Cursors.Hand;
-            pnlStats4.Location = new Point(0, 100);
+            pnlStats4.Location = new Point(720, 0);
             pnlStats4.Margin = new Padding(0, 0, 15, 0);
             pnlStats4.Name = "pnlStats4";
             pnlStats4.Size = new Size(225, 100);
@@ -735,7 +735,6 @@
             Controls.Add(pnlContent);
             Controls.Add(pnlTopBar);
             Controls.Add(pnlSidebar);
-            // IsMdiContainer = true;  // Removed - using embedded forms instead
             Name = "frmMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "MilkTea POS - Hệ thống quản lý trà sữa";

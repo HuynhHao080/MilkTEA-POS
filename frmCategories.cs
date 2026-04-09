@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using MilkTeaPOS.Models;
+using MilkTeaPOS.Helpers;
 
 namespace MilkTeaPOS
 {
@@ -519,11 +520,33 @@ namespace MilkTeaPOS
 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
+            if (!PermissionChecker.CanCreate("frmCategories"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền thêm danh mục mới!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Vui lòng liên hệ quản trị viên.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             await SaveCategory();
         }
 
         private async void btnEdit_Click(object sender, EventArgs e)
         {
+            if (!PermissionChecker.CanUpdate("frmCategories"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền sửa danh mục!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Vui lòng liên hệ quản trị viên.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_selectedCategory == null)
             {
                 MessageBox.Show("⚠️ Vui lòng chọn danh mục cần sửa!", "Thông báo",
@@ -535,6 +558,17 @@ namespace MilkTeaPOS
 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
+            if (!PermissionChecker.CanDelete("frmCategories"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền xóa danh mục!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Vui lòng liên hệ quản trị viên.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_selectedCategory == null)
             {
                 MessageBox.Show("⚠️ Vui lòng chọn danh mục cần xóa!", "Thông báo",

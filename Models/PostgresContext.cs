@@ -448,6 +448,9 @@ public partial class PostgresContext : DbContext
                 .HasPrecision(12, 2)
                 .HasDefaultValue(0m)
                 .HasColumnName("voucher_discount");
+            entity.Property(e => e.Status)
+                .HasColumnType("order_status")
+                .HasColumnName("status");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.CustomerId)
@@ -615,6 +618,12 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
+            entity.Property(e => e.Method)
+                .HasColumnType("payment_method")
+                .HasColumnName("method");
+            entity.Property(e => e.Status)
+                .HasColumnType("payment_status")
+                .HasColumnName("status");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)

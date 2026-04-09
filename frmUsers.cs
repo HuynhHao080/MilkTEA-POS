@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using MilkTeaPOS.Models;
+using MilkTeaPOS.Helpers;
 
 namespace MilkTeaPOS
 {
@@ -633,11 +634,33 @@ namespace MilkTeaPOS
 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
+            if (!PermissionChecker.CanCreate("frmUsers"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền quản lý người dùng!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Chỉ Admin mới có thể truy cập.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             await SaveUser();
         }
 
         private async void btnEdit_Click(object sender, EventArgs e)
         {
+            if (!PermissionChecker.CanUpdate("frmUsers"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền sửa người dùng!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Chỉ Admin mới có thể truy cập.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_selectedUser == null)
             {
                 MessageBox.Show("⚠️ Vui lòng chọn người dùng cần sửa!", "Thông báo",
@@ -649,6 +672,17 @@ namespace MilkTeaPOS
 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
+            if (!PermissionChecker.CanDelete("frmUsers"))
+            {
+                MessageBox.Show("❌ Bạn không có quyền xóa người dùng!\n\n" +
+                    $"👤 Role hiện tại: {PermissionChecker.GetCurrentRoleName()}\n" +
+                    $"🔒 Chỉ Admin mới có thể truy cập.",
+                    "🚫 Truy cập bị từ chối",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_selectedUser == null)
             {
                 MessageBox.Show("⚠️ Vui lòng chọn người dùng cần xóa!", "Thông báo",

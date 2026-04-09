@@ -25,6 +25,12 @@
     <Compile Update="frmMemberships.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="frmOrderHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="frmOrders.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="frmProducts.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -32,6 +38,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="frmTables.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="frmPayment.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="frmToppings.cs">

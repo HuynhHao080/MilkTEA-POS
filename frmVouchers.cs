@@ -13,12 +13,14 @@ namespace MilkTeaPOS
     public partial class frmVouchers : Form
     {
         private Voucher _selectedVoucher;
+        private CheckedListBox _clbTiers;
 
         #region Constants
 
         private static readonly string[] VOUCHER_TYPES = { "percentage", "fixed_amount", "free_item", "buy_one_get_one" };
         private static readonly string[] STATUSES = { "active", "inactive", "expired", "used_up" };
         private static readonly string[] FILTER_STATUSES = { "Tất cả", "Hoạt động", "Hết hạn", "Đã dùng hết", "Không hoạt động" };
+        private static readonly string[] TIERS = { "none", "silver", "gold", "platinum", "diamond" };
 
         #endregion
 
@@ -33,7 +35,58 @@ namespace MilkTeaPOS
         private void InitializeForm()
         {
             InitializeComboBoxes();
+            InitializeTierCheckList();
             LoadVoucherData();
+        }
+
+        private void InitializeTierCheckList()
+        {
+            _clbTiers = new CheckedListBox
+            {
+                Name = "clbTiers",
+                CheckOnClick = true,
+                Font = new Font("Segoe UI", 9F),
+                Size = new Size(200, 90),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+            foreach (var tier in TIERS)
+            {
+                _clbTiers.Items.Add(tier.ToUpperInvariant());
+            }
+            for (int i = 0; i < _clbTiers.Items.Count; i++)
+                _clbTiers.SetItemChecked(i, true);
+
+            // Add label
+            var lblTiers = new Label
+            {
+                Text = "Hạng áp dụng:",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(45, 55, 72),
+                AutoSize = true,
+                Name = "lblTiers"
+            };
+
+            // Find pnlFormFields or pnlRight to add controls to
+            // pnlFormFields is inside pnlRight, which contains all the form fields
+            var formFields = this.Controls.Find("pnlFormFields", true).FirstOrDefault() as Panel;
+            if (formFields != null)
+            {
+                // Position after cbStatus
+                var statusLabel = formFields.Controls.Find("lblStatus", true).FirstOrDefault();
+                if (statusLabel != null)
+                {
+                    lblTiers.Location = new Point(statusLabel.Left, statusLabel.Bottom + 35);
+                    _clbTiers.Location = new Point(statusLabel.Left, lblTiers.Bottom + 4);
+                }
+                else
+                {
+                    lblTiers.Location = new Point(20, 420);
+                    _clbTiers.Location = new Point(20, lblTiers.Bottom + 4);
+                }
+                formFields.Controls.Add(lblTiers);
+                formFields.Controls.Add(_clbTiers);
+                formFields.Height = Math.Max(formFields.Height, _clbTiers.Bottom + 30);
+            }
         }
 
         private void InitializeComboBoxes()
@@ -270,9 +323,47 @@ namespace MilkTeaPOS
             if (_selectedVoucher.ValidFrom.HasValue) dtpValidFrom.Value = _selectedVoucher.ValidFrom.Value.ToLocalTime();
             if (_selectedVoucher.ValidUntil.HasValue) dtpValidUntil.Value = _selectedVoucher.ValidUntil.Value.ToLocalTime();
 
-            // Chọn đúng status trong ComboBox
             var statusToSelect = _selectedVoucher.status?.ToLower() ?? "active";
             cbStatus.SelectedItem = STATUSES.Contains(statusToSelect) ? statusToSelect : "active";
+
+            // Load applicable tiers
+            LoadApplicableTiersToCheckList();
+        }
+
+        private void LoadApplicableTiersToCheckList()
+        {
+            if (_clbTiers == null || _selectedVoucher == null) return;
+
+            // Parse applicable_tiers from DB - raw SQL since EF doesn't map it well
+            var applicableTiers = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "none", "silver", "gold", "platinum", "diamond" }; // default: all
+
+            try
+            {
+                using var context = new PostgresContext();
+                var conn = context.Database.GetDbConnection();
+                if (conn.State != System.Data.ConnectionState.Open) conn.Open();
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT applicable_tiers::text FROM vouchers WHERE id = @id";
+                var p = cmd.CreateParameter();
+                p.ParameterName = "@id";
+                p.Value = _selectedVoucher.Id;
+                cmd.Parameters.Add(p);
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    var tiersStr = result.ToString()?.Trim('{', '}') ?? "";
+                    if (!string.IsNullOrEmpty(tiersStr))
+                    {
+                        applicableTiers = new HashSet<string>(tiersStr.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), StringComparer.OrdinalIgnoreCase);
+                    }
+                }
+            }
+            catch { }
+
+            for (int i = 0; i < _clbTiers.Items.Count && i < TIERS.Length; i++)
+            {
+                _clbTiers.SetItemChecked(i, applicableTiers.Contains(TIERS[i]));
+            }
         }
 
         private void ClearForm()
@@ -281,6 +372,14 @@ namespace MilkTeaPOS
             txtMinOrder.Clear(); txtMaxDiscount.Clear(); txtUsageLimit.Clear();
             dtpValidFrom.Value = DateTime.Now; dtpValidUntil.Value = DateTime.Now.AddYears(1);
             cbVoucherType.SelectedIndex = 0; cbStatus.SelectedIndex = 0; _selectedVoucher = null;
+
+            // Reset tiers to all checked
+            if (_clbTiers != null)
+            {
+                for (int i = 0; i < _clbTiers.Items.Count; i++)
+                    _clbTiers.SetItemChecked(i, true);
+            }
+
             txtCode.Focus();
         }
 
@@ -423,6 +522,19 @@ namespace MilkTeaPOS
 
             if (validUntil <= validFrom) { MessageBox.Show("Ngày hết hạn phải sau ngày bắt đầu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
+            // Build applicable_tiers array from checked items
+            var selectedTiers = new List<string>();
+            if (_clbTiers != null)
+            {
+                for (int i = 0; i < _clbTiers.Items.Count && i < TIERS.Length; i++)
+                {
+                    if (_clbTiers.GetItemChecked(i))
+                        selectedTiers.Add(TIERS[i]);
+                }
+            }
+            if (selectedTiers.Count == 0) selectedTiers = TIERS.ToList(); // fallback: all tiers
+            var tiersArray = "{" + string.Join(",", selectedTiers) + "}";
+
             try
             {
                 using var context = new PostgresContext();
@@ -431,17 +543,17 @@ namespace MilkTeaPOS
                 {
                     bool isExist = await context.Vouchers.AsNoTracking().AnyAsync(v => v.Code == code);
                     if (isExist) { MessageBox.Show($"Mã Voucher '{code}' đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
-                    
+
                     var id = Guid.NewGuid();
                     var currentUserId = PostgresContext.CurrentUserId;
 
                     await context.Database.ExecuteSqlInterpolatedAsync($@"
                         INSERT INTO vouchers (id, code, name, description, voucher_type, discount_value,
                             min_order_amount, max_discount_amount, usage_limit, usage_count,
-                            status, valid_from, valid_until, created_at, updated_at, created_by)
+                            status, valid_from, valid_until, applicable_tiers, created_at, updated_at, created_by)
                         VALUES ({id}, {code}, {name}, {description}, {voucherType}::voucher_type, {discountVal},
                             {minOrderAmount}, {maxDiscount}, {usageLimit}, 0,
-                            {status}::voucher_status, {validFrom}, {validUntil}, {DateTime.UtcNow}, {DateTime.UtcNow},
+                            {status}::voucher_status, {validFrom}, {validUntil}, {tiersArray}::membership_tier[], {DateTime.UtcNow}, {DateTime.UtcNow},
                             {currentUserId})");
 
                     // Log Audit
@@ -458,16 +570,17 @@ namespace MilkTeaPOS
                     if (isExist) { MessageBox.Show($"Mã Voucher '{code}' đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
                     
                     await context.Database.ExecuteSqlInterpolatedAsync($@"
-                        UPDATE vouchers SET 
-                            code = {code}, name = {name}, description = {description}, 
+                        UPDATE vouchers SET
+                            code = {code}, name = {name}, description = {description},
                             voucher_type = {voucherType}::voucher_type,
-                            discount_value = {discountVal}, 
-                            min_order_amount = {minOrderAmount}, 
+                            discount_value = {discountVal},
+                            min_order_amount = {minOrderAmount},
                             max_discount_amount = {maxDiscount},
-                            usage_limit = {usageLimit}, 
+                            usage_limit = {usageLimit},
                             status = {status}::voucher_status,
-                            valid_from = {validFrom}, 
-                            valid_until = {validUntil}, 
+                            valid_from = {validFrom},
+                            valid_until = {validUntil},
+                            applicable_tiers = {tiersArray}::membership_tier[],
                             updated_at = {DateTime.UtcNow}
                         WHERE id = {_selectedVoucher.Id}");
                     

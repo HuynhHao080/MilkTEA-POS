@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using MilkTeaPOS.Models;
+using Npgsql;
 
 namespace MilkTeaPOS
 {
@@ -29,6 +31,7 @@ namespace MilkTeaPOS
         public frmSalesReport()
         {
             InitializeComponent();
+            InitializeDataGridViewColumns();
             InitializeDateRange();
             LoadReport();
         }
@@ -77,6 +80,40 @@ namespace MilkTeaPOS
             LoadReport();
         }
 
+        private async void btnAllTime_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using var context = new PostgresContext();
+                
+                // Find earliest and latest order dates
+                var earliest = await context.Orders.AsNoTracking().MinAsync(o => o.CreatedAt);
+                var latest = await context.Orders.AsNoTracking().MaxAsync(o => o.CreatedAt);
+                
+                if (earliest.HasValue && latest.HasValue)
+                {
+                    _startDate = earliest.Value.Date;
+                    _endDate = latest.Value.Date.AddDays(1);
+                    dtpStartDate.Value = _startDate.ToLocalTime();
+                    dtpEndDate.Value = _endDate.ToLocalTime();
+                    
+                    System.Diagnostics.Debug.WriteLine($"[SalesReport] All Time: {earliest} to {latest}");
+                    
+                    LoadReport();
+                }
+                else
+                {
+                    MessageBox.Show("💤 Không có đơn hàng nào trong database!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Lỗi:\n{ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             LoadReport();
@@ -115,7 +152,15 @@ namespace MilkTeaPOS
             {
                 ShowLoading(true);
 
-                await Task.WhenAll(
+                // Debug: Show date range being used
+                System.Diagnostics.Debug.WriteLine($"[SalesReport] Loading report with date range:");
+                System.Diagnostics.Debug.WriteLine($"[SalesReport]   Start (UTC): {_startDate:yyyy-MM-dd HH:mm:ss}");
+                System.Diagnostics.Debug.WriteLine($"[SalesReport]   End (UTC): {_endDate:yyyy-MM-dd HH:mm:ss}");
+                System.Diagnostics.Debug.WriteLine($"[SalesReport]   Start (Local): {_startDate.ToLocalTime():yyyy-MM-dd HH:mm:ss}");
+                System.Diagnostics.Debug.WriteLine($"[SalesReport]   End (Local): {_endDate.ToLocalTime():yyyy-MM-dd HH:mm:ss}");
+
+                var tasks = new List<Task>
+                {
                     LoadRevenueSummary(),
                     LoadDailyRevenue(),
                     LoadPaymentBreakdown(),
@@ -123,11 +168,22 @@ namespace MilkTeaPOS
                     LoadOrderStatistics(),
                     LoadHourlyDistribution(),
                     LoadCustomerAnalytics()
-                );
+                };
+
+                await Task.WhenAll(tasks);
+
+                // Check for any exceptions from tasks
+                foreach (var task in tasks)
+                {
+                    if (task.IsFaulted)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[SalesReport] Task failed: {task.Exception?.Flatten().Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Lỗi tải báo cáo:\n{ex.Message}", "Lỗi",
+                MessageBox.Show($"❌ Lỗi tải báo cáo:\n{ex.Message}\n\nStack: {ex.StackTrace}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -142,48 +198,63 @@ namespace MilkTeaPOS
             {
                 using var context = new PostgresContext();
 
-                var servedOrders = await context.Orders
+                var allOrders = await context.Orders
                     .AsNoTracking()
-                    .Where(o => o.Status == "served" && o.CreatedAt >= _startDate && o.CreatedAt < _endDate)
+                    .Where(o => o.CreatedAt >= _startDate && o.CreatedAt < _endDate)
                     .ToListAsync();
 
-                var totalRevenue = servedOrders.Sum(o => o.TotalAmount ?? 0m);
-                var totalOrders = servedOrders.Count;
-                var totalDiscount = servedOrders.Sum(o => o.Discount ?? 0m);
-                var totalVoucherDiscount = servedOrders.Sum(o => o.VoucherDiscount ?? 0m);
-                var totalMembershipDiscount = servedOrders.Sum(o => o.MembershipDiscount ?? 0m);
+                System.Diagnostics.Debug.WriteLine($"[RevenueSummary] Total orders in range: {allOrders.Count}");
+                
+                var statusGroups = allOrders.GroupBy(x => x.Status ?? "NULL").Select(g => new { Status = g.Key, Count = g.Count() }).ToList();
+                foreach (var o in statusGroups)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[RevenueSummary]   Status '{o.Status}': {o.Count}");
+                }
+
+                var servedOnly = allOrders.Where(o => o.Status == "served").ToList();
+                System.Diagnostics.Debug.WriteLine($"[RevenueSummary] Served orders: {servedOnly.Count}");
+
+                var totalRevenue = servedOnly.Sum(o => o.TotalAmount ?? 0m);
+                var totalOrders = servedOnly.Count;
+                var totalDiscount = servedOnly.Sum(o => (o.Discount ?? 0m) + (o.VoucherDiscount ?? 0m) + (o.MembershipDiscount ?? 0m));
                 var avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0m;
 
-                var pendingOrders = await context.Orders
-                    .AsNoTracking()
-                    .CountAsync(o => o.Status == "pending" && o.CreatedAt >= _startDate && o.CreatedAt < _endDate);
-                var cancelledOrders = await context.Orders
-                    .AsNoTracking()
-                    .CountAsync(o => o.Status == "cancelled" && o.CreatedAt >= _startDate && o.CreatedAt < _endDate);
+                var pendingOrders = allOrders.Count(o => o.Status == "pending");
+                var cancelledOrders = allOrders.Count(o => o.Status == "cancelled");
 
-                // Customer analytics
-                var ordersWithCustomer = servedOrders.Where(o => o.CustomerId.HasValue).ToList();
+                var ordersWithCustomer = servedOnly.Where(o => o.CustomerId.HasValue).ToList();
                 var uniqueCustomers = ordersWithCustomer.Select(o => o.CustomerId).Distinct().Count();
                 var avgSpentPerCustomer = uniqueCustomers > 0 ? totalRevenue / uniqueCustomers : 0m;
 
-                if (InvokeRequired)
+                System.Diagnostics.Debug.WriteLine($"[RevenueSummary] Revenue={totalRevenue}, Orders={totalOrders}, Discount={totalDiscount}");
+                System.Diagnostics.Debug.WriteLine($"[RevenueSummary] Pending={pendingOrders}, Cancelled={cancelledOrders}, Customers={uniqueCustomers}");
+
+                // Update UI - try Invoke directly since form is already shown
+                try
                 {
-                    Invoke(() =>
+                    System.Diagnostics.Debug.WriteLine($"[RevenueSummary] About to Invoke UI update...");
+                    this.Invoke(() =>
                     {
                         lblTotalRevenue.Text = FormatCurrency(totalRevenue);
                         lblTotalOrders.Text = totalOrders.ToString();
                         lblAvgOrderValue.Text = FormatCurrency(avgOrderValue);
-                        lblTotalDiscount.Text = FormatCurrency(totalDiscount + totalVoucherDiscount + totalMembershipDiscount);
+                        lblTotalDiscount.Text = FormatCurrency(totalDiscount);
                         lblPendingOrders.Text = pendingOrders.ToString();
                         lblCancelledOrders.Text = cancelledOrders.ToString();
                         lblUniqueCustomers.Text = uniqueCustomers.ToString();
                         lblAvgSpentPerCustomer.Text = FormatCurrency(avgSpentPerCustomer);
+                        
+                        System.Diagnostics.Debug.WriteLine($"[RevenueSummary] ✅ UI labels updated: Revenue={lblTotalRevenue.Text}, Orders={lblTotalOrders.Text}");
                     });
                 }
+                catch (Exception uiEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[RevenueSummary] ❌ UI update failed: {uiEx.Message}");
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail - will retry
+                ShowQueryError("Revenue Summary", ex);
             }
         }
 
@@ -252,9 +323,9 @@ namespace MilkTeaPOS
                     dgvDailyRevenue.Rows[0].DefaultCellStyle.Font = _fontItalic;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                ShowQueryError("Daily Revenue", ex);
             }
         }
 
@@ -327,9 +398,9 @@ namespace MilkTeaPOS
                     dgvPaymentBreakdown.Rows[0].DefaultCellStyle.Font = _fontItalic;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                ShowQueryError("Payment Breakdown", ex);
             }
         }
 
@@ -388,9 +459,9 @@ namespace MilkTeaPOS
                     dgvProductPerformance.Rows[0].DefaultCellStyle.Font = _fontItalic;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                ShowQueryError("Product Performance", ex);
             }
         }
 
@@ -453,9 +524,9 @@ namespace MilkTeaPOS
                     });
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                ShowQueryError("Order Statistics", ex);
             }
         }
 
@@ -508,9 +579,9 @@ namespace MilkTeaPOS
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                ShowQueryError("Hourly Distribution", ex);
             }
         }
 
@@ -564,9 +635,9 @@ namespace MilkTeaPOS
                     });
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail
+                ShowQueryError("Customer Analytics", ex);
             }
         }
 
@@ -653,7 +724,53 @@ namespace MilkTeaPOS
 
         #region Helper Methods
 
+        private void UpdateSummaryLabels(decimal totalRevenue, int totalOrders, decimal totalDiscount,
+            decimal avgOrderValue, int pendingOrders, int cancelledOrders, int uniqueCustomers, decimal avgSpentPerCustomer)
+        {
+            try
+            {
+                lblTotalRevenue.Text = FormatCurrency(totalRevenue);
+                lblTotalOrders.Text = totalOrders.ToString();
+                lblAvgOrderValue.Text = FormatCurrency(avgOrderValue);
+                lblTotalDiscount.Text = FormatCurrency(totalDiscount);
+                lblPendingOrders.Text = pendingOrders.ToString();
+                lblCancelledOrders.Text = cancelledOrders.ToString();
+                lblUniqueCustomers.Text = uniqueCustomers.ToString();
+                lblAvgSpentPerCustomer.Text = FormatCurrency(avgSpentPerCustomer);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[RevenueSummary] Error updating labels: {ex.Message}");
+            }
+        }
+
         private string FormatCurrency(decimal amount) => amount.ToString("#,##0") + "đ";
+
+        private void ShowQueryError(string queryName, Exception ex)
+        {
+            var errorMsg = $"⚠️ Lỗi tải {queryName}:\n{ex.Message}";
+            
+            if (ex is PostgresException pgEx)
+            {
+                errorMsg += $"\n\nPostgreSQL Error:\n";
+                errorMsg += $"  SQL State: {pgEx.SqlState}\n";
+                errorMsg += $"  Message: {pgEx.MessageText}\n";
+                errorMsg += $"  Detail: {pgEx.Detail}\n";
+                errorMsg += $"  Hint: {pgEx.Hint}\n";
+                errorMsg += $"  Position: {pgEx.Position}";
+            }
+            
+            System.Diagnostics.Debug.WriteLine($"[SalesReport] {queryName} Error: {errorMsg}");
+            
+            if (InvokeRequired)
+            {
+                Invoke(() =>
+                {
+                    MessageBox.Show(errorMsg, "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                });
+            }
+        }
 
         private void ShowLoading(bool isLoading)
         {

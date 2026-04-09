@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
 using MilkTeaPOS.Models;
+using MilkTeaPOS.Helpers;
 using FormsTimer = System.Windows.Forms.Timer;
 
 namespace MilkTeaPOS
@@ -36,8 +41,57 @@ namespace MilkTeaPOS
         {
             setupClock();
             updateUserInfo();
+            setupRoleBasedAccess();
             setupButtonHoverEffects();
             setupChildFormEvents();
+            UpdateWelcomePanel();
+        }
+
+        private void setupRoleBasedAccess()
+        {
+            // Get user role name
+            var roleName = _currentUser?.Role?.Name ?? "Cashier";
+
+            // Map buttons to their form names
+            var buttonFormMap = new Dictionary<Button, string>
+            {
+                { btnDashboard, "frmDashboard" },
+                { btnCategories, "frmCategories" },
+                { btnProducts, "frmProducts" },
+                { btnToppings, "frmToppings" },
+                { btnTables, "frmTables" },
+                { btnPOS, "frmOrders" },
+                { btnOrderHistory, "frmOrderHistory" },
+                { btnCustomers, "frmCustomers" },
+                { btnMemberships, "frmMemberships" },
+                { btnVouchers, "frmVouchers" },
+                { btnReports, "frmSalesReport" },
+                { btnUsers, "frmUsers" },
+                { btnAuditLog, "frmAuditLog" }
+            };
+
+            // Apply visibility based on permissions
+            foreach (var kvp in buttonFormMap)
+            {
+                var button = kvp.Key;
+                var formName = kvp.Value;
+
+                if (button != null)
+                {
+                    bool hasAccess = RolePermissions.HasAccess(formName, roleName);
+                    button.Visible = hasAccess;
+                }
+            }
+
+            // Auto-select first visible button as dashboard
+            if (!btnDashboard.Visible)
+            {
+                var firstVisibleButton = buttonFormMap.Keys.FirstOrDefault(b => b.Visible);
+                if (firstVisibleButton != null)
+                {
+                    setActiveButton(firstVisibleButton);
+                }
+            }
         }
 
         private void setupClock()
@@ -72,24 +126,27 @@ namespace MilkTeaPOS
 
         private void setupButtonHoverEffects()
         {
-            // Attach hover events to all menu buttons
+            // Attach hover events to all visible menu buttons
             var menuButtons = new[] { btnDashboard, btnCategories, btnProducts, btnToppings,
                 btnTables, btnPOS, btnOrderHistory, btnCustomers, btnMemberships,
                 btnVouchers, btnReports, btnUsers, btnAuditLog };
 
             foreach (var btn in menuButtons)
             {
-                if (btn != null)
+                if (btn != null && btn.Visible)
                 {
                     btn.MouseEnter += Button_MouseEnter;
                     btn.MouseLeave += Button_MouseLeave;
-                    // Use MouseDown for instant active (fires BEFORE Click)
                     btn.MouseDown += Button_MouseDown;
                 }
             }
 
-            // Auto-select Dashboard on startup
-            setActiveButton(btnDashboard);
+            // Auto-select first visible button on startup
+            var firstVisibleButton = menuButtons.FirstOrDefault(b => b != null && b.Visible);
+            if (firstVisibleButton != null)
+            {
+                setActiveButton(firstVisibleButton);
+            }
         }
 
         private void Button_MouseDown(object? sender, MouseEventArgs e)
@@ -187,7 +244,100 @@ namespace MilkTeaPOS
         {
             _currentChildForm = null;
             pnlWelcome.Visible = true;
+            UpdateWelcomePanel();
         }
+
+        private void UpdateWelcomePanel()
+        {
+            try
+            {
+                var userName = _currentUser?.Username ?? "Bạn";
+                var role = _currentUser?.Role?.Name ?? "Nhân viên";
+                var timeOfDay = DateTime.Now.Hour switch
+                {
+                    >= 5 and < 12 => "buổi sáng",
+                    >= 12 and < 18 => "buổi chiều",
+                    >= 18 and < 22 => "buổi tối",
+                    _ => "đêm"
+                };
+
+                if (InvokeRequired)
+                {
+                    Invoke(() =>
+                    {
+                        lblWelcomeTitle.Text = $"Xin chào, {userName}! 👋";
+                        lblWelcomeSubtitle.Text = $"Chúc {role.ToLower()} một {timeOfDay} làm việc hiệu quả! | 🕒 {DateTime.Now:dddd, dd/MM/yyyy HH:mm}";
+                    });
+                }
+                else
+                {
+                    lblWelcomeTitle.Text = $"Xin chào, {userName}! 👋";
+                    lblWelcomeSubtitle.Text = $"Chúc {role.ToLower()} một {timeOfDay} làm việc hiệu quả! | 🕒 {DateTime.Now:dddd, dd/MM/yyyy HH:mm}";
+                }
+
+                // Load quick stats
+                _ = LoadWelcomeStatsAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Main] UpdateWelcomePanel error: {ex.Message}");
+            }
+        }
+
+        private async Task LoadWelcomeStatsAsync()
+        {
+            try
+            {
+                using var context = new PostgresContext();
+                var todayStart = DateTime.Now.Date.ToUniversalTime();
+                var todayEnd = todayStart.AddDays(1);
+
+                // Stats 1: Revenue today
+                var revenueToday = await context.Orders
+                    .Where(o => o.Status == "served" && o.CreatedAt >= todayStart && o.CreatedAt < todayEnd)
+                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m;
+
+                // Stats 2: Orders today
+                var ordersToday = await context.Orders
+                    .CountAsync(o => o.CreatedAt >= todayStart && o.CreatedAt < todayEnd);
+
+                // Stats 3: Tables in use
+                var occupiedTables = await context.Tables.CountAsync(t => t.Status == "occupied");
+                var totalTables = await context.Tables.CountAsync();
+
+                // Stats 4: Total customers
+                var totalCustomers = await context.Customers.CountAsync();
+
+                if (InvokeRequired)
+                {
+                    Invoke(() => UpdateStatsCards(revenueToday, ordersToday, occupiedTables, totalTables, totalCustomers));
+                }
+                else
+                {
+                    UpdateStatsCards(revenueToday, ordersToday, occupiedTables, totalTables, totalCustomers);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Main] LoadWelcomeStats error: {ex.Message}");
+            }
+        }
+
+        private void UpdateStatsCards(decimal revenue, int orders, int occupiedTables, int totalTables, int totalCustomers)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(() => UpdateStatsCards(revenue, orders, occupiedTables, totalTables, totalCustomers));
+                return;
+            }
+
+            lblStats1Value.Text = FormatCurrency(revenue);
+            lblStats2Value.Text = $"{orders} đơn hôm nay";
+            lblStats3Value.Text = $"{occupiedTables}/{totalTables}";
+            lblStats4Value.Text = $"{totalCustomers} khách";
+        }
+
+        private string FormatCurrency(decimal amount) => amount.ToString("#,##0") + "đ";
 
         #endregion
 
@@ -202,6 +352,20 @@ namespace MilkTeaPOS
                 }
                 else
                 {
+                    // Double-check permissions before opening
+                    var roleName = _currentUser?.Role?.Name ?? "Cashier";
+                    if (!RolePermissions.HasAccess(formName, roleName))
+                    {
+                        MessageBox.Show(
+                            $"❌ Bạn không có quyền truy cập chức năng này!\n\n" +
+                            $"👤 Role hiện tại: {roleName}\n" +
+                            $"🔒 Vui lòng liên hệ quản trị viên nếu cần truy cập.",
+                            "🚫 Truy cập bị từ chối",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     openForm(formName);
                 }
             }
@@ -227,6 +391,8 @@ namespace MilkTeaPOS
                     "frmProducts" => new frmProducts(),
                     "frmToppings" => new frmToppings(),
                     "frmTables" => new frmTables(),
+                    "frmOrders" => new frmOrders(),
+                    "frmOrderHistory" => new frmOrderHistory(),
                     _ => createPlaceholderForm(formName)
                 };
 

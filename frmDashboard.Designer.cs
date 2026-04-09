@@ -86,10 +86,10 @@ namespace MilkTeaPOS
 
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             pnlHeader = new Panel();
             lblTitle = new Label();
             lblClock = new Label();
@@ -122,9 +122,9 @@ namespace MilkTeaPOS
             pnlLeft = new FlowLayoutPanel();
             lblSectionRecent = new Label();
             dgvRecentOrders = new DataGridView();
+            pnlRight = new FlowLayoutPanel();
             lblSectionTopProducts = new Label();
             dgvTopProducts = new DataGridView();
-            pnlRight = new FlowLayoutPanel();
             lblSectionPayments = new Label();
             dgvPaymentBreakdown = new DataGridView();
             tabCharts = new TabPage();
@@ -151,8 +151,8 @@ namespace MilkTeaPOS
             spOverview.SuspendLayout();
             pnlLeft.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRecentOrders).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)dgvTopProducts).BeginInit();
             pnlRight.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvTopProducts).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvPaymentBreakdown).BeginInit();
             tabCharts.SuspendLayout();
             tabTables.SuspendLayout();
@@ -215,7 +215,7 @@ namespace MilkTeaPOS
             pnlCards.Dock = DockStyle.Top;
             pnlCards.Location = new Point(0, 85);
             pnlCards.Name = "pnlCards";
-            pnlCards.Size = new Size(1350, 120);
+            pnlCards.Size = new Size(1350, 133);
             pnlCards.TabIndex = 1;
             // 
             // pnlCard1
@@ -227,7 +227,7 @@ namespace MilkTeaPOS
             pnlCard1.Cursor = Cursors.Hand;
             pnlCard1.Location = new Point(15, 10);
             pnlCard1.Name = "pnlCard1";
-            pnlCard1.Size = new Size(240, 100);
+            pnlCard1.Size = new Size(240, 117);
             pnlCard1.TabIndex = 0;
             // 
             // lblCard1Emoji
@@ -257,7 +257,7 @@ namespace MilkTeaPOS
             lblCard1Trend.AutoSize = true;
             lblCard1Trend.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             lblCard1Trend.ForeColor = Color.FromArgb(255, 255, 200);
-            lblCard1Trend.Location = new Point(12, 72);
+            lblCard1Trend.Location = new Point(12, 77);
             lblCard1Trend.Name = "lblCard1Trend";
             lblCard1Trend.Size = new Size(0, 15);
             lblCard1Trend.TabIndex = 2;
@@ -271,7 +271,7 @@ namespace MilkTeaPOS
             pnlCard2.Cursor = Cursors.Hand;
             pnlCard2.Location = new Point(270, 10);
             pnlCard2.Name = "pnlCard2";
-            pnlCard2.Size = new Size(240, 100);
+            pnlCard2.Size = new Size(240, 117);
             pnlCard2.TabIndex = 1;
             // 
             // lblCard2Emoji
@@ -301,7 +301,7 @@ namespace MilkTeaPOS
             lblCard2Trend.AutoSize = true;
             lblCard2Trend.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             lblCard2Trend.ForeColor = Color.FromArgb(255, 255, 200);
-            lblCard2Trend.Location = new Point(12, 72);
+            lblCard2Trend.Location = new Point(12, 77);
             lblCard2Trend.Name = "lblCard2Trend";
             lblCard2Trend.Size = new Size(0, 15);
             lblCard2Trend.TabIndex = 2;
@@ -315,7 +315,7 @@ namespace MilkTeaPOS
             pnlCard3.Cursor = Cursors.Hand;
             pnlCard3.Location = new Point(525, 10);
             pnlCard3.Name = "pnlCard3";
-            pnlCard3.Size = new Size(240, 100);
+            pnlCard3.Size = new Size(240, 117);
             pnlCard3.TabIndex = 2;
             // 
             // lblCard3Emoji
@@ -345,7 +345,7 @@ namespace MilkTeaPOS
             lblCard3Trend.AutoSize = true;
             lblCard3Trend.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             lblCard3Trend.ForeColor = Color.FromArgb(255, 255, 200);
-            lblCard3Trend.Location = new Point(12, 72);
+            lblCard3Trend.Location = new Point(12, 77);
             lblCard3Trend.Name = "lblCard3Trend";
             lblCard3Trend.Size = new Size(0, 15);
             lblCard3Trend.TabIndex = 2;
@@ -359,7 +359,7 @@ namespace MilkTeaPOS
             pnlCard4.Cursor = Cursors.Hand;
             pnlCard4.Location = new Point(780, 10);
             pnlCard4.Name = "pnlCard4";
-            pnlCard4.Size = new Size(240, 100);
+            pnlCard4.Size = new Size(240, 117);
             pnlCard4.TabIndex = 3;
             // 
             // lblCard4Emoji
@@ -389,7 +389,7 @@ namespace MilkTeaPOS
             lblCard4Trend.AutoSize = true;
             lblCard4Trend.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             lblCard4Trend.ForeColor = Color.FromArgb(255, 255, 200);
-            lblCard4Trend.Location = new Point(12, 72);
+            lblCard4Trend.Location = new Point(12, 77);
             lblCard4Trend.Name = "lblCard4Trend";
             lblCard4Trend.Size = new Size(0, 15);
             lblCard4Trend.TabIndex = 2;
@@ -403,7 +403,7 @@ namespace MilkTeaPOS
             pnlCard5.Cursor = Cursors.Hand;
             pnlCard5.Location = new Point(1035, 10);
             pnlCard5.Name = "pnlCard5";
-            pnlCard5.Size = new Size(240, 100);
+            pnlCard5.Size = new Size(240, 117);
             pnlCard5.TabIndex = 4;
             // 
             // lblCard5Emoji
@@ -433,7 +433,7 @@ namespace MilkTeaPOS
             lblCard5Trend.AutoSize = true;
             lblCard5Trend.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             lblCard5Trend.ForeColor = Color.FromArgb(255, 255, 200);
-            lblCard5Trend.Location = new Point(12, 72);
+            lblCard5Trend.Location = new Point(12, 77);
             lblCard5Trend.Name = "lblCard5Trend";
             lblCard5Trend.Size = new Size(0, 15);
             lblCard5Trend.TabIndex = 2;
@@ -442,10 +442,10 @@ namespace MilkTeaPOS
             // 
             pnlContent.Controls.Add(tcDashboard);
             pnlContent.Dock = DockStyle.Fill;
-            pnlContent.Location = new Point(0, 205);
+            pnlContent.Location = new Point(0, 218);
             pnlContent.Margin = new Padding(0);
             pnlContent.Name = "pnlContent";
-            pnlContent.Size = new Size(1350, 856);
+            pnlContent.Size = new Size(1350, 843);
             pnlContent.TabIndex = 0;
             // 
             // tcDashboard
@@ -460,7 +460,7 @@ namespace MilkTeaPOS
             tcDashboard.Name = "tcDashboard";
             tcDashboard.Padding = new Point(15, 5);
             tcDashboard.SelectedIndex = 0;
-            tcDashboard.Size = new Size(1350, 856);
+            tcDashboard.Size = new Size(1350, 843);
             tcDashboard.TabIndex = 0;
             // 
             // tabOverview
@@ -469,31 +469,29 @@ namespace MilkTeaPOS
             tabOverview.Controls.Add(spOverview);
             tabOverview.Location = new Point(4, 30);
             tabOverview.Name = "tabOverview";
-            tabOverview.Size = new Size(1342, 822);
+            tabOverview.Size = new Size(1342, 809);
             tabOverview.TabIndex = 0;
             tabOverview.Text = "Tổng quan";
             // 
             // spOverview
-            //
+            // 
             spOverview.Dock = DockStyle.Fill;
             spOverview.Location = new Point(0, 0);
             spOverview.Name = "spOverview";
-            spOverview.Orientation = Orientation.Vertical;
-            //
+            // 
             // spOverview.Panel1
-            //
+            // 
             spOverview.Panel1.Controls.Add(pnlLeft);
-            //
+            // 
             // spOverview.Panel2
-            //
+            // 
             spOverview.Panel2.Controls.Add(pnlRight);
-            spOverview.Size = new Size(1342, 822);
+            spOverview.Size = new Size(1342, 809);
             spOverview.SplitterDistance = 850;
             spOverview.TabIndex = 0;
             // 
             // pnlLeft
-            //
-            pnlLeft.AutoScroll = false;
+            // 
             pnlLeft.BackColor = Color.FromArgb(248, 250, 252);
             pnlLeft.Controls.Add(lblSectionRecent);
             pnlLeft.Controls.Add(dgvRecentOrders);
@@ -502,12 +500,12 @@ namespace MilkTeaPOS
             pnlLeft.Location = new Point(0, 0);
             pnlLeft.Name = "pnlLeft";
             pnlLeft.Padding = new Padding(10);
-            pnlLeft.Size = new Size(850, 822);
+            pnlLeft.Size = new Size(850, 809);
             pnlLeft.TabIndex = 0;
             pnlLeft.WrapContents = false;
-            //
+            // 
             // lblSectionRecent
-            //
+            // 
             lblSectionRecent.AutoSize = true;
             lblSectionRecent.BackColor = Color.Transparent;
             lblSectionRecent.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
@@ -518,9 +516,9 @@ namespace MilkTeaPOS
             lblSectionRecent.Size = new Size(194, 37);
             lblSectionRecent.TabIndex = 0;
             lblSectionRecent.Text = "📋 Đơn hàng gần đây";
-            //
+            // 
             // dgvRecentOrders
-            //
+            // 
             dgvRecentOrders.AllowUserToAddRows = false;
             dgvRecentOrders.AllowUserToDeleteRows = false;
             dgvRecentOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -528,14 +526,14 @@ namespace MilkTeaPOS
             dgvRecentOrders.BorderStyle = BorderStyle.None;
             dgvRecentOrders.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvRecentOrders.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = Color.FromArgb(59, 130, 246);
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle5.ForeColor = Color.White;
-            dataGridViewCellStyle5.Padding = new Padding(5, 8, 5, 8);
-            dataGridViewCellStyle5.SelectionBackColor = Color.FromArgb(59, 130, 246);
-            dataGridViewCellStyle5.SelectionForeColor = Color.White;
-            dgvRecentOrders.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(59, 130, 246);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.Padding = new Padding(5, 8, 5, 8);
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(59, 130, 246);
+            dataGridViewCellStyle1.SelectionForeColor = Color.White;
+            dgvRecentOrders.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvRecentOrders.ColumnHeadersHeight = 40;
             dgvRecentOrders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgvRecentOrders.EnableHeadersVisualStyles = false;
@@ -555,8 +553,7 @@ namespace MilkTeaPOS
             dgvRecentOrders.TabIndex = 1;
             // 
             // pnlRight
-            //
-            pnlRight.AutoScroll = false;
+            // 
             pnlRight.BackColor = Color.FromArgb(248, 250, 252);
             pnlRight.Controls.Add(lblSectionTopProducts);
             pnlRight.Controls.Add(dgvTopProducts);
@@ -567,12 +564,12 @@ namespace MilkTeaPOS
             pnlRight.Location = new Point(0, 0);
             pnlRight.Name = "pnlRight";
             pnlRight.Padding = new Padding(10);
-            pnlRight.Size = new Size(482, 822);
+            pnlRight.Size = new Size(488, 809);
             pnlRight.TabIndex = 0;
             pnlRight.WrapContents = false;
-            //
+            // 
             // lblSectionTopProducts
-            //
+            // 
             lblSectionTopProducts.AutoSize = true;
             lblSectionTopProducts.BackColor = Color.Transparent;
             lblSectionTopProducts.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
@@ -583,9 +580,9 @@ namespace MilkTeaPOS
             lblSectionTopProducts.Size = new Size(233, 37);
             lblSectionTopProducts.TabIndex = 2;
             lblSectionTopProducts.Text = "🏆 Top sản phẩm bán chạy";
-            //
+            // 
             // dgvTopProducts
-            //
+            // 
             dgvTopProducts.AllowUserToAddRows = false;
             dgvTopProducts.AllowUserToDeleteRows = false;
             dgvTopProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -593,14 +590,14 @@ namespace MilkTeaPOS
             dgvTopProducts.BorderStyle = BorderStyle.None;
             dgvTopProducts.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvTopProducts.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = Color.FromArgb(245, 158, 11);
-            dataGridViewCellStyle6.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle6.ForeColor = Color.White;
-            dataGridViewCellStyle6.Padding = new Padding(5, 8, 5, 8);
-            dataGridViewCellStyle6.SelectionBackColor = Color.FromArgb(245, 158, 11);
-            dataGridViewCellStyle6.SelectionForeColor = Color.White;
-            dgvTopProducts.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(245, 158, 11);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle2.ForeColor = Color.White;
+            dataGridViewCellStyle2.Padding = new Padding(5, 8, 5, 8);
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(245, 158, 11);
+            dataGridViewCellStyle2.SelectionForeColor = Color.White;
+            dgvTopProducts.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvTopProducts.ColumnHeadersHeight = 40;
             dgvTopProducts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgvTopProducts.EnableHeadersVisualStyles = false;
@@ -618,22 +615,22 @@ namespace MilkTeaPOS
             dgvTopProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTopProducts.Size = new Size(459, 250);
             dgvTopProducts.TabIndex = 3;
-            //
+            // 
             // lblSectionPayments
-            //
+            // 
             lblSectionPayments.AutoSize = true;
             lblSectionPayments.BackColor = Color.Transparent;
             lblSectionPayments.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblSectionPayments.ForeColor = Color.FromArgb(16, 185, 129);
-            lblSectionPayments.Location = new Point(13, 320);
+            lblSectionPayments.Location = new Point(13, 303);
             lblSectionPayments.Name = "lblSectionPayments";
             lblSectionPayments.Padding = new Padding(12, 8, 5, 8);
             lblSectionPayments.Size = new Size(212, 37);
             lblSectionPayments.TabIndex = 0;
             lblSectionPayments.Text = "💳 Thanh toán hôm nay";
-            //
+            // 
             // dgvPaymentBreakdown
-            //
+            // 
             dgvPaymentBreakdown.AllowUserToAddRows = false;
             dgvPaymentBreakdown.AllowUserToDeleteRows = false;
             dgvPaymentBreakdown.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -641,19 +638,19 @@ namespace MilkTeaPOS
             dgvPaymentBreakdown.BorderStyle = BorderStyle.None;
             dgvPaymentBreakdown.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvPaymentBreakdown.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = Color.FromArgb(16, 185, 129);
-            dataGridViewCellStyle7.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle7.ForeColor = Color.White;
-            dataGridViewCellStyle7.Padding = new Padding(5, 8, 5, 8);
-            dataGridViewCellStyle7.SelectionBackColor = Color.FromArgb(16, 185, 129);
-            dataGridViewCellStyle7.SelectionForeColor = Color.White;
-            dgvPaymentBreakdown.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(16, 185, 129);
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle3.ForeColor = Color.White;
+            dataGridViewCellStyle3.Padding = new Padding(5, 8, 5, 8);
+            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(16, 185, 129);
+            dataGridViewCellStyle3.SelectionForeColor = Color.White;
+            dgvPaymentBreakdown.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvPaymentBreakdown.ColumnHeadersHeight = 40;
             dgvPaymentBreakdown.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgvPaymentBreakdown.EnableHeadersVisualStyles = false;
             dgvPaymentBreakdown.GridColor = Color.FromArgb(241, 245, 249);
-            dgvPaymentBreakdown.Location = new Point(13, 360);
+            dgvPaymentBreakdown.Location = new Point(13, 343);
             dgvPaymentBreakdown.MultiSelect = false;
             dgvPaymentBreakdown.Name = "dgvPaymentBreakdown";
             dgvPaymentBreakdown.ReadOnly = true;
@@ -668,14 +665,14 @@ namespace MilkTeaPOS
             dgvPaymentBreakdown.TabIndex = 1;
             // 
             // tabCharts
-            //
+            // 
             tabCharts.BackColor = Color.FromArgb(247, 249, 252);
             tabCharts.Controls.Add(lblChartInfo);
             tabCharts.Controls.Add(lblHourlyInfo);
             tabCharts.Location = new Point(4, 30);
             tabCharts.Name = "tabCharts";
             tabCharts.Padding = new Padding(20);
-            tabCharts.Size = new Size(1342, 611);
+            tabCharts.Size = new Size(1342, 822);
             tabCharts.TabIndex = 1;
             tabCharts.Text = "Biểu đồ";
             // 
@@ -709,7 +706,7 @@ namespace MilkTeaPOS
             tabTables.Location = new Point(4, 30);
             tabTables.Name = "tabTables";
             tabTables.Padding = new Padding(20);
-            tabTables.Size = new Size(1342, 611);
+            tabTables.Size = new Size(1342, 822);
             tabTables.TabIndex = 2;
             tabTables.Text = "Bàn ăn";
             // 
@@ -720,8 +717,8 @@ namespace MilkTeaPOS
             dgvTables.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvTables.BackgroundColor = Color.White;
             dgvTables.BorderStyle = BorderStyle.None;
-            dataGridViewCellStyle8.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dgvTables.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dgvTables.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             dgvTables.ColumnHeadersHeight = 35;
             dgvTables.Dock = DockStyle.Fill;
             dgvTables.EnableHeadersVisualStyles = false;
@@ -732,7 +729,7 @@ namespace MilkTeaPOS
             dgvTables.ReadOnly = true;
             dgvTables.RowHeadersVisible = false;
             dgvTables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvTables.Size = new Size(1302, 571);
+            dgvTables.Size = new Size(1302, 782);
             dgvTables.TabIndex = 0;
             // 
             // lblSectionTables
@@ -754,7 +751,7 @@ namespace MilkTeaPOS
             tabStats.Location = new Point(4, 30);
             tabStats.Name = "tabStats";
             tabStats.Padding = new Padding(20);
-            tabStats.Size = new Size(1342, 611);
+            tabStats.Size = new Size(1342, 822);
             tabStats.TabIndex = 3;
             tabStats.Text = "Thống kê";
             // 
@@ -802,9 +799,9 @@ namespace MilkTeaPOS
             pnlLeft.ResumeLayout(false);
             pnlLeft.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRecentOrders).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dgvTopProducts).EndInit();
             pnlRight.ResumeLayout(false);
             pnlRight.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvTopProducts).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvPaymentBreakdown).EndInit();
             tabCharts.ResumeLayout(false);
             tabCharts.PerformLayout();
