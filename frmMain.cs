@@ -343,7 +343,6 @@ namespace MilkTeaPOS
 
         private void btnMenu_Click(object? sender, EventArgs e)
         {
-            // Button đã được active trong MouseDown rồi, chỉ cần mở form
             if (sender is Button btn && btn.Tag is string formName)
             {
                 if (formName == "Logout")
@@ -366,6 +365,8 @@ namespace MilkTeaPOS
                         return;
                     }
 
+                    // Force set active state to be clear and immediate
+                    setActiveButton(btn);
                     openForm(formName);
                 }
             }

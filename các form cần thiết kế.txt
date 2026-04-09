@@ -7,7 +7,7 @@
 ⏳ = CHƯA LÀM
 
 =====================================================
-📊 TỔNG KẾT: 18 FORMS
+📊 TỔNG KẾT: 18 FORMS - HOÀN THÀNH 100% 🎉
 =====================================================
 
 ┌────────────────┬──────────┬────────────────────────────────┐
@@ -15,27 +15,26 @@
 ├────────────────┼──────────┼────────────────────────────────┤
 │ Authentication │    2     │ Login, ChangePassword          │
 │ Main           │    1     │ MDI Container                  │
-│ Dashboard      │    1     │ Charts, KPIs                   │
+│ Dashboard      │    1     │ Charts, KPIs, Bar Charts       │
 │ Products       │    3     │ Categories, Products, Toppings │
-│ Tables         │    1     │ Visual layout                  │
-│ POS & Orders   │    3     │ Core business                  │
+│ Tables         │    1     │ Visual layout, sơ đồ bàn       │
+│ POS & Orders   │    3     │ Orders, OrderHistory, Payment  │
 │ Customers      │    2     │ CRM + Membership               │
-│ Vouchers       │    1     │ Promotion                      │
-│ Order History  │    1     │ Search, Filter                 │
+│ Vouchers       │    1     │ Promotion, tier mapping        │
 │ Reports        │    2     │ Sales + Audit                  │
 │ Users          │    1     │ Staff management               │
 ├────────────────┼──────────┼────────────────────────────────┤
-│ TỔNG           │   18     │                                │
+│ TỔNG           │   18     │ HOÀN THÀNH 18/18 (100%) ✅     │
 └────────────────┴──────────┴────────────────────────────────┘
 
-Tiến độ: 16/18 forms (89%) ✅
+Tiến độ: 18/18 forms (100%) ✅🎉
 
 =====================================================
-✅ FORM ĐÃ HOÀN THÀNH (16/18)
+✅ FORM ĐÃ HOÀN THÀNH (18/18)
 =====================================================
 
 ✅ 1. frmLogin ⭐
-   File: frmLogin.cs (266 dòng)
+   File: frmLogin.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - Đăng nhập với username/password
@@ -46,17 +45,8 @@ Tiến độ: 16/18 forms (89%) ✅
    - Friendly error messages
    - Nút đổi mật khẩu (trong frmMain)
 
-   Security:
-   - BCrypt hashing (work factor 12)
-   - Auto salt per password
-   - Constant-time comparison
-   - EF Core parameterized
-   - OWASP compliant
-
-   Login: admin / admin123
-
 ✅ 2. frmChangePassword ⭐
-   File: frmChangePassword.cs (330+ dòng)
+   File: frmChangePassword.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - Đổi mật khẩu cho user đang đăng nhập
@@ -64,470 +54,166 @@ Tiến độ: 16/18 forms (89%) ✅
    - Validate mật khẩu mới (min 6 ký tự)
    - Xác nhận mật khẩu mới
    - BCrypt hashing (work factor = 12)
-   - Friendly error messages
-   - Password masking (●)
-   - Keyboard navigation (Enter → submit)
-   - Only updates password_hash (no plain text)
    - Audit logging: PASSWORD_CHANGE
 
-   Security:
-   - BCrypt password hashing (work=12)
-   - Verify current password
-   - Password length validation
-   - Match confirmation check
-   - Auto salt per password
-   - No plain-text storage
-
-   Database:
-   - Update password_hash (BCrypt only)
-   - password column removed from updates
-
-✅ 3. frmMain
+✅ 3. frmMain ⭐
    File: frmMain.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - MDI Container
-   - Menu sidebar
-   - Dashboard widgets
-   - Nút đổi mật khẩu
+   - Menu sidebar với active state (in đậm nút đang chọn)
+   - Welcome panel với live stats:
+     + 💰 Doanh thu hôm nay
+     + 📦 Đơn hàng hôm nay  
+     + 🪑 Bàn đang dùng (occupied/total)
+     + 👥 Tổng khách hàng
    - Real-time clock display
    - User info display (username + role)
+   - Greeting động theo buổi (sáng/chiều/tối/đêm)
    - Logout with confirmation
 
 ✅ 4. frmDashboard ⭐
    File: frmDashboard.cs
    Status: 10/10 - PRODUCTION READY
    Features:
-   - 5 KPI cards (Revenue today, Orders today, Active tables, Total customers, Weekly revenue)
-   - Real-time data from database
-   - Recent orders list (10 latest) with status color coding
-   - Top 8 products by quantity sold
-   - Table status overview with location & capacity
-   - Payment method breakdown for today
-   - Loading overlay during data fetch
-   - Short-lived DbContext pattern
+   - Tab 1 - Overview: 5 KPI cards, recent orders, top products, payment breakdown
+   - Tab 2 - Biểu đồ: Bar chart doanh thu theo ngày, phân bố giờ cao điểm
+   - Tab 3 - Bàn ăn: Sơ đồ bàn trực quan với card màu theo trạng thái
+   - Tab 4 - Thống kê: Membership tier stats, voucher summary, customer analytics
+   - Real-time data từ database
+   - Auto-refresh mỗi 30s
    - Font caching (no GDI leaks)
-   - Responsive scrollable layout
-
-   KPI Cards:
-   - 💰 Revenue today (Coral Red)
-   - 📦 Orders today (Green)
-   - 🪑 Active tables (Yellow)
-   - 👥 Total customers (Teal)
-   - 📈 Weekly revenue (Purple)
-
-   DataGridViews:
-   - Recent Orders (Mã đơn, Khách, Bàn, Tổng, Trạng thái, Giờ)
-   - Top Products (Top, Sản phẩm, SL bán, Doanh thu)
-   - Tables (Tên bàn, Vị trí, Sức chứa, Trạng thái)
-   - Payments (Phương thức, Số giao dịch, Tổng tiền)
-
-   Security:
-   - Short-lived DbContext
-   - AsNoTracking() for reads
-   - Proper font disposal on form close
 
 ✅ 5. frmUsers ⭐
-   File: frmUsers.cs (1070+ dòng)
+   File: frmUsers.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
    - Tìm kiếm theo username
-   - Role assignment via ComboBox (cbRole)
-   - Password strength indicator (🔴🟡🟠🟢 + progress bar)
-   - Keyboard navigation (Enter → next field → submit)
-   - Validation trùng username
-   - BCrypt password hashing (no plain text)
-   - Loading indicators (Refresh, không DoEvents)
-   - Friendly error messages
-   - Short-lived DbContext (using pattern)
-   - DataGridView styling hoàn hảo
+   - Role assignment via ComboBox
+   - Password strength indicator
    - Audit logging: INSERT, UPDATE, DELETE
 
-   Security:
-   - BCrypt hashing (work factor 12)
-   - Password strength validation (min 6 chars)
-   - No plain-text password storage (temporary for NOT NULL constraint)
-   - Role-based access control
-   - Short-lived DbContext
-
-   UI/UX:
-   - DataGridView styling (header, cells, alternating rows)
-   - Password strength meter với progress bar
-   - Color-coded strength levels (Weak/Medium/Strong)
-   - Keyboard shortcuts cho tất cả fields
-   - ComboBox naming convention: cb (không phải cbo)
-
 ✅ 6. frmCategories ⭐
-   File: frmCategories.cs (920+ dòng)
+   File: frmCategories.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
-   - Tìm kiếm theo tên, mô tả
    - Upload ảnh (max 10MB, whitelist)
-   - Auto-save ảnh khi duyệt
-   - Preview ảnh (không lock file)
-   - Xóa ảnh cũ tự động
-   - Validation trùng tên
-   - Loading indicators (proper async, no DoEvents)
-   - Path traversal protection
-   - Keyboard navigation (Enter → next field → submit)
-   - Read-only DateTimePicker (auto-set)
    - Audit logging: INSERT, UPDATE, DELETE
-   - Anti-duplicate audit (500ms debounce)
-
-   Security:
-   - Path traversal protection
-   - File size validation (10MB max)
-   - Extension whitelist (.jpg, .jpeg, .png, .gif, .webp)
-   - Backward compatible
-
-   UI/UX:
-   - DataGridView styling (matches frmUsers)
-   - Password strength meter with progress bar
-   - Color-coded strength levels
-   - Keyboard shortcuts for all fields
-   - Disabled CreatedAt editing
-
-   Ảnh lưu tại: Images/Categories/
 
 ✅ 7. frmCustomers ⭐
-   File: frmCustomers.cs (1240+ dòng)
+   File: frmCustomers.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
    - Tìm kiếm theo tên, SĐT, email
-   - Upload ảnh đại diện (max 10MB, whitelist)
-   - Auto-save ảnh khi duyệt
-   - Preview ảnh (không lock file - MemoryStream)
-   - Xóa ảnh cũ tự động
-   - Validation trùng SĐT, email
-   - Loading indicators (proper async, no DoEvents)
-   - Path traversal protection
-   - Keyboard navigation (9 fields → Enter → submit)
-   - Editable dtpDateOfBirth, dtpCreatedAt, dtpUpdatedAt
-   - Short-lived DbContext (using pattern)
-   - DataGridView styling hoàn hảo
-   - Gender mapping (VN ↔ DB: Nam/Nữ/Khác ↔ male/female/other)
-   - Gender color coding (Nam=blue, Nữ=red)
-   - Avatar-only update (không cần full form save)
+   - Upload ảnh đại diện
    - Audit logging: INSERT, UPDATE, DELETE
-   - Anti-duplicate audit (500ms debounce)
-
-   Security:
-   - Path traversal protection
-   - File size limit (10MB)
-   - Extension whitelist (.jpg, .jpeg, .png, .gif, .webp)
-   - SQL injection safe (EF Core)
-   - Short-lived DbContext
-
-   UI/UX:
-   - DataGridView styling (header, cells, alternating rows)
-   - Gender color-coded trong DataGridView
-   - Avatar preview (120x120px, Zoom mode)
-   - Keyboard shortcuts cho tất cả fields (9 fields)
-   - ComboBox naming: cb (không phải cbo)
-   - Two-column layout
-
-   Ảnh lưu tại: Images/Customers/
 
 ✅ 8. frmProducts ⭐
-   File: frmProducts.cs (860+ dòng)
+   File: frmProducts.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
-   - Tìm kiếm theo tên, category filter, status filter
-   - Upload ảnh (max 5MB, whitelist)
-   - Auto-save ảnh khi duyệt
-   - Preview ảnh (không lock file)
-   - Xóa ảnh cũ tự động
-   - Validation trùng tên theo category
    - Quản lý sizes (S, M, L) với auto-calculation
-   - Loading indicators (proper async, no DoEvents)
-   - Path traversal protection
-   - Keyboard navigation (Enter → submit)
-   - Short-lived DbContext (using pattern)
-   - DataGridView styling hoàn hảo
+   - Upload ảnh
    - Audit logging: INSERT, UPDATE, DELETE, SOFT_DELETE
-   - Anti-duplicate audit (500ms debounce)
-   - Soft-delete fallback khi có orders
-
-   Security:
-   - Path traversal protection
-   - File size limit (5MB)
-   - Extension whitelist
-   - SQL injection safe (EF Core)
-   - Short-lived DbContext
-
-   UI/UX:
-   - DataGridView styling (header, cells, alternating rows)
-   - Product size management (S/M/L)
-   - Featured product flag
-   - Preparation time tracking
-   - Keyboard shortcuts (Ctrl+N/S/Delete/R)
-   - _loadingProductId race condition guard
-
-   Ảnh lưu tại: Images/Products/
 
 ✅ 9. frmToppings ⭐
-   File: frmToppings.cs (760+ dòng)
+   File: frmToppings.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
-   - Tìm kiếm theo tên, mô tả
-   - Filter theo trạng thái (Tất cả, Đang bán, Ngừng bán)
-   - Upload ảnh (max 5MB, whitelist)
-   - Auto-save ảnh khi duyệt
-   - Preview ảnh (không lock file)
-   - Xóa ảnh cũ tự động
-   - Validation trùng tên
-   - Loading indicators (proper async, no DoEvents)
-   - Path traversal protection
-   - Keyboard navigation (Enter → submit)
-   - Short-lived DbContext (using pattern)
-   - DataGridView styling hoàn hảo
+   - Filter theo trạng thái
+   - Upload ảnh
+   - Usage count tracking
    - Audit logging: INSERT, UPDATE, DELETE, SOFT_DELETE
-   - Anti-duplicate audit (500ms debounce)
-   - Soft-delete fallback khi có orders
-   - Usage count tracking (số lần xuất hiện trong order)
-
-   Security:
-   - Path traversal protection
-   - File size limit (5MB)
-   - Extension whitelist
-   - SQL injection safe (EF Core)
-   - Short-lived DbContext
-
-   UI/UX:
-   - DataGridView styling (header, cells, alternating rows)
-   - Usage count column (bold + italic)
-   - Checkmark display for IsAvailable (✓/✗)
-   - Keyboard shortcuts cho tất cả fields
-
-   Ảnh lưu tại: Images/Toppings/
 
 ✅ 10. frmTables ⭐
-   File: frmTables.cs (830+ dòng)
+   File: frmTables.cs
    Status: 10/10 - PRODUCTION READY
    Features:
    - CRUD đầy đủ (Thêm, Sửa, Xóa)
-   - Tìm kiếm theo tên, status filter, location filter
-   - Upload ảnh (max 5MB, whitelist)
-   - Auto-save ảnh khi duyệt
-   - Preview ảnh (không lock file)
-   - Xóa ảnh cũ tự động
-   - Validation trùng tên
-   - Loading indicators (proper async, no DoEvents)
-   - Path traversal protection
-   - Keyboard navigation (Enter → submit)
-   - Short-lived DbContext (using pattern)
-   - DataGridView styling hoàn hảo
-   - Audit logging: INSERT, UPDATE, DELETE
-   - Anti-duplicate audit (500ms debounce)
    - Auto-refresh timer (30s)
    - Double-click để xem active orders
-   - PostgreSQL ENUM casting (::table_status) via raw SQL
-
-   Security:
-   - Path traversal protection
-   - File size limit (5MB)
-   - Extension whitelist
-   - SQL injection safe (EF Core + raw SQL with params)
-   - Short-lived DbContext
-
-   UI/UX:
-   - DataGridView styling (header, cells, alternating rows)
-   - Status color coding (available=green, occupied=red, reserved=yellow, maintenance=gray)
-   - Active orders display on double-click
-   - Keyboard shortcuts cho tất cả fields
-   - cboStatusFilter + txtLocationFilter event handlers
-
-   Ảnh lưu tại: Images/Tables/
+   - Audit logging: INSERT, UPDATE, DELETE
 
 ✅ 11. frmMemberships ⭐
-   File: frmMemberships.cs (~760 dòng)
+   File: frmMemberships.cs
    Status: 10/10 - PRODUCTION READY
    Features:
-   - CRUD đầy đủ (Thêm, Sửa, Xóa) với PostgreSQL ENUM types
-   - Tìm kiếm theo tên khách hàng, SĐT
-   - Filter theo hạng thành viên (Tất cả, none, silver, gold, platinum, diamond)
-   - Auto-fill SĐT khi chọn khách hàng từ combobox
-   - Auto-select khách hàng khi nhập SĐT
-   - Validation: SĐT (9-11 số), Points ≥ 0, TotalSpent ≥ 0, TotalOrders ≥ 0
-   - Date validation: ExpiresAt > JoinedAt
-   - Color-coded Tier column (None=Gray, Silver=Silver, Gold=Gold, Platinum=Gray, Diamond=Red)
-   - ExecuteSqlInterpolatedAsync với explicit ENUM casting (::membership_tier)
-   - Short-lived DbContext (using pattern)
-   - Loading indicators
-   - Keyboard navigation (Enter → next field → submit)
-   - ComboBox reset về "Tất cả" khi refresh
+   - CRUD đầy đủ với PostgreSQL ENUM types
+   - Filter theo hạng thành viên
+   - Color-coded Tier column
    - Audit logging: INSERT, UPDATE, DELETE
-   - Anti-duplicate audit (500ms debounce)
-
-   Database:
-   - membership_tier ENUM (none, silver, gold, platinum, diamond)
-   - customer_id FK to customers (unique constraint)
-   - Auto-calculate tier based on total_spent (trigger)
-   - Auto-add points when order served (trigger)
-
-   UI/UX:
-   - Header xanh đậm "QUẢN LÝ THẺ HỘI VIÊN"
-   - Stats cards với icon và số liệu
-   - Grid view (Left) + Form nhập liệu (Right)
-   - Font Segoe UI 10F đồng nhất
-   - Tiếng Việt hiển thị đầy đủ, không lỗi encoding
-   - Button layout: Thêm | Sửa | Làm mới | Xóa
-
-   Security:
-   - ExecuteSqlInterpolatedAsync (SQL injection safe)
-   - Explicit ENUM casting (::membership_tier)
-   - Short-lived DbContext
 
 ✅ 12. frmVouchers ⭐
-   File: frmVouchers.cs (520+ dòng)
+   File: frmVouchers.cs
    Status: 10/10 - PRODUCTION READY
    Features:
-   - CRUD đầy đủ (Thêm, Sửa, Xóa) với PostgreSQL ENUM types
-   - Tìm kiếm theo mã, tên, mô tả
-   - Filter theo trạng thái (Tất cả, Hoạt động, Hết hạn, Đã dùng hết, Không hoạt động)
-   - 4 Stats cards (Tổng, Hoạt động, Hết hạn, Đã dùng hết) với color-coding
-   - Validation: Mã UPPER_CASE, discount 0-100%, check trùng mã
-   - Date validation: valid_until > valid_from
-   - Color-coded Status column (Green/Yellow/Gray/Red backgrounds)
-   - Highlight cảnh báo khi remaining ≤ 5
-   - ExecuteSqlInterpolatedAsync với explicit ENUM casting
-   - Audit Log cho INSERT/UPDATE/DELETE
-   - Anti-duplicate audit (500ms debounce)
-   - Tracking created_by với CurrentUserId
-   - Short-lived DbContext (using pattern)
-   - Loading indicators
-   - Keyboard navigation (Enter → next field → submit)
-   - ComboBox reset về "Tất cả" khi refresh
+   - CRUD đầy đủ với PostgreSQL ENUM types
+   - Filter theo trạng thái
+   - 4 Stats cards với color-coding
+   - Applicable tiers mapping
+   - Audit logging: INSERT, UPDATE, DELETE
 
-   Database:
-   - voucher_type ENUM (percentage, fixed_amount, free_item, buy_one_get_one)
-   - voucher_status ENUM (active, inactive, expired, used_up)
-   - applicable_tiers membership_tier[] (áp dụng theo hạng thành viên)
-   - created_by FK to users (audit tracking)
-
-   UI/UX:
-   - Header xanh đậm "QUẢN LÝ VOUCHER"
-   - Stats cards với icon và số liệu
-   - Grid view (Left) + Form nhập liệu (Right)
-   - Font Segoe UI 10F đồng nhất, không chữ to chữ nhỏ
-   - Tiếng Việt hiển thị đầy đủ, không lỗi encoding
-   - Button layout: Thêm | Sửa | Làm mới | Xóa
-
-   Security:
-   - ExecuteSqlInterpolatedAsync (SQL injection safe)
-   - Explicit ENUM casting (::voucher_type, ::voucher_status)
-   - Audit trail (ai làm gì, lúc nào)
-   - Short-lived DbContext
-
-✅ 13. frmSalesReport ⭐
-   File: frmSalesReport.cs (~690 dòng)
+✅ 13. frmOrders ⭐
+   File: frmOrders.cs
    Status: 10/10 - PRODUCTION READY
    Features:
-   - Báo cáo doanh thu theo khoảng ngày tùy chọn
-   - Quick filters: Hôm nay, 7 ngày, 30 ngày
-   - 8 KPI cards (Tổng doanh thu, Tổng đơn hàng, TB/đơn, Giảm giá, Chờ xử lý, Đã hủy, Khách hàng, TB/KH)
-   - Doanh thu theo ngày (Daily Revenue với thứ trong tuần)
-   - Thanh toán theo phương thức (Payment Breakdown với tỷ lệ %)
-   - Hiệu suất sản phẩm (Top 20 products theo số lượng & doanh thu)
-   - Thống kê đơn hàng theo trạng thái
-   - Phân bố giờ cao điểm (Hourly Distribution 6h-22h với bar chart)
-   - Top 5 khách hàng chi tiêu nhiều nhất
-   - Export báo cáo ra CSV (UTF-8 encoding)
-   - Short-lived DbContext (using pattern)
-   - AsNoTracking() cho tất cả read queries
-   - Loading indicators
-   - Keyboard navigation (Enter → filter)
-   - Không GDI leak (tất cả fonts được dispose)
-
-   Reports:
-   - 📊 Daily Revenue (Ngày, Thứ, SL đơn, Doanh thu)
-   - 💳 Payment Breakdown (Phương thức, Số GD, Tổng, TB, Tỷ lệ %)
-   - 🏆 Product Performance (Top 20, Xếp hạng, SL, Doanh thu, Giá TB)
-   - 📈 Order Statistics (Theo trạng thái, Dine-in vs Delivery)
-   - ⏰ Hourly Distribution (6h-22h, Bar chart visualization ███)
-   - 👥 Customer Analytics (Top 5 KH chi tiêu)
-
-   UI/UX:
-   - Color-coded KPIs (Green=Revenue, Blue=Orders, Purple=Avg, Red=Discount)
-   - Medal ranking system (🥇🥈🥉)
-   - Hourly bar chart visualization (███)
-   - Peak hour highlighting
-   - CSV export với UTF-8 encoding
-   - Two-panel layout (Left: Reports, Right: Stats)
-   - Full HD 1920x1060, Maximized
-   - AutoSizeColumnsMode = Fill
-   - Row height 35px, Font 10F + Padding 8px
-
-   Security:
-   - Short-lived DbContext
-   - AsNoTracking() cho read queries
-   - Proper font disposal on form close
-
-✅ 14. frmAuditLog ⭐
-   File: frmAuditLog.cs (~900 dòng)
-   Status: 10/10 - PRODUCTION READY
-   Features:
-   - Xem lịch sử hành động (INSERT/UPDATE/DELETE/PASSWORD_CHANGE)
-   - Filter: Date range, Action, Table, User
-   - Tìm kiếm theo username, action, table, IP
-   - Color-coded actions (Insert=Xanh, Update=Vàng, Delete=Đỏ, Password=Xanh dương)
-   - Double-click xem chi tiết với Material Design cards
-   - JSON viewer dark theme (VS Code style)
-   - Export audit log ra CSV
-   - Xóa log cũ (>30 ngày)
-   - Pagination (max 500 records)
-   - Short-lived DbContext (using pattern)
-   - Loading indicators
-   - Keyboard navigation (Enter → filter)
-
-   UI/UX:
-   - FlowLayoutPanel - không bị dính/chồng
-   - Header với icon circle + gradient effect
-   - Card layout với shadow, accent bars, icon circles
-   - JSON viewer dark theme (#1e1e28 bg, #a6e22e text)
-   - Stats bar hiển thị tổng số bản ghi
-   - Nút Đóng trong footer
-
-   Database:
-   - C# code ghi audit log cho các bảng (thay vì trigger)
-   - Session variables (user_id, client_ip) từ C#
-   - SET app.current_user_id + SET app.client_ip trước mỗi SaveChanges
-   - jsonb column cho new_values/old_values
-
-   Security:
-   - Short-lived DbContext
-   - AsNoTracking() cho read queries
-   - Proper font disposal on form close
-   - Anti-duplicate audit logging (500ms debounce)
-
-=====================================================
-🔜 FORM CHƯA HOÀN THÀNH (2/18)
-=====================================================
-
-🔜 15. frmPOS ⭐ (QUAN TRỌNG NHẤT)
-   Tables: orders, order_details, order_toppings
-   Features:
-   - Tạo đơn hàng
-   - Custom: size, đường, đá, toppings
+   - Tạo đơn hàng với customization (size, đường, đá, toppings)
+   - Áp dụng voucher discount
+   - Transaction wrapping cho order save
    - Tính tiền real-time
+   - Audit logging
 
-🔜 16. frmPayment ⭐ (QUAN TRỌNG NHẤT)
-   Tables: orders, payments
+✅ 14. frmOrderHistory ⭐
+   File: frmOrderHistory.cs
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - Lịch sử đơn hàng
+   - Search, filter theo trạng thái, ngày
+   - Xem chi tiết đơn hàng
+   - Resume held orders
+
+✅ 15. frmPayment ⭐
+   File: frmPayment.cs
+   Status: 10/10 - PRODUCTION READY
    Features:
    - Xử lý thanh toán
-   - Multiple payment methods
-   - In hóa đơn
+   - Multiple payment methods (tiền mặt, QR, thẻ)
+   - Tính tiền thừa
+   - Hiển thị voucher discount
 
-=====================================================
-⏳ FORM CHƯA LÀM (0/18)
-=====================================================
+✅ 16. frmSalesReport ⭐
+   File: frmSalesReport.cs
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - Báo cáo doanh thu theo khoảng ngày
+   - Quick filters: Hôm nay, 7 ngày, 30 ngày, Tất cả
+   - 8 KPI cards
+   - Doanh thu theo ngày, theo giờ
+   - Top products, top customers
+   - Export CSV
+   - Timezone fix (UTC ↔ Local)
 
-(Tất cả form core đã hoàn thành!)
+✅ 17. frmAuditLog ⭐
+   File: frmAuditLog.cs
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - Xem lịch sử hành động
+   - Filter: Date range, Action, Table, User
+   - Double-click xem chi tiết JSON
+   - Export audit log ra CSV
+
+✅ 18. frmPOS ⭐
+   File: frmPOS.cs
+   Status: 10/10 - PRODUCTION READY
+   Features:
+   - Point of Sale interface
+   - Tạo đơn hàng nhanh
+   - Custom: size, đường, đá, toppings
 
 =====================================================
 🔐 PASSWORD SECURITY (BCrypt) - PRODUCTION READY
@@ -540,69 +226,8 @@ Tiến độ: 16/18 forms (89%) ✅
 - Constant-time comparison
 - OWASP compliant
 
-✅ Migration Strategy:
-- ✅ Dual column: password_hash + password (legacy)
-- ✅ Auto-migrate: Plain text → BCrypt (first login)
-- ✅ Plain-text storage REMOVED from new code
-- ✅ Only password_hash is updated now
-
-✅ Login Flow:
-1. Check password_hash (BCrypt)
-2. If exists → BCrypt.Verify()
-3. If not → Check password (plain text - legacy)
-4. If match → Auto hash → Save → Success!
-
-✅ Change Password Flow:
-1. Verify current (BCrypt)
-2. Hash new password (BCrypt work=12)
-3. Update password_hash (BCrypt only)
-4. No plain-text storage
-
 =====================================================
-📝 HƯỚNG DẪN CODE FORM MỚI
-=====================================================
-
-1. Tạo form mới:
-   - Add → Windows Form
-   - Đặt tên: frm<Tên>.cs (ví dụ: frmProducts.cs)
-
-2. Cấu trúc code (theo frmCategories):
-   #region Constructor & Initialization
-   #region Data Loading & Display
-   #region Event Handlers
-   #region Form Data Management
-   #region Image Handling (nếu có)
-   #region Search Functionality (nếu có)
-   #region Toolbar Actions
-   #region Database Operations
-   #region Helper Methods
-
-3. Checklist khi làm form:
-   [ ] Load data
-   [ ] Hiển thị DataGridView
-   [ ] Thêm mới
-   [ ] Sửa
-   [ ] Xóa (có confirm)
-   [ ] Tìm kiếm
-   [ ] Validation
-   [ ] Error handling
-   [ ] Loading indicator
-   [ ] Security (nếu upload file)
-
-4. Security checklist:
-   [ ] Path traversal validation
-   [ ] File size limit (nếu upload)
-   [ ] Extension whitelist (nếu upload)
-   [ ] SQL injection safe (dùng EF Core)
-   [ ] Null checks
-
-5. Update file này:
-   - Đánh dấu ✅ khi hoàn thành
-   - Note features đã làm
-   - Note issues (nếu có)
-
-=====================================================
-QUY ƯỚC CODE
+📝 QUY ƯỚC CODE
 =====================================================
 
 Đặt tên:
@@ -620,68 +245,19 @@ Code style:
 - Try-catch với friendly messages (Vietnamese)
 - Validation trước khi save
 - Dùng #region để organize code
-- Comments khi cần thiết
-- Friendly error messages với emoji
-
-Best Practices (Implemented):
-- ✅ Short-lived DbContext (using pattern) - ALL forms
-- ✅ No Application.DoEvents() - use Refresh() instead
-- ✅ AsNoTracking() for read-only queries
-- ✅ Keyboard navigation (Enter key) for all forms
-- ✅ Password strength indicators
-- ✅ Consistent DataGridView styling
-- ✅ No plain-text password storage (temporary for constraint)
-- ✅ Loading indicators with proper async
-- ✅ Editable date fields where appropriate
-- ✅ ComboBox naming: cb (không phải cbo)
-- ✅ CellFormatting wired in Designer (no memory leak)
-- ✅ Spam-proof connection handling (Max Auto Prepare=0)
-- ✅ Audit logging cho tất cả CRUD operations
-- ✅ Anti-duplicate audit (500ms debounce + lock)
-- ✅ JSON format for audit new_values (jsonb compatible)
-- ✅ Raw SQL với ENUM casting (::type) khi cần
+- Short-lived DbContext (using pattern)
+- AsNoTracking() cho read-only queries
 
 Security checklist:
 - ✅ Path traversal validation
 - ✅ File size limit (nếu upload)
 - ✅ Extension whitelist (nếu upload)
 - ✅ SQL injection safe (dùng EF Core)
-- ✅ Null checks
 - ✅ BCrypt password hashing
-- ✅ No plain-text secrets
 - ✅ Audit trail cho mọi thay đổi dữ liệu
+- ✅ Transaction wrapping cho order save
 
 =====================================================
-AUDIT LOGGING - FULL INTEGRATION
-=====================================================
-
-✅ Completed (10/10 forms):
-- frmTables (INSERT, UPDATE, DELETE)
-- frmToppings (INSERT, UPDATE, DELETE, SOFT_DELETE)
-- frmCategories (INSERT, UPDATE, DELETE)
-- frmCustomers (INSERT, UPDATE, DELETE)
-- frmProducts (INSERT, UPDATE, DELETE, SOFT_DELETE)
-- frmUsers (INSERT, UPDATE, DELETE)
-- frmMemberships (INSERT, UPDATE, DELETE)
-- frmVouchers (INSERT, UPDATE, DELETE)
-- frmChangePassword (PASSWORD_CHANGE)
-- frmAuditLog (Viewer - không cần log)
-
-Audit log features:
-- ✅ Thread-safe với lock + 500ms debounce
-- ✅ JSON format cho new_values (jsonb compatible)
-- ✅ User tracking (userId, IP address)
-- ✅ Short-lived DbContext
-- ✅ Silent error handling (catch & ignore)
-
-Database note:
-- ❌ Đã xóa PostgreSQL trigger audit (bị duplicate)
-- ✅ Chỉ còn C# code ghi audit_logs
-- ✅ Mỗi hành động → 1 bản ghi duy nhất
-
-=====================================================
-CẬP NHẬT CUỐI: April 7, 2026 - 16/18 forms (89%) ✅
-frmProducts, frmToppings, frmTables hoàn thành 10/10 ⭐
-Audit logging tích hợp toàn bộ 10 forms ✅
-.gitignore cleaned - no bin/obj conflicts ✅
+CẬP NHẬT CUỐI: April 9, 2026 - 18/18 forms (100%) 🎉
+HOÀN THÀNH TOÀN BỘ DỰ ÁN ✅
 =====================================================
